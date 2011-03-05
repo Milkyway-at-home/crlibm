@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "crlibm.h"
+#include "crlibm_msvc_hacks.h"
+
 /*
  * Correctly rounded trigpi functions
  *

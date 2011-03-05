@@ -256,5 +256,9 @@ endif()
 
 add_library(crlibm STATIC ${crlibm_src} ${crlibm_headers})
 
+set_target_properties(crlibm PROPERTIES PUBLIC_HEADER crlibm.h)
 
+install(TARGETS crlibm
+        ARCHIVE       DESTINATION lib
+        PUBLIC_HEADER DESTINATION include)
 

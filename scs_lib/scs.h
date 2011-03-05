@@ -41,6 +41,8 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #include <inttypes.h>
 #endif
 
+#include "crlibm_msvc_hacks.h"
+
 
 
 /* 64 bit arithmetic may be standardised, but people still do want they want */
