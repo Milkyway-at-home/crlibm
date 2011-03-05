@@ -68,7 +68,7 @@ set(crlibm_src crlibm_private.c
 #                    atan_fast.h
 #                    atan_accurate.h
 #                    csh_fast.h
-
+#
 #                    # headers missing from cmake one
 #                    log.h
 #                    trigpi.h
@@ -92,7 +92,7 @@ set(crlibm_src crlibm_private.c
 # 	             atan_fast.c
 #                atan_accurate.c
 #                csh_fast.c
-
+#
 #                # source missing from cmake one
 #                triple-double.c
 #  	             log.c
@@ -114,8 +114,6 @@ set(scs_lib_headers scs_lib/tests/tbx_timing.h)
 
 list(APPEND crlibm_src ${scs_lib_src})
 list(APPEND crlibm_headers ${scs_lib_headers})
-
-add_library(crlibm STATIC ${crlibm_src} ${crlibm_headers})
 
 check_include_file(fenv.h HAVE_FENV_H)
 check_include_file(float.h HAVE_FLOAT_H)
@@ -173,6 +171,14 @@ endif()
 
 option(ENABLE_SSE2 "Enable SSE2" ON)
 
+if(NOT MSVC)
+  set(SSE2_FLAGS "-mfpmath=sse -msse -msse2")
+else()
+  set(SSE2_FLAGS "${CMAKE_C_FLAGS} /arch:SSE2")
+endif()
+
+
+
 option(ENABLE_DOUBLE_EXTENDED "Enable double-extended optimised versions of functions if hardware supports it" ON)
 
 
@@ -202,7 +208,12 @@ add_test(cosh ${TEST_DIR}/blind_test ${TEST_DIR}/cosh.testdata)
 # First check the host processor
 
 if(CMAKE_SYSTEM_PROCESSOR MATCHES i*86|k6|k7|pentium*|athlon*)
-  add_definitions(-DCRLIBM_TYPECPU_X86)
+    # CMAKE_SYSTEM_PROCESSOR is unfortunately still i386 on 64 bit OS X
+  if(CMAKE_SIZEOF_VOID_P EQUAL 8) # 64-bit
+    add_definitions(-DCRLIBM_TYPECPU_AMD64)
+  else()
+    add_definitions(-DCRLIBM_TYPECPU_X86)
+  endif()
 endif()
 
 if(CMAKE_SYSTEM_PROCESSOR MATCHES alpha)
@@ -226,13 +237,19 @@ if(CMAKE_SYSTEM_PROCESSOR MATCHES ia64)
 endif()
 
 
+if(ENABLE_SSE2)
+  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${SSE2_FLAGS}")
+endif()
 
 
 option(BUILD_INTERVAL_FUNCTIONS "Something" OFF)
 
 
-
 configure_file (
   "${PROJECT_SOURCE_DIR}/crlibm_config.h.in"
   "${PROJECT_SOURCE_DIR}/crlibm_config.h")
+
+add_library(crlibm STATIC ${crlibm_src} ${crlibm_headers})
+
+
 
