@@ -18,6 +18,7 @@ endif()
 # What was in the autotools
 set(crlibm_headers crlibm.h
                    crlibm_private.h
+                   crlibm_msvc_hacks.h
                    triple-double.h
 	               exp-td.h
 	               expm1.h
@@ -248,6 +249,10 @@ option(BUILD_INTERVAL_FUNCTIONS "Something" OFF)
 configure_file (
   "${PROJECT_SOURCE_DIR}/crlibm_config.h.in"
   "${PROJECT_SOURCE_DIR}/crlibm_config.h")
+
+if(MSVC)
+  set_property(SOURCE ${crlibm_src} PROPERTY LANGUAGE CXX)
+endif()
 
 add_library(crlibm STATIC ${crlibm_src} ${crlibm_headers})
 

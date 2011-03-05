@@ -16,10 +16,19 @@
  *
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 #include <stdio.h>
 #include <stdlib.h>
+
+#if defined(_MSC_VER) || defined(__MINGW32__)
+#include <float.h>
+#endif /* defined(_MSC_VER) || defined(__MINGW32__) */
+
+#ifdef _MSC_VER
+#pragma fenv_access (on)
+#endif /* _MSC_VER */
+
 #include "crlibm.h"
 #include "crlibm_private.h"
 
@@ -58,23 +67,38 @@
 unsigned long long crlibm_init() {
 #ifndef CRLIBM_TYPEOS_BSD
 #if defined(CRLIBM_HAS_FPU_CONTROL) && (defined(CRLIBM_TYPECPU_X86) || defined(CRLIBM_TYPECPU_AMD64))
+
+#if defined(_MSC_VER) || defined(__MINGW32__)
+  unsigned int oldcw, cw;
+
+  /* CHECKME */
+  oldcw = _controlfp(0, 0);
+  _controlfp(_PC_53, MCW_PC);
+
+  return (unsigned long long) oldcw;
+
+#elif defined(__SUNPRO_C)  /* Sun Studio  */
   unsigned short oldcw, cw;
 
-#if 1 /* gcc */
-  /* save old state */
+  __asm__ ("movw    $639, -22(%ebp)");
+  __asm__ ("fldcw -22(%ebp)");
+
+  return (unsigned long long) oldcw;
+
+#else /* GCC, clang */
+  unsigned short oldcw, cw;
+
+    /* save old state */
   _FPU_GETCW(oldcw);
-  /* Set FPU flags to use double, not double extended, 
-     with rounding to nearest */  
+  /* Set FPU flags to use double, not double extended,
+     with rounding to nearest */
   cw = (_FPU_DEFAULT & ~_FPU_EXTENDED)|_FPU_DOUBLE;
   _FPU_SETCW(cw);
   return (unsigned long long) oldcw;
-#else  /* Sun Studio  */
-  __asm__ ("movw    $639, -22(%ebp)");
-  __asm__ ("fldcw -22(%ebp)");
 #endif
 
 
-#elif defined(CRLIBM_TYPECPU_ITANIUM) 
+#elif defined(CRLIBM_TYPECPU_ITANIUM)
   /* On Itanium we assume that SF2 is used fo speculation, and use only SF3 */
 
   unsigned long long int  old_fpsr;
@@ -102,10 +126,16 @@ unsigned long long crlibm_init() {
 void crlibm_exit(unsigned long long int oldcw) {
 #ifndef CRLIBM_TYPEOS_BSD
 #if (defined(CRLIBM_TYPECPU_X86) || defined(CRLIBM_TYPECPU_AMD64))
-  /* Set FPU flags to use double, not double extended, 
+
+#ifndef _MSC_VER
+  /* Set FPU flags to use double, not double extended,
      with rounding to nearest */
   unsigned short t = (unsigned short)oldcw;
   _FPU_SETCW(t);
+#else
+  _controlfp(oldcw, 0xfffff);
+#endif /* _MSC_VER */
+
 #endif
 #endif
 }
