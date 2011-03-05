@@ -1,6 +1,6 @@
 /*
  *  crlibm_private.h
- *  
+ *
  * This file contains useful tools and data for the crlibm functions.
  *
  */
@@ -23,21 +23,21 @@
 
 
 #if (defined(CRLIBM_TYPECPU_X86) || defined(CRLIBM_TYPECPU_AMD64))
-# ifdef CRLIBM_HAS_FPU_CONTROL
-#  include <fpu_control.h>
+#  if HAVE_FPU_CONTROL_H
+#    include <fpu_control.h>
+#  endif
 #  ifndef _FPU_SETCW
 #   define _FPU_SETCW(cw) __asm__ ("fldcw %0" : : "m" (*&cw))
 #  endif
 #  ifndef _FPU_GETCW
 #   define _FPU_GETCW(cw) __asm__ ("fnstcw %0" : "=m" (*&cw))
 #  endif
-# endif
 #endif
 
 /* 64 bit arithmetic may be standardised, but people still do what they want */
 #ifdef HAVE_INTTYPES_H
 #define ULL(bits) 0x##bits##uLL
-#elif defined(_WIN32) 
+#elif defined(_WIN32)
 /*  Windows garbage there */
 typedef long long int int64_t;
 typedef unsigned long long int uint64_t;
@@ -68,7 +68,7 @@ multiplications of the Dekker family may be either defined as
 functions, or as #defines.  Which one is better depends on the
 processor/compiler/OS.  As #define has to be used with more care (not
 type-safe), the two following variables should  be set to 1 in the
-development/debugging phase, until no type warning remains.  
+development/debugging phase, until no type warning remains.
 
 */
 
@@ -77,12 +77,12 @@ development/debugging phase, until no type warning remains.
 #define SQRT_AS_FUNCTIONS 0
 
 /* The conditional version of the Add12 can be implemented either
-   using 3 floating point additions, a absolute value test and 
+   using 3 floating point additions, a absolute value test and
    a branch or using 6 floating point additions but no branch.
-   The Add22 sequence is similar. 
+   The Add22 sequence is similar.
    The branchless versions might be faster on some systems.
 
-   The function versions of Add12Cond and Add22Cond are not 
+   The function versions of Add12Cond and Add22Cond are not
    implemented in branchless versions.
 */
 
@@ -106,12 +106,12 @@ extern int crlibm_second_step_taken;
 /* extern void exp_SC(scs_ptr res_scs, double x);*/
 
 
- 
+
 
 
 /*
  * i = d in rounding to nearest
-  The constant added is 2^52 + 2^51 
+  The constant added is 2^52 + 2^51
  */
 #define DOUBLE2INT(_i, _d)       \
   {db_number _t;              \
@@ -136,7 +136,7 @@ extern int crlibm_second_step_taken;
 
 /* Macros for the rounding tests in directed modes */
 /* After Evgeny Gvozdev pointed out a bug in the rounding procedures I
-   decided to centralize them here 
+   decided to centralize them here
 
 Note that these tests launch the accurate phase when yl=0, in
 particular in the exceptional cases when the image of a double is a
@@ -286,7 +286,7 @@ All this does not work for denormals, of course
 
 /* If the processor has a FMA, use it !   **/
 
-/* All this probably works only with gcc. 
+/* All this probably works only with gcc.
    See Markstein book for the case of HP's compiler */
 
 #if defined(CRLIBM_TYPECPU_POWERPC) && defined(__GNUC__)
@@ -319,10 +319,10 @@ All this does not work for denormals, of course
 
 
 
-/* On the Itanium 1 / gcc3.2 we lose 10 cycles when using the FMA !?! 
-   It probably breaks the scheduling algorithms somehow... 
+/* On the Itanium 1 / gcc3.2 we lose 10 cycles when using the FMA !?!
+   It probably breaks the scheduling algorithms somehow...
    To test again with higher gcc versions
-*/ 
+*/
 
 #if defined(CRLIBM_TYPECPU_ITANIUM) && defined(__GNUC__)  && !defined(__INTEL_COMPILER) && 0
 #define PROCESSOR_HAS_FMA 1
@@ -353,7 +353,7 @@ All this does not work for denormals, of course
 
 
 
-#if defined(CRLIBM_TYPECPU_ITANIUM) && defined(__INTEL_COMPILER) 
+#if defined(CRLIBM_TYPECPU_ITANIUM) && defined(__INTEL_COMPILER)
 #define PROCESSOR_HAS_FMA 1
 #if 0 /* Commented out because it shouldn't be there: There should be
 	 a standard #include doing all this, but as of april 2005
@@ -385,11 +385,11 @@ typedef enum {
 #endif
 
 #define FMA(a,b,c)  /* r = a*b + c*/                 \
-   _Asm_fma( 2/*_PC_D*/, a, b, c, 0/*_SF0*/ );              
+   _Asm_fma( 2/*_PC_D*/, a, b, c, 0/*_SF0*/ );
 
 
 #define FMS(a,b,c)  /* r = a*b - c*/                 \
-   _Asm_fms( 2/*_PC_D*/, a, b, c, 0/*_SF0*/);              
+   _Asm_fms( 2/*_PC_D*/, a, b, c, 0/*_SF0*/);
 
 #endif /*defined(CRLIBM_TYPECPU_ITANIUM) && defined(__INTEL_COMPILER)*/
 
@@ -441,7 +441,7 @@ extern const scs scs_zer, scs_half, scs_one, scs_two, scs_sixinv;
 
 
 /*
- * computes s and r such that s + r = a + b,  with s = a @+ b exactly 
+ * computes s and r such that s + r = a + b,  with s = a @+ b exactly
  */
 #if AVOID_BRANCHES
 #define Add12Cond(s, r, a, b)      \
@@ -466,22 +466,22 @@ extern const scs scs_zer, scs_half, scs_one, scs_two, scs_sixinv;
            r = _b - _z;            \
          }else {                   \
            _z = s - _b;            \
-           r = _a - _z;}}                          
+           r = _a - _z;}}
 #endif
 
 /*
- *  computes s and r such that s + r = a + b,  with s = a @+ b exactly 
+ *  computes s and r such that s + r = a + b,  with s = a @+ b exactly
  * under the condition  a >= b
  */
 #define Add12(s, r, a, b)          \
         {double _z, _a=a, _b=b;    \
          s = _a + _b;              \
          _z = s - _a;              \
-         r = _b - _z;   }            
+         r = _b - _z;   }
 
 
 /*
- * computes r1, r2, r3 such that r1 + r2 + r3 = a + b + c exactly 
+ * computes r1, r2, r3 such that r1 + r2 + r3 = a + b + c exactly
  */
 #define Fast3Sum(r1, r2, r3, a, b,  c) \
         {double u, v, w;               \
@@ -498,7 +498,7 @@ extern const scs scs_zer, scs_half, scs_one, scs_two, scs_sixinv;
 /*
  * Functions to computes double-double addition: zh+zl = xh+xl + yh+yl
  * knowing that xh>yh
- * relative error is smaller than 2^-103 
+ * relative error is smaller than 2^-103
  */
 
 
@@ -517,7 +517,7 @@ do {                                                                            
   _v3 = (xl) + (yl);                                                                   \
   _v4 = _v2 + _v3;                                                                     \
   Add12((*(zh)),(*(zl)),_v1,_v4);                                                      \
-} while (2+2==5) 
+} while (2+2==5)
 #else
 #define Add22Cond(zh,zl,xh,xl,yh,yl)                                                   \
 do {                                                                                   \
@@ -528,7 +528,7 @@ do {                                                                            
   *zl = (_r - (*zh)) + _s;                                                             \
 } while(2+2==5)
 #endif
-  
+
 
 #define Add22(zh,zl,xh,xl,yh,yl)         \
 do {                                     \
@@ -566,7 +566,7 @@ double ph, pl;                                        \
 
 
 /* besides we don't care anymore about overflows in the mult  */
-#define Mul12Cond Mul12    
+#define Mul12Cond Mul12
 #define Mul22cond Mul22
 
 
@@ -580,7 +580,7 @@ extern void Mul22(double *zh, double *zl, double xh, double xl, double yh, doubl
 #else /* if DEKKER_AS_FUNCTIONS  */
 /*
  * computes rh and rl such that rh + rl = a * b with rh = a @* b exactly
- * under the conditions : a < 2^970 et b < 2^970 
+ * under the conditions : a < 2^970 et b < 2^970
  */
 #if 1
 #define Mul12(rh,rl,u,v)                        \
@@ -595,7 +595,7 @@ extern void Mul22(double *zh, double *zl, double xh, double xl, double yh, doubl
   *rh = _u*_v;                                  \
   *rl = (((u1*v1-*rh)+(u1*v2))+(u2*v1))+(u2*v2);\
 }
-#else 
+#else
 /* This works but is much slower. Problem:
  SSE2 instructions are two-address, and intrinsincs are 3-address  */
 #include<emmintrin.h>
@@ -657,9 +657,9 @@ extern void Mul22(double *zh, double *zl, double xh, double xl, double yh, doubl
  * computes double-double multiplication: zh+zl = (xh+xl) *  (yh+yl)
  * relative error is smaller than 2^-102
  */
-  
 
-  
+
+
 #define Mul22(zh,zl,xh,xl,yh,yl)                      \
 {                                                     \
 double mh, ml;                                        \
@@ -712,8 +712,8 @@ double mh, ml;                                        \
     Add12((*(resh)),(*(resl)),_t3,_t8);              \
 }
 
-/* Eps MulAdd212 <= 2^-100 
-   for |(ah + bh) * (bh + bl)| <= 1/4 * |ch + cl| 
+/* Eps MulAdd212 <= 2^-100
+   for |(ah + bh) * (bh + bl)| <= 1/4 * |ch + cl|
 */
 #define MulAdd22(resh,resl,ch,cl,ah,al,bh,bl)        \
 {                                                    \
@@ -738,7 +738,7 @@ double mh, ml;                                        \
     Add12(_t1,_t2,(a),(bh));                         \
     _t3 = _t2 + (bl);                                \
     Add12((*(resh)),(*(resl)),_t1,_t3);              \
-}    
+}
 
 #define Add122Cond(resh,resl,a,bh,bl)                \
 {                                                    \
@@ -747,7 +747,7 @@ double mh, ml;                                        \
     Add12Cond(_t1,_t2,(a),(bh));                     \
     _t3 = _t2 + (bl);                                \
     Add12((*(resh)),(*(resl)),_t1,_t3);              \
-}    
+}
 
 
 #define Add212(resh,resl,ah,al,b)                    \
@@ -780,19 +780,19 @@ extern void Div22(double *z, double *zz, double x, double xx, double y, double y
 
 
 
-/* 
+/*
    Coefficients for 1/sqrt(m) with 1/2 < m < 2
    The corresponding relative polynomial approximation error is less than
    eps < 2^(-8.3127) (cf. Maple file)
    The Itanium instruction frsqrta is slightly more accurate; it can
    therefore easily replace the polynomial evaluation.
 */
-   
-#define SQRTPOLYC0 2.50385236695888790947606139525305479764938354492188e+00   
-#define SQRTPOLYC1 -3.29763389114324168005509818613063544034957885742188e+00  
-#define SQRTPOLYC2 2.75726076139124520736345402838196605443954467773438e+00   
-#define SQRTPOLYC3 -1.15233725777933848632983426796272397041320800781250e+00  
-#define SQRTPOLYC4 1.86900066679800969104974228685023263096809387207031e-01   
+
+#define SQRTPOLYC0 2.50385236695888790947606139525305479764938354492188e+00
+#define SQRTPOLYC1 -3.29763389114324168005509818613063544034957885742188e+00
+#define SQRTPOLYC2 2.75726076139124520736345402838196605443954467773438e+00
+#define SQRTPOLYC3 -1.15233725777933848632983426796272397041320800781250e+00
+#define SQRTPOLYC4 1.86900066679800969104974228685023263096809387207031e-01
 #define SQRTTWO52 4.50359962737049600000000000000000000000000000000000e+15
 
 #if SQRT_AS_FUNCTIONS
@@ -965,9 +965,9 @@ extern void sqrt12(double *resh, double *resl, double x);
   } /* End: special case 0 */                                                                \
 }
 
-/* 
-   sqrt12_64_unfiltered = sqrt(x) * (1 + eps) where abs(eps) <= 2^(-64) 
-   
+/*
+   sqrt12_64_unfiltered = sqrt(x) * (1 + eps) where abs(eps) <= 2^(-64)
+
    if x is neither subnormal nor 0
 
 */

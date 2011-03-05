@@ -1,26 +1,32 @@
 
-ADD_EXECUTABLE(blindtest blind_test.c test_common.c)
+find_package(GMP)
+find_package(MPFR)
+
+if(LIBGMP_FOUND)
+  include_directories(${LIBGMP_INCLUDE_DIR})
+  add_definitions(-DHAVE_GMP_H)
+endif()
+
+if(LIBMPFR_FOUND)
+  include_directories(${LIBMPFR_INCLUDE_DIR})
+  add_definitions(-DHAVE_MPFR_H)
+endif()
 
 
-FIND_PATH(INTTYPES_H
-	  inttypes.h
-	  /usr/include/ /usr/local/include/
-	  DOC "C99 file that defines int32_t, int64_t, etc"
-)
 
-IF(INTTYPES_H)
-  ADD_DEFINITIONS(-DHAVE_INTTYPES_H)
-  INCLUDE_DIRECTORIES(${INTTYPES_H})
-ENDIF(INTTYPES_H)
+add_executable(blind_test blind_test.c test_common.c)
+
+if(LIBGMP_FOUND)
+  target_link_libraries(blind_test ${LIBGMP_LIB})
+endif()
+
+if(LIBMPFR_FOUND)
+  target_link_libraries(blind_test ${LIBMPFR_LIB})
+endif()
 
 
+include_directories(${PROJECT_SOURCE_DIR})
 
-FIND_PATH(CRLIBM_H  crlibm.h  ../ )
-IF(CRLIBM_H)
-  INCLUDE_DIRECTORIES(${CRLIBM_H})
-ENDIF(CRLIBM_H)
+link_directories(${PROJECT_SOURCE_DIR})
+target_link_libraries(blind_test crlibm)
 
-FIND_LIBRARY(CRLIBM_LIB NAMES crlibm ../ )
-IF(CRLIBM_LIB)
-  LINK_DIRECTORIES(${CRLIBM_LIB})
-ENDIF(CRLIBM_LIB)
