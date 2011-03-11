@@ -28,5 +28,5 @@ endif()
 include_directories(${PROJECT_SOURCE_DIR})
 
 link_directories(${PROJECT_SOURCE_DIR})
-target_link_libraries(blind_test crlibm)
+target_link_libraries(blind_test crlibm m)
 
