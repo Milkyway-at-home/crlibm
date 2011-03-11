@@ -1,12 +1,12 @@
-/* 
- *this function computes log, correctly rounded, 
+/*
+ *this function computes log, correctly rounded,
  using  double-extended arithmetic
 
  THIS IS EXPERIMENTAL SOFTWARE
 
 In particular it changes rounding modes all the time without warning
 nor restoring.
- 
+
  *
  * Author :  Florent de Dinechin
  * Florent.de.Dinechin at ens-lyon.fr
@@ -21,7 +21,7 @@ icc -DHAVE_CONFIG_H  -Qoption,cpp,--extended_float_types \
                     -IPF_fp_speculationsafe -c log-de.c;\
  mv log-de.o log-td.o; make
 
- 
+
 */
 
 
@@ -35,8 +35,8 @@ icc -DHAVE_CONFIG_H  -Qoption,cpp,--extended_float_types \
 
 static void log_accurate(double_ext* prh, double_ext* prl, double_ext z, int E, int index) {
 
-double_ext  eh,el,  t13, t12, t11, t10, t9, t8, 
-  p7h,p7l, t7h,t7l, t6h,t6l, t5h,t5l, t4h,t4l, 
+double_ext  eh,el,  t13, t12, t11, t10, t9, t8,
+  p7h,p7l, t7h,t7l, t6h,t6l, t5h,t5l, t4h,t4l,
   t3h,t3l, t2h,t2l, t1h,t1l, t0h,t0l;
 /* Many temporary because single assignment form is nicer for Gappa */
 
@@ -49,10 +49,10 @@ double_ext  eh,el,  t13, t12, t11, t10, t9, t8,
 #if EVAL_PERF
   crlibm_second_step_taken++;
 #endif
-  
+
   /* TODO check the conditions for the double-double ops */
 
- 
+
   PREFETCH_POLY_ACCURATE;
   t13 = c13h + z*c14h;
   t12 = c12h + z*t13;
@@ -73,7 +73,7 @@ double_ext  eh,el,  t13, t12, t11, t10, t9, t8,
   FMA22_ext(&t2h, &t2l,   z,0,   t3h,t3l,    c2h,c2l);
   FMA22_ext(&t1h, &t1l,   z,0,   t2h,t2l,    c1h,c1l);
   FMA22_ext(&t0h, &t0l,   z,0,   t1h,t1l,    argredtable[index].logirh, argredtable[index].logirl);
-  
+
   Mul22_ext(&eh, &el,   log2H,log2L, E, 0);
   Add22_ext(prh, prl,   eh,el,  t0h,t0l);
 }
@@ -100,7 +100,7 @@ double log_rn(double x) {
    xdb.d=x;
 
    index0 = (xdb.i[HI] & 0x000fffff);
-   index = (index0 + (1<<(20-L-1))) >> (20-L); 
+   index = (index0 + (1<<(20-L-1))) >> (20-L);
    E = (xdb.i[HI]>>20)-1023;             /* extract the exponent */
 
    /* Filter cases */
@@ -108,20 +108,20 @@ double log_rn(double x) {
      if (((xdb.i[HI] & 0x7fffffff)|xdb.i[LO])==0)    return -1.0/0.0;  /* log(+/-0) = -Inf */
      if (xdb.i[HI] < 0)                              return (x-x)/0;   /* log(-x) = Nan    */
      /* Else subnormal number */
-     xdb.d *= two64; 	  /* make x a normal number    */ 
+     xdb.d *= two64; 	  /* make x a normal number    */
      E = -64 + (xdb.i[HI]>>20)-1023;             /* extract the exponent */
      index0 = (xdb.i[HI] & 0x000fffff);
-     index = (index0 + (1<<(20-L-1))) >> (20-L); 
+     index = (index0 + (1<<(20-L-1))) >> (20-L);
    }
    if (xdb.i[HI] >= 0x7ff00000)                      return  x+x;      /* Inf or Nan       */
-   
+
    DOUBLE_EXTENDED_MODE;  /* This one should be overlapped with following integer computation */
 
    /* Extract exponent and mantissa */
    xdb.i[HI] =  index0 | 0x3ff00000;	/* do exponent = 0 */
    /* reduce  such that sqrt(2)/2 < xdb.d < sqrt(2) */
    if (index >= MAXINDEX){ /* corresponds to y>sqrt(2)*/
-     xdb.i[HI] -= 0x00100000; 
+     xdb.i[HI] -= 0x00100000;
      index = index & INDEXMASK;
      E++;
 }
@@ -139,9 +139,9 @@ double log_rn(double x) {
      if ((i & ULL(7fffffffffffffff))==0)  return -1.0/0.0;    /* log(+/-0) = -Inf */
      if (i<0)                             return (x-x)/0;     /* log(-x) = Nan    */
      /* Else subnormal number */
-     y *= two64; 	  /* make x a normal number    */ 
+     y *= two64; 	  /* make x a normal number    */
      E = -64;
-     i =  _Asm_getf(2/*_FR_D*/, y); /* and update i */ 
+     i =  _Asm_getf(2/*_FR_D*/, y); /* and update i */
    }
    if (i >= ULL(7ff0000000000000))        return  x+x;	      /* Inf or Nan       */
 
@@ -155,10 +155,10 @@ double log_rn(double x) {
      index = index & INDEXMASK;
      E++;
    }
-   else 
-     y = _Asm_setf(2/*_FR_D*/, i | ULL(3ff0000000000000) ); /* exponent = 0*/   
+   else
+     y = _Asm_setf(2/*_FR_D*/, i | ULL(3ff0000000000000) ); /* exponent = 0*/
 #endif  /* defined(CRLIBM_TYPECPU_X86) || defined(CRLIBM_TYPECPU_AMD64) */
- 
+
 
 
    /* All the previous argument reduction was exact */
@@ -176,26 +176,26 @@ double log_rn(double x) {
 #else
       roundtestmask=ACCURATE_TO_62_BITS;
 #endif
-      
+
 #ifdef ESTRIN
   /* Estrin polynomial evaluation  */
   double_ext z2,z4, p01, p23, p45, p67, p03, p47,p07;
-    
+
   z2  = z*z;      p67 = c6 + z*c7;     p45 = c4 + z*c5;   p23 = c2 + z*c3;    p01 = logirh + z;
-  z4  = z2*z2;    p47 = p45 + z2*p67;  p03 = p01 + z2*p23; 
+  z4  = z2*z2;    p47 = p45 + z2*p67;  p03 = p01 + z2*p23;
   p07 = p03 + z4*p47;
   logde = p07 + E*log2H;
 #endif
-  
+
 #ifdef PATERSON
   double_ext z4,z2,t0,t1,t2,t3,t4,t5,t6,t7,t8;
-  
+
   z2 = z * z;        t1 = z + ps_alpha;   t2 = z + ps_beta;  t3 = c3 * z + c2;  t4 = z + logirh;
-  z4 = z2 * z2;      t5 = z2 + ps_c;      t6 = t3 * z2 + t4;    
-  t7 = t5 * t1 + t2; t0 = z4 * c7;        t8 = t7 * t0 + t6; 
+  z4 = z2 * z2;      t5 = z2 + ps_c;      t6 = t3 * z2 + t4;
+  t7 = t5 * t1 + t2; t0 = z4 * c7;        t8 = t7 * t0 + t6;
   logde = t8 + E*log2H;
 #endif
-  
+
 #if 0 /* to time the first step only */
    BACK_TO_DOUBLE_MODE; return (double)t;
 #endif
@@ -203,12 +203,12 @@ double log_rn(double x) {
 
    /* To test the second step only, comment out the following line */
    DE_TEST_AND_RETURN_RN(logde, roundtestmask);
-   
+
 
    log_accurate(&th, &tl, z, E, index);
-   
+
    BACK_TO_DOUBLE_MODE;
-   
+
    return (double) (th+tl); /* The exact sum of these double-extended is rounded to the nearest */
 }
 
@@ -243,20 +243,20 @@ double log_rd(double x) {
      if (xdb.i[HI] < 0)                              return (x-x)/0;   /* log(-x) = Nan    */
      /* Else subnormal number */
      E = -64; 		
-     xdb.d *= two64; 	  /* make x a normal number    */ 
+     xdb.d *= two64; 	  /* make x a normal number    */
    }
    if (xdb.i[HI] >= 0x7ff00000)                      return  x+x;      /* Inf or Nan       */
-   
+
    DOUBLE_EXTENDED_MODE;  /* This one should be overlapped with following integer computation */
 
    /* Extract exponent and mantissa */
    E += (xdb.i[HI]>>20)-1023;             /* extract the exponent */
    index = (xdb.i[HI] & 0x000fffff);
    xdb.i[HI] =  index | 0x3ff00000;	/* do exponent = 0 */
-   index = (index + (1<<(20-L-1))) >> (20-L); 
+   index = (index + (1<<(20-L-1))) >> (20-L);
    /* reduce  such that sqrt(2)/2 < xdb.d < sqrt(2) */
    if (index >= MAXINDEX){ /* corresponds to y>sqrt(2)*/
-     xdb.i[HI] -= 0x00100000; 
+     xdb.i[HI] -= 0x00100000;
      E++;
    }
    y = xdb.d;
@@ -272,9 +272,9 @@ double log_rd(double x) {
      if ((i & ULL(7fffffffffffffff))==0)  return -1.0/0.0;    /* log(+/-0) = -Inf */
      if (i<0)                             return (x-x)/0;     /* log(-x) = Nan    */
      /* Else subnormal number */
-     y *= two64; 	  /* make x a normal number    */ 
+     y *= two64; 	  /* make x a normal number    */
      E = -64;
-     i =  _Asm_getf(2/*_FR_D*/, y); /* and update i */ 
+     i =  _Asm_getf(2/*_FR_D*/, y); /* and update i */
    }
    if (i >= ULL(7ff0000000000000))        return  x+x;	      /* Inf or Nan       */
 
@@ -287,10 +287,10 @@ double log_rd(double x) {
      y = _Asm_setf(2/*_FR_D*/, (i | ULL(3ff0000000000000)) - ULL(0010000000000000) ); /* exponent = -1 */
      E++;
    }
-   else 
-     y = _Asm_setf(2/*_FR_D*/, i | ULL(3ff0000000000000) ); /* exponent = 0*/   
+   else
+     y = _Asm_setf(2/*_FR_D*/, i | ULL(3ff0000000000000) ); /* exponent = 0*/
 #endif  /* defined(CRLIBM_TYPECPU_X86) || defined(CRLIBM_TYPECPU_AMD64) */
- 
+
    /* All the previous argument reduction was exact */
    /* now y holds 1+f, and E is the exponent */
    index = index & INDEXMASK;
@@ -298,7 +298,7 @@ double log_rd(double x) {
    logirh = argredtable[index].logirh;
    r = (double_ext) (argredtable[index].r); /* approx to 1/y.d */
    z = y*r - 1. ; /* even without an FMA, all exact */
-   
+
    if(E==0)
      roundtestmask=ACCURATE_TO_61_BITS;
    else
@@ -307,21 +307,21 @@ double log_rd(double x) {
 #ifdef ESTRIN
   /* Estrin polynomial evaluation  */
   double_ext z2,z4, p01, p23, p45, p67, p03, p47,p07;
-    
+
   z2  = z*z;              p67 = c6 + z*c7;       p45 = c4 + z*c5;      p23 = c2 + z*c3;    p01 = logirh + z;
-  z4  = z2*z2;            p47 = p45 + z2*p67;    p03 = p01 + z2*p23; 
+  z4  = z2*z2;            p47 = p45 + z2*p67;    p03 = p01 + z2*p23;
   p07 = p03 + z4*p47;
   logde = p07 + E*log2H;
 #endif
-  
+
 #ifdef PATERSON
   double_ext z4,z2,t0,t1,t2,t3,t4,t5,t6,t7,t8;
-  
+
   z2 = z * z;        t1 = z + ps_alpha;        t2 = z + ps_beta;        t3 = c3 * z + c2;        t4 = z + logirh;
-  z4 = z2 * z2;      t5 = z2 + ps_c;           t6 = t3 * z2 + t4;    
-  
-  t7 = t5 * t1 + t2; t0 = z4 * c7;             t8 = t7 * t0 + t6; 
-  
+  z4 = z2 * z2;      t5 = z2 + ps_c;           t6 = t3 * z2 + t4;
+
+  t7 = t5 * t1 + t2; t0 = z4 * c7;             t8 = t7 * t0 + t6;
+
   logde = t8 + E*log2H;
 #endif
 
@@ -370,22 +370,22 @@ double log_ru(double x) {
      if (xdb.i[HI] < 0)                              return (x-x)/0;   /* log(-x) = Nan    */
      /* Else subnormal number */
      E = -64; 		
-     xdb.d *= two64; 	  /* make x a normal number    */ 
+     xdb.d *= two64; 	  /* make x a normal number    */
    }
    if (xdb.i[HI] >= 0x7ff00000)                      return  x+x;      /* Inf or Nan       */
-   
+
    DOUBLE_EXTENDED_MODE;  /* This one should be overlapped with following integer computation */
 
    /* Extract exponent and mantissa */
    E += (xdb.i[HI]>>20)-1023;             /* extract the exponent */
    index = (xdb.i[HI] & 0x000fffff);
    xdb.i[HI] =  index | 0x3ff00000;	/* do exponent = 0 */
-   index = (index + (1<<(20-L-1))) >> (20-L); 
+   index = (index + (1<<(20-L-1))) >> (20-L);
 
    /* reduce  such that sqrt(2)/2 < xdb.d < sqrt(2) */
    if (index >= MAXINDEX){ /* corresponds to y>sqrt(2)*/
      index = index & INDEXMASK;
-     xdb.i[HI] -= 0x00100000; 
+     xdb.i[HI] -= 0x00100000;
      E++;
    }
    y = xdb.d;
@@ -401,9 +401,9 @@ double log_ru(double x) {
      if ((i & ULL(7fffffffffffffff))==0)  return -1.0/0.0;    /* log(+/-0) = -Inf */
      if (i<0)                             return (x-x)/0;     /* log(-x) = Nan    */
      /* Else subnormal number */
-     y *= two64; 	  /* make x a normal number    */ 
+     y *= two64; 	  /* make x a normal number    */
      E = -64;
-     i =  _Asm_getf(2/*_FR_D*/, y); /* and update i */ 
+     i =  _Asm_getf(2/*_FR_D*/, y); /* and update i */
    }
    if (i >= ULL(7ff0000000000000))        return  x+x;	      /* Inf or Nan       */
 
@@ -417,40 +417,40 @@ double log_ru(double x) {
      index = index & INDEXMASK;
      E++;
    }
-   else 
-     y = _Asm_setf(2/*_FR_D*/, i | ULL(3ff0000000000000) ); /* exponent = 0*/   
+   else
+     y = _Asm_setf(2/*_FR_D*/, i | ULL(3ff0000000000000) ); /* exponent = 0*/
 #endif  /* defined(CRLIBM_TYPECPU_X86) || defined(CRLIBM_TYPECPU_AMD64) */
- 
+
    /* All the previous argument reduction was exact */
    /* now y holds 1+f, and E is the exponent */
-   
+
    logirh = argredtable[index].logirh;
    r = (double_ext) (argredtable[index].r); /* approx to 1/y.d */
    z = y*r - 1. ; /* even without an FMA, all exact */
-   
+
    if(E==0)
      roundtestmask=ACCURATE_TO_61_BITS;
    else
      roundtestmask=ACCURATE_TO_62_BITS;
-   
+
 #ifdef ESTRIN
   /* Estrin polynomial evaluation  */
   double_ext z2,z4, p01, p23, p45, p67, p03, p47,p07;
-    
+
   z2  = z*z;              p67 = c6 + z*c7;       p45 = c4 + z*c5;      p23 = c2 + z*c3;    p01 = logirh + z;
-  z4  = z2*z2;            p47 = p45 + z2*p67;    p03 = p01 + z2*p23; 
+  z4  = z2*z2;            p47 = p45 + z2*p67;    p03 = p01 + z2*p23;
   p07 = p03 + z4*p47;
   logde = p07 + E*log2H;
 #endif
-  
+
 #ifdef PATERSON
   double_ext z4,z2,t0,t1,t2,t3,t4,t5,t6,t7,t8;
-  
+
   z2 = z * z;        t1 = z + ps_alpha;        t2 = z + ps_beta;        t3 = c3 * z + c2;        t4 = z + logirh;
-  z4 = z2 * z2;      t5 = z2 + ps_c;           t6 = t3 * z2 + t4;    
-  
-  t7 = t5 * t1 + t2; t0 = z4 * c7;             t8 = t7 * t0 + t6; 
-  
+  z4 = z2 * z2;      t5 = z2 + ps_c;           t6 = t3 * z2 + t4;
+
+  t7 = t5 * t1 + t2; t0 = z4 * c7;             t8 = t7 * t0 + t6;
+
   logde = t8 + E*log2H;
 #endif
 
@@ -459,7 +459,7 @@ double log_ru(double x) {
    BACK_TO_DOUBLE_MODE; return (double)t;
 #endif
 
-   
+
    /* To test the second step only, comment out the following line */
    DE_TEST_AND_RETURN_RU(logde, roundtestmask);
 

@@ -8,9 +8,9 @@
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or 
+ * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -18,7 +18,7 @@
  *
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 */
 
 
@@ -33,7 +33,7 @@
 
 
 
-void log1p_td_accurate(double *logh, double *logm, double *logl, double ed, int index, 
+void log1p_td_accurate(double *logh, double *logm, double *logl, double ed, int index,
 		       double zh, double zm, double zl, double logih, double logim) {
   double highPoly, t1h, t1l, t2h, t2l, t3h, t3l, t4h, t4l, t5h, t5l, t6h, t6l, t7h, t7l, t8h, t8l, t9h, t9l, t10h, t10l, t11h, t11l;
   double t12h, t12l, t13h, t13l, t14h, t14l, zSquareh, zSquarem, zSquarel, zCubeh, zCubem, zCubel, higherPolyMultZh, higherPolyMultZm;
@@ -49,7 +49,7 @@ void log1p_td_accurate(double *logh, double *logm, double *logl, double ed, int 
 
   /* Accurate phase:
 
-     Argument reduction is already done. 
+     Argument reduction is already done.
      We must return logh, logm and logl representing the intermediate result in 118 bits precision.
 
      We use a 14 degree polynomial, computing the first 3 (the first is 0) coefficients in triple double,
@@ -64,8 +64,8 @@ void log1p_td_accurate(double *logh, double *logm, double *logl, double ed, int 
 #else
   highPoly = accPolyC10 + zh * (accPolyC11 + zh * (accPolyC12 + zh * (accPolyC13 + zh * accPolyC14)));
 #endif
-  
-  /* We want to write 
+
+  /* We want to write
 
      accPolyC3 + zh * (accPoly4 + zh * (accPoly5 + zh * (accPoly6 + zh * (accPoly7 + zh * (accPoly8 + zh * (accPoly9 + zh * highPoly))))));
      (        t14  t13         t12  t11         t10   t9          t8   t7          t6   t5          t4   t3          t2   t1  )
@@ -91,21 +91,21 @@ void log1p_td_accurate(double *logh, double *logm, double *logl, double ed, int 
 
   /* We must now prepare (zh + zm)^2 and (zh + zm)^3 as triple doubles */
 
-  Mul33(&zSquareh, &zSquarem, &zSquarel, zh, zm, zl, zh, zm, zl); 
-  Mul33(&zCubeh, &zCubem, &zCubel, zh, zm, zl, zSquareh, zSquarem, zSquarel); 
-  
+  Mul33(&zSquareh, &zSquarem, &zSquarel, zh, zm, zl, zh, zm, zl);
+  Mul33(&zCubeh, &zCubem, &zCubel, zh, zm, zl, zSquareh, zSquarem, zSquarel);
+
   /* We can now multiplicate the middle and higher polynomial by z^3 */
 
   Mul233(&higherPolyMultZh, &higherPolyMultZm, &higherPolyMultZl, t14h, t14l, zCubeh, zCubem, zCubel);
-  
+
   /* Multiply now z^2 by -1/2 (exact op) and add to middle and higher polynomial */
-  
+
   zSquareHalfh = zSquareh * -0.5;
   zSquareHalfm = zSquarem * -0.5;
   zSquareHalfl = zSquarel * -0.5;
 
-  Add33(&polyWithSquareh, &polyWithSquarem, &polyWithSquarel, 
-	zSquareHalfh, zSquareHalfm, zSquareHalfl, 
+  Add33(&polyWithSquareh, &polyWithSquarem, &polyWithSquarel,
+	zSquareHalfh, zSquareHalfm, zSquareHalfl,
 	higherPolyMultZh, higherPolyMultZm, higherPolyMultZl);
 
   /* Add now zh and zm to obtain the polynomial evaluation result */
@@ -113,15 +113,15 @@ void log1p_td_accurate(double *logh, double *logm, double *logl, double ed, int 
   Add33(&polyh, &polym, &polyl, zh, zm, zl, polyWithSquareh, polyWithSquarem, polyWithSquarel);
 
   /* Reconstruct now log(y) = log(1 + z) - log(ri) by adding logih, logim, logil
-     logil has not been read to the time, do this first 
+     logil has not been read to the time, do this first
   */
 
   logil =  argredtable[index].logil;
 
   Add33(&logyh, &logym, &logyl, logih, logim, logil, polyh, polym, polyl);
 
-  /* Multiply log2 with E, i.e. log2h, log2m, log2l by ed 
-     ed is always less than 2^(12) and log2h and log2m are stored with at least 12 trailing zeros 
+  /* Multiply log2 with E, i.e. log2h, log2m, log2l by ed
+     ed is always less than 2^(12) and log2h and log2m are stored with at least 12 trailing zeros
      So multiplying naively is correct (up to 134 bits at least)
 
      The final result is thus obtained by adding log2 * E to log(y)
@@ -132,9 +132,9 @@ void log1p_td_accurate(double *logh, double *logm, double *logl, double ed, int 
   log2edlover = log2l * ed;
 
   /* It may be necessary to renormalize the tabulated value (multiplied by ed) before adding
-     the to the log(y)-result 
+     the to the log(y)-result
 
-     If needed, uncomment the following Renormalize3-Statement and comment out the copies 
+     If needed, uncomment the following Renormalize3-Statement and comment out the copies
      following it.
   */
 
@@ -146,7 +146,7 @@ void log1p_td_accurate(double *logh, double *logm, double *logl, double ed, int 
 
   Add33(&loghover, &logmover, &loglover, log2edh, log2edm, log2edl, logyh, logym, logyl);
 
-  /* Since we can not guarantee in each addition and multiplication procedure that 
+  /* Since we can not guarantee in each addition and multiplication procedure that
      the results are not overlapping, we must renormalize the result before handing
      it over to the final rounding
   */
@@ -162,7 +162,7 @@ void log1p_td_accurate(double *logh, double *logm, double *logl, double ed, int 
  *               ROUNDED  TO NEAREST			     *
  *************************************************************
  *************************************************************/
- double log1p_rn(double x){ 
+ double log1p_rn(double x){
    db_number xdb, shdb, scaledb;
    double yh, yl, ed, ri, logih, logim, yhrih, yhril, ylri, t1, t2, t3, t4, t5, t6, zh, zm, zl;
    double polyHorner, zhSquareh, zhSquarel, polyUpper, zhSquareHalfh, zhSquareHalfl;
@@ -175,24 +175,24 @@ void log1p_td_accurate(double *logh, double *logm, double *logl, double ed, int 
 
    /* Filter cases */
    if ((xdb.i[HI] & 0x7fffffff) < 0x3c900000) {
-     /* We are less than 2^(-54) and return simply an adjusted x 
+     /* We are less than 2^(-54) and return simply an adjusted x
 	This captures also the algebraic case x = 0
      */
      return x;
    }
 
    if (((xdb.i[HI] & 0x80000000) != 0) && ((xdb.i[HI] & 0x7fffffff) >= 0x3ff00000)) {
-     /* We are less or equal than -1 (-inf and NaN, too), 
-	we return -inf for -1 and NaN otherwise 
+     /* We are less or equal than -1 (-inf and NaN, too),
+	we return -inf for -1 and NaN otherwise
      */
      if (x == -1.0) return x/0.0;
 
-     
+
      return (x-x)/0.0;
    }
 
    if ((xdb.i[HI] & 0x7ff00000) == 0x7ff00000) {
-     /* We are +inf or NaN 
+     /* We are +inf or NaN
 	If +inf, we return +inf (x+x)
 	If NaN, we return NaN (x+x)
      */
@@ -200,13 +200,13 @@ void log1p_td_accurate(double *logh, double *logm, double *logl, double ed, int 
    }
 
    /* Test if |x| < 2^(-8)
-      
-   If yes, short-circuit the range reduction 
-   
+
+   If yes, short-circuit the range reduction
+
    */
-   
+
    if ((xdb.i[HI] & 0x7fffffff) < 0x3f700000) {
-     /* Use the polynomial p(zh + zl) approximating log(1+zh+zl) directly 
+     /* Use the polynomial p(zh + zl) approximating log(1+zh+zl) directly
 	Set E and index to values that read 0.0 in the accurate phase.
      */
      logih = 0.0;
@@ -219,21 +219,21 @@ void log1p_td_accurate(double *logh, double *logm, double *logl, double ed, int 
      zl = 0.0;
    } else {
      /* If we are here, |x| >= 2^(-8) and we must perform range reduction */
-     
+
      /* Compute first exactly
 	
-        sh + sl = 1 + x 
-     
+        sh + sl = 1 + x
+
         x can move over 1, so use a conditional Add12
      */
-     
+
      Add12Cond(sh,sl,1.0,x);
-     
+
      /* Transform higher order double to integer */
-     
+
      shdb.d = sh;
 
-     /* Extract exponent and mantissa 
+     /* Extract exponent and mantissa
 	Do range reduction,
 	yielding to E holding the exponent and
 	y the mantissa between sqrt(2)/2 and sqrt(2)
@@ -243,115 +243,115 @@ void log1p_td_accurate(double *logh, double *logm, double *logl, double ed, int 
      index = (shdb.i[HI] & 0x000fffff);
      shdb.i[HI] =  index | 0x3ff00000;	/* do exponent = 0 */
      index = (index + (1<<(20-L-1))) >> (20-L);
-     
+
      /* reduce  such that sqrt(2)/2 < xdb.d < sqrt(2) */
      if (index >= MAXINDEX){ /* corresponds to xdb>sqrt(2)*/
-       shdb.i[HI] -= 0x00100000; 
+       shdb.i[HI] -= 0x00100000;
        E++;
      }
-     
-     
+
+
      /* Transform shdb to yh */
      yh = shdb.d;
-     
-    
+
+
      /* Compute the index to the table */
      index = index & INDEXMASK;
-     
+
      /* Cast integer E into double ed for multiplication later */
      ed = (double) E;
-     
-     /* 
+
+     /*
 	Read tables:
 	Read one float for ri
 	Read the first two doubles for -log(r_i) (out of three)
-	    
+	
 	Organization of the table:
 	
-	one struct entry per index, the struct entry containing 
+	one struct entry per index, the struct entry containing
 	r, logih, logim and logil in this order
      */
-     
-     
+
+
      ri = argredtable[index].ri;
-     /* 
+     /*
 	Actually we don't need the logarithm entries now
 	Move the following two lines to the eventual reconstruction
-	As long as we don't have any if in the following code, we can overlap 
-	memory access with calculations 
+	As long as we don't have any if in the following code, we can overlap
+	memory access with calculations
      */
      logih = argredtable[index].logih;
      logim = argredtable[index].logim;
-     
-     /* Test if we have a simple range reduction or a complicated one 
+
+     /* Test if we have a simple range reduction or a complicated one
 	
         Simple range reduction for x < 0: x + 1 is exact, sl = 0 exactly
         Simple range reduction for x > 2^(125) (sh > 2^(125)): x + 1 is not exact but its error less than 2^(-125)
-     
-	Complicated range reduction: other cases 
+
+	Complicated range reduction: other cases
 	
      */
 
-     
+
      if ((sl == 0.0) || (E > 125)) {
        /* Simple range reduction */
-       
+
        Mul12(&yhrih, &yhril, yh, ri);
-       t1 = yhrih - 1.0; 
-       Add12Cond(zh, zm, t1, yhril); 
+       t1 = yhrih - 1.0;
+       Add12Cond(zh, zm, t1, yhril);
        zl = 0.0;
-       
+
      } else {
        /* Complicated range reduction; E <= 125 */
-       
-       
-       /* Scale sl accordingly to sh, from which the exponent was extracted 
-	  
+
+
+       /* Scale sl accordingly to sh, from which the exponent was extracted
+	
           We form first 2^(-E) and multiply sl with this value; this gives yl.
        */
-       
+
        scaledb.i[HI] = (-E + 1023) << 20;
        scaledb.i[LO] = 0;
-       
+
        yl = sl * scaledb.d;
-       
-       
+
+
        /* Do complicated range reduction:
 	
-          zh + zm + zl = (yh + yl) * ri - 1.0 
+          zh + zm + zl = (yh + yl) * ri - 1.0
 
 
 	  We use zh + zm in the quick phase and zh + zm + zl in the accurate phase
-	  
+	
 	  The multiplication yl * ri is exact because yl contains at most 9 bits and
 	  ri contains at most 24 bits.
-	  
+	
 	  The substraction yhrih - 1.0 is exact as per Sterbenz' lemma.
 
        */
-     
+
        Mul12(&yhrih,&yhril,yh,ri);
        ylri = yl * ri;
-       
+
        t1 = yhrih - 1.0;
-       
-       /* The unnormalized triple-double t1 + yhril + ylri is equal to (yh + yl) * ri - 1.0 
+
+       /* The unnormalized triple-double t1 + yhril + ylri is equal to (yh + yl) * ri - 1.0
 	  As t1 can move over yhril and yhri can move over ylri, we normalize first these
-	  values pairwise with Add12Conds. Then we renormalize the pairs by a 
+	  values pairwise with Add12Conds. Then we renormalize the pairs by a
 	  "inverted" (A.E.) Renormalize3.
        */
-       
+
        Add12Cond(t2,t3,yhril,ylri);
        Add12Cond(t4,t5,t1,t2);
-       
+
        Add12Cond(t6,zl,t3,t5);
        Add12Cond(zh,zm,t4,t6);
-       
+
      }
    }
-   
-   
-   /* 
+
+
+   /*
       Polynomial evaluation
 
       Use a 7 degree polynomial
@@ -377,33 +377,33 @@ void log1p_td_accurate(double *logh, double *logm, double *logl, double ed, int 
    Add22(&t2h, &t2l, zh, zm, zhSquareHalfh, zhSquareHalfl);
    Add22(&ph, &pl, t2h, t2l, t1h, t1l);
 
-   /* Reconstruction 
+   /* Reconstruction
 
       Read logih and logim in the tables (already done)
-      
+
       Compute log(x) = E * log(2) + log(1+z) - log(ri)
       i.e. log(x) = ed * (log2h + log2m) + (ph + pl) + (logih + logim) + delta
 
       Carry out everything in double double precision
 
    */
-   
-   /* 
+
+   /*
       We store log2 as log2h + log2m + log2l where log2h and log2m have 12 trailing zeros
       Multiplication of ed (double E) and log2h is thus correct
       The overall accuracy of log2h + log2m + log2l is 53 * 3 - 24 = 135 which
       is enough for the accurate phase
       The accuracy suffices also for the quick phase: 53 * 2 - 24 = 82
       Nevertheless the storage with trailing zeros implies an overlap of the tabulated
-      triple double values. We have to take it into account for the accurate phase 
+      triple double values. We have to take it into account for the accurate phase
       basic procedures for addition and multiplication
-      The condition on the next Add12 is verified as log2m is smaller than log2h 
+      The condition on the next Add12 is verified as log2m is smaller than log2h
       and both are scaled by ed
    */
 
    Add12(log2edh, log2edl, log2h * ed, log2m * ed);
 
-   /* Add logih and logim to ph and pl 
+   /* Add logih and logim to ph and pl
 
       We must use conditioned Add22 as logih can move over ph
    */
@@ -424,15 +424,15 @@ void log1p_td_accurate(double *logh, double *logm, double *logl, double ed, int 
 
    if(logh == (logh + (logm * roundcst)))
      return logh;
-   else 
+   else
      {
-       
+
 #if DEBUG
        printf("Going for Accurate Phase for x=%1.50e\n",x);
 #endif
 
-       log1p_td_accurate(&logh, &logm, &logl, ed, index, zh, zm, zl, logih, logim); 
-       
+       log1p_td_accurate(&logh, &logm, &logl, ed, index, zh, zm, zl, logih, logim);
+
        ReturnRoundToNearest3(logh, logm, logl);
 
      } /* Accurate phase launched */
@@ -454,12 +454,12 @@ double log1p_ru(double x) {
 
    /* Filter cases */
    if ((xdb.i[HI] & 0x7fffffff) < 0x3c900000) {
-     /* We are less than 2^(-54) and return simply an adjusted x 
+     /* We are less than 2^(-54) and return simply an adjusted x
 	
         If x = 0, the result is algebraic and equal to 0.
 	
 	The series for log(1 + x) = x - 1/2 * x^2 + ... is alternated
-	and converges in this interval. 
+	and converges in this interval.
 	The truncation rest -1/2 * x^2 + 1/3 * x^3 - ... is
 	always negative, so log(1 + x) is always less than x but less than
 	1 ulp of x away.
@@ -470,17 +470,17 @@ double log1p_ru(double x) {
    }
 
    if (((xdb.i[HI] & 0x80000000) != 0) && ((xdb.i[HI] & 0x7fffffff) >= 0x3ff00000)) {
-     /* We are less or equal than -1 (-inf and NaN, too), 
-	we return -inf for -1 and NaN otherwise 
+     /* We are less or equal than -1 (-inf and NaN, too),
+	we return -inf for -1 and NaN otherwise
      */
      if (x == -1.0) return x/0.0;
 
-     
+
      return (x-x)/0.0;
    }
 
    if ((xdb.i[HI] & 0x7ff00000) == 0x7ff00000) {
-     /* We are +inf or NaN 
+     /* We are +inf or NaN
 	If +inf, we return +inf (x+x)
 	If NaN, we return NaN (x+x)
      */
@@ -488,13 +488,13 @@ double log1p_ru(double x) {
    }
 
    /* Test if |x| < 2^(-8)
-      
-   If yes, short-circuit the range reduction 
-   
+
+   If yes, short-circuit the range reduction
+
    */
-   
+
    if ((xdb.i[HI] & 0x7fffffff) < 0x3f700000) {
-     /* Use the polynomial p(zh + zl) approximating log(1+zh+zl) directly 
+     /* Use the polynomial p(zh + zl) approximating log(1+zh+zl) directly
 	Set E and index to values that read 0.0 in the accurate phase.
      */
      logih = 0.0;
@@ -507,21 +507,21 @@ double log1p_ru(double x) {
      zl = 0.0;
    } else {
      /* If we are here, |x| >= 2^(-8) and we must perform range reduction */
-     
+
      /* Compute first exactly
 	
-        sh + sl = 1 + x 
-     
+        sh + sl = 1 + x
+
         x can move over 1, so use a conditional Add12
      */
-     
+
      Add12Cond(sh,sl,1.0,x);
-     
+
      /* Transform higher order double to integer */
-     
+
      shdb.d = sh;
 
-     /* Extract exponent and mantissa 
+     /* Extract exponent and mantissa
 	Do range reduction,
 	yielding to E holding the exponent and
 	y the mantissa between sqrt(2)/2 and sqrt(2)
@@ -531,115 +531,115 @@ double log1p_ru(double x) {
      index = (shdb.i[HI] & 0x000fffff);
      shdb.i[HI] =  index | 0x3ff00000;	/* do exponent = 0 */
      index = (index + (1<<(20-L-1))) >> (20-L);
-     
+
      /* reduce  such that sqrt(2)/2 < xdb.d < sqrt(2) */
      if (index >= MAXINDEX){ /* corresponds to xdb>sqrt(2)*/
-       shdb.i[HI] -= 0x00100000; 
+       shdb.i[HI] -= 0x00100000;
        E++;
      }
-     
-     
+
+
      /* Transform shdb to yh */
      yh = shdb.d;
-     
-    
+
+
      /* Compute the index to the table */
      index = index & INDEXMASK;
-     
+
      /* Cast integer E into double ed for multiplication later */
      ed = (double) E;
-     
-     /* 
+
+     /*
 	Read tables:
 	Read one float for ri
 	Read the first two doubles for -log(r_i) (out of three)
-	    
+	
 	Organization of the table:
 	
-	one struct entry per index, the struct entry containing 
+	one struct entry per index, the struct entry containing
 	r, logih, logim and logil in this order
      */
-     
-     
+
+
      ri = argredtable[index].ri;
-     /* 
+     /*
 	Actually we don't need the logarithm entries now
 	Move the following two lines to the eventual reconstruction
-	As long as we don't have any if in the following code, we can overlap 
-	memory access with calculations 
+	As long as we don't have any if in the following code, we can overlap
+	memory access with calculations
      */
      logih = argredtable[index].logih;
      logim = argredtable[index].logim;
-     
-     /* Test if we have a simple range reduction or a complicated one 
+
+     /* Test if we have a simple range reduction or a complicated one
 	
         Simple range reduction for x < 0: x + 1 is exact, sl = 0 exactly
         Simple range reduction for x > 2^(125) (sh > 2^(125)): x + 1 is not exact but its error less than 2^(-125)
-     
-	Complicated range reduction: other cases 
+
+	Complicated range reduction: other cases
 	
      */
 
-     
+
      if ((sl == 0.0) || (E > 125)) {
        /* Simple range reduction */
-       
+
        Mul12(&yhrih, &yhril, yh, ri);
-       t1 = yhrih - 1.0; 
-       Add12Cond(zh, zm, t1, yhril); 
+       t1 = yhrih - 1.0;
+       Add12Cond(zh, zm, t1, yhril);
        zl = 0.0;
-       
+
      } else {
        /* Complicated range reduction; E <= 125 */
-       
-       
-       /* Scale sl accordingly to sh, from which the exponent was extracted 
-	  
+
+
+       /* Scale sl accordingly to sh, from which the exponent was extracted
+	
           We form first 2^(-E) and multiply sl with this value; this gives yl.
        */
-       
+
        scaledb.i[HI] = (-E + 1023) << 20;
        scaledb.i[LO] = 0;
-       
+
        yl = sl * scaledb.d;
-       
-       
+
+
        /* Do complicated range reduction:
 	
-          zh + zm + zl = (yh + yl) * ri - 1.0 
+          zh + zm + zl = (yh + yl) * ri - 1.0
 
 
 	  We use zh + zm in the quick phase and zh + zm + zl in the accurate phase
-	  
+	
 	  The multiplication yl * ri is exact because yl contains at most 9 bits and
 	  ri contains at most 24 bits.
-	  
+	
 	  The substraction yhrih - 1.0 is exact as per Sterbenz' lemma.
 
        */
-     
+
        Mul12(&yhrih,&yhril,yh,ri);
        ylri = yl * ri;
-       
+
        t1 = yhrih - 1.0;
-       
-       /* The unnormalized triple-double t1 + yhril + ylri is equal to (yh + yl) * ri - 1.0 
+
+       /* The unnormalized triple-double t1 + yhril + ylri is equal to (yh + yl) * ri - 1.0
 	  As t1 can move over yhril and yhri can move over ylri, we normalize first these
-	  values pairwise with Add12Conds. Then we renormalize the pairs by a 
+	  values pairwise with Add12Conds. Then we renormalize the pairs by a
 	  "inverted" (A.E.) Renormalize3.
        */
-       
+
        Add12Cond(t2,t3,yhril,ylri);
        Add12Cond(t4,t5,t1,t2);
-       
+
        Add12Cond(t6,zl,t3,t5);
        Add12Cond(zh,zm,t4,t6);
-       
+
      }
    }
-   
-   
-   /* 
+
+
+   /*
       Polynomial evaluation
 
       Use a 7 degree polynomial
@@ -665,33 +665,33 @@ double log1p_ru(double x) {
    Add22(&t2h, &t2l, zh, zm, zhSquareHalfh, zhSquareHalfl);
    Add22(&ph, &pl, t2h, t2l, t1h, t1l);
 
-   /* Reconstruction 
+   /* Reconstruction
 
       Read logih and logim in the tables (already done)
-      
+
       Compute log(x) = E * log(2) + log(1+z) - log(ri)
       i.e. log(x) = ed * (log2h + log2m) + (ph + pl) + (logih + logim) + delta
 
       Carry out everything in double double precision
 
    */
-   
-   /* 
+
+   /*
       We store log2 as log2h + log2m + log2l where log2h and log2m have 12 trailing zeros
       Multiplication of ed (double E) and log2h is thus correct
       The overall accuracy of log2h + log2m + log2l is 53 * 3 - 24 = 135 which
       is enough for the accurate phase
       The accuracy suffices also for the quick phase: 53 * 2 - 24 = 82
       Nevertheless the storage with trailing zeros implies an overlap of the tabulated
-      triple double values. We have to take it into account for the accurate phase 
+      triple double values. We have to take it into account for the accurate phase
       basic procedures for addition and multiplication
-      The condition on the next Add12 is verified as log2m is smaller than log2h 
+      The condition on the next Add12 is verified as log2m is smaller than log2h
       and both are scaled by ed
    */
 
    Add12(log2edh, log2edl, log2h * ed, log2m * ed);
 
-   /* Add logih and logim to ph and pl 
+   /* Add logih and logim to ph and pl
 
       We must use conditioned Add22 as logih can move over ph
    */
@@ -710,13 +710,13 @@ double log1p_ru(double x) {
       roundcst = RDROUNDCST2;
 
    TEST_AND_RETURN_RU(logh, logm, roundcst);
-       
+
 #if DEBUG
        printf("Going for Accurate Phase for x=%1.50e\n",x);
 #endif
 
-       log1p_td_accurate(&logh, &logm, &logl, ed, index, zh, zm, zl, logih, logim); 
-       
+       log1p_td_accurate(&logh, &logm, &logl, ed, index, zh, zm, zl, logih, logim);
+
        ReturnRoundUpwards3(logh, logm, logl);
 }
 
@@ -733,12 +733,12 @@ double log1p_rd(double x) {
 
    /* Filter cases */
    if ((xdb.i[HI] & 0x7fffffff) < 0x3c900000) {
-     /* We are less than 2^(-54) and return simply an adjusted x 
+     /* We are less than 2^(-54) and return simply an adjusted x
 	
         If x = 0, the result is algebraic and equal to 0.
 	
 	The series for log(1 + x) = x - 1/2 * x^2 + ... is alternated
-	and converges in this interval. 
+	and converges in this interval.
 	The truncation rest -1/2 * x^2 + 1/3 * x^3 - ... is
 	always negative, so log(1 + x) is always less than x but less than
 	1 ulp of x away.
@@ -757,17 +757,17 @@ double log1p_rd(double x) {
    }
 
    if (((xdb.i[HI] & 0x80000000) != 0) && ((xdb.i[HI] & 0x7fffffff) >= 0x3ff00000)) {
-     /* We are less or equal than -1 (-inf and NaN, too), 
-	we return -inf for -1 and NaN otherwise 
+     /* We are less or equal than -1 (-inf and NaN, too),
+	we return -inf for -1 and NaN otherwise
      */
      if (x == -1.0) return x/0.0;
 
-     
+
      return (x-x)/0.0;
    }
 
    if ((xdb.i[HI] & 0x7ff00000) == 0x7ff00000) {
-     /* We are +inf or NaN 
+     /* We are +inf or NaN
 	If +inf, we return +inf (x+x)
 	If NaN, we return NaN (x+x)
      */
@@ -775,13 +775,13 @@ double log1p_rd(double x) {
    }
 
    /* Test if |x| < 2^(-8)
-      
-   If yes, short-circuit the range reduction 
-   
+
+   If yes, short-circuit the range reduction
+
    */
-   
+
    if ((xdb.i[HI] & 0x7fffffff) < 0x3f700000) {
-     /* Use the polynomial p(zh + zl) approximating log(1+zh+zl) directly 
+     /* Use the polynomial p(zh + zl) approximating log(1+zh+zl) directly
 	Set E and index to values that read 0.0 in the accurate phase.
      */
      logih = 0.0;
@@ -794,21 +794,21 @@ double log1p_rd(double x) {
      zl = 0.0;
    } else {
      /* If we are here, |x| >= 2^(-8) and we must perform range reduction */
-     
+
      /* Compute first exactly
 	
-        sh + sl = 1 + x 
-     
+        sh + sl = 1 + x
+
         x can move over 1, so use a conditional Add12
      */
-     
+
      Add12Cond(sh,sl,1.0,x);
-     
+
      /* Transform higher order double to integer */
-     
+
      shdb.d = sh;
 
-     /* Extract exponent and mantissa 
+     /* Extract exponent and mantissa
 	Do range reduction,
 	yielding to E holding the exponent and
 	y the mantissa between sqrt(2)/2 and sqrt(2)
@@ -818,115 +818,115 @@ double log1p_rd(double x) {
      index = (shdb.i[HI] & 0x000fffff);
      shdb.i[HI] =  index | 0x3ff00000;	/* do exponent = 0 */
      index = (index + (1<<(20-L-1))) >> (20-L);
-     
+
      /* reduce  such that sqrt(2)/2 < xdb.d < sqrt(2) */
      if (index >= MAXINDEX){ /* corresponds to xdb>sqrt(2)*/
-       shdb.i[HI] -= 0x00100000; 
+       shdb.i[HI] -= 0x00100000;
        E++;
      }
-     
-     
+
+
      /* Transform shdb to yh */
      yh = shdb.d;
-     
-    
+
+
      /* Compute the index to the table */
      index = index & INDEXMASK;
-     
+
      /* Cast integer E into double ed for multiplication later */
      ed = (double) E;
-     
-     /* 
+
+     /*
 	Read tables:
 	Read one float for ri
 	Read the first two doubles for -log(r_i) (out of three)
-	    
+	
 	Organization of the table:
 	
-	one struct entry per index, the struct entry containing 
+	one struct entry per index, the struct entry containing
 	r, logih, logim and logil in this order
      */
-     
-     
+
+
      ri = argredtable[index].ri;
-     /* 
+     /*
 	Actually we don't need the logarithm entries now
 	Move the following two lines to the eventual reconstruction
-	As long as we don't have any if in the following code, we can overlap 
-	memory access with calculations 
+	As long as we don't have any if in the following code, we can overlap
+	memory access with calculations
      */
      logih = argredtable[index].logih;
      logim = argredtable[index].logim;
-     
-     /* Test if we have a simple range reduction or a complicated one 
+
+     /* Test if we have a simple range reduction or a complicated one
 	
         Simple range reduction for x < 0: x + 1 is exact, sl = 0 exactly
         Simple range reduction for x > 2^(125) (sh > 2^(125)): x + 1 is not exact but its error less than 2^(-125)
-     
-	Complicated range reduction: other cases 
+
+	Complicated range reduction: other cases
 	
      */
 
-     
+
      if ((sl == 0.0) || (E > 125)) {
        /* Simple range reduction */
-       
+
        Mul12(&yhrih, &yhril, yh, ri);
-       t1 = yhrih - 1.0; 
-       Add12Cond(zh, zm, t1, yhril); 
+       t1 = yhrih - 1.0;
+       Add12Cond(zh, zm, t1, yhril);
        zl = 0.0;
-       
+
      } else {
        /* Complicated range reduction; E <= 125 */
-       
-       
-       /* Scale sl accordingly to sh, from which the exponent was extracted 
-	  
+
+
+       /* Scale sl accordingly to sh, from which the exponent was extracted
+	
           We form first 2^(-E) and multiply sl with this value; this gives yl.
        */
-       
+
        scaledb.i[HI] = (-E + 1023) << 20;
        scaledb.i[LO] = 0;
-       
+
        yl = sl * scaledb.d;
-       
-       
+
+
        /* Do complicated range reduction:
 	
-          zh + zm + zl = (yh + yl) * ri - 1.0 
+          zh + zm + zl = (yh + yl) * ri - 1.0
 
 
 	  We use zh + zm in the quick phase and zh + zm + zl in the accurate phase
-	  
+	
 	  The multiplication yl * ri is exact because yl contains at most 9 bits and
 	  ri contains at most 24 bits.
-	  
+	
 	  The substraction yhrih - 1.0 is exact as per Sterbenz' lemma.
 
        */
-     
+
        Mul12(&yhrih,&yhril,yh,ri);
        ylri = yl * ri;
-       
+
        t1 = yhrih - 1.0;
-       
-       /* The unnormalized triple-double t1 + yhril + ylri is equal to (yh + yl) * ri - 1.0 
+
+       /* The unnormalized triple-double t1 + yhril + ylri is equal to (yh + yl) * ri - 1.0
 	  As t1 can move over yhril and yhri can move over ylri, we normalize first these
-	  values pairwise with Add12Conds. Then we renormalize the pairs by a 
+	  values pairwise with Add12Conds. Then we renormalize the pairs by a
 	  "inverted" (A.E.) Renormalize3.
        */
-       
+
        Add12Cond(t2,t3,yhril,ylri);
        Add12Cond(t4,t5,t1,t2);
-       
+
        Add12Cond(t6,zl,t3,t5);
        Add12Cond(zh,zm,t4,t6);
-       
+
      }
    }
-   
-   
-   /* 
+
+
+   /*
       Polynomial evaluation
 
       Use a 7 degree polynomial
@@ -952,33 +952,33 @@ double log1p_rd(double x) {
    Add22(&t2h, &t2l, zh, zm, zhSquareHalfh, zhSquareHalfl);
    Add22(&ph, &pl, t2h, t2l, t1h, t1l);
 
-   /* Reconstruction 
+   /* Reconstruction
 
       Read logih and logim in the tables (already done)
-      
+
       Compute log(x) = E * log(2) + log(1+z) - log(ri)
       i.e. log(x) = ed * (log2h + log2m) + (ph + pl) + (logih + logim) + delta
 
       Carry out everything in double double precision
 
    */
-   
-   /* 
+
+   /*
       We store log2 as log2h + log2m + log2l where log2h and log2m have 12 trailing zeros
       Multiplication of ed (double E) and log2h is thus correct
       The overall accuracy of log2h + log2m + log2l is 53 * 3 - 24 = 135 which
       is enough for the accurate phase
       The accuracy suffices also for the quick phase: 53 * 2 - 24 = 82
       Nevertheless the storage with trailing zeros implies an overlap of the tabulated
-      triple double values. We have to take it into account for the accurate phase 
+      triple double values. We have to take it into account for the accurate phase
       basic procedures for addition and multiplication
-      The condition on the next Add12 is verified as log2m is smaller than log2h 
+      The condition on the next Add12 is verified as log2m is smaller than log2h
       and both are scaled by ed
    */
 
    Add12(log2edh, log2edl, log2h * ed, log2m * ed);
 
-   /* Add logih and logim to ph and pl 
+   /* Add logih and logim to ph and pl
 
       We must use conditioned Add22 as logih can move over ph
    */
@@ -997,13 +997,13 @@ double log1p_rd(double x) {
       roundcst = RDROUNDCST2;
 
    TEST_AND_RETURN_RD(logh, logm, roundcst);
-       
+
 #if DEBUG
        printf("Going for Accurate Phase for x=%1.50e\n",x);
 #endif
 
-       log1p_td_accurate(&logh, &logm, &logl, ed, index, zh, zm, zl, logih, logim); 
-       
+       log1p_td_accurate(&logh, &logm, &logl, ed, index, zh, zm, zl, logih, logim);
+
        ReturnRoundDownwards3(logh, logm, logl);
 }
 
@@ -1020,12 +1020,12 @@ double log1p_rz(double x) {
 
    /* Filter cases */
    if ((xdb.i[HI] & 0x7fffffff) < 0x3c900000) {
-     /* We are less than 2^(-54) and return simply an adjusted x 
+     /* We are less than 2^(-54) and return simply an adjusted x
 	
         If x = 0, the result is algebraic and equal to 0.
 	
 	The series for log(1 + x) = x - 1/2 * x^2 + ... is alternated
-	and converges in this interval. 
+	and converges in this interval.
 	The truncation rest -1/2 * x^2 + 1/3 * x^3 - ... is
 	always negative, so log(1 + x) is always less than x but less than
 	1 ulp of x away.
@@ -1044,17 +1044,17 @@ double log1p_rz(double x) {
    }
 
    if (((xdb.i[HI] & 0x80000000) != 0) && ((xdb.i[HI] & 0x7fffffff) >= 0x3ff00000)) {
-     /* We are less or equal than -1 (-inf and NaN, too), 
-	we return -inf for -1 and NaN otherwise 
+     /* We are less or equal than -1 (-inf and NaN, too),
+	we return -inf for -1 and NaN otherwise
      */
      if (x == -1.0) return x/0.0;
 
-     
+
      return (x-x)/0.0;
    }
 
    if ((xdb.i[HI] & 0x7ff00000) == 0x7ff00000) {
-     /* We are +inf or NaN 
+     /* We are +inf or NaN
 	If +inf, we return +inf (x+x)
 	If NaN, we return NaN (x+x)
      */
@@ -1062,13 +1062,13 @@ double log1p_rz(double x) {
    }
 
    /* Test if |x| < 2^(-8)
-      
-   If yes, short-circuit the range reduction 
-   
+
+   If yes, short-circuit the range reduction
+
    */
-   
+
    if ((xdb.i[HI] & 0x7fffffff) < 0x3f700000) {
-     /* Use the polynomial p(zh + zl) approximating log(1+zh+zl) directly 
+     /* Use the polynomial p(zh + zl) approximating log(1+zh+zl) directly
 	Set E and index to values that read 0.0 in the accurate phase.
      */
      logih = 0.0;
@@ -1081,21 +1081,21 @@ double log1p_rz(double x) {
      zl = 0.0;
    } else {
      /* If we are here, |x| >= 2^(-8) and we must perform range reduction */
-     
+
      /* Compute first exactly
 	
-        sh + sl = 1 + x 
-     
+        sh + sl = 1 + x
+
         x can move over 1, so use a conditional Add12
      */
-     
+
      Add12Cond(sh,sl,1.0,x);
-     
+
      /* Transform higher order double to integer */
-     
+
      shdb.d = sh;
 
-     /* Extract exponent and mantissa 
+     /* Extract exponent and mantissa
 	Do range reduction,
 	yielding to E holding the exponent and
 	y the mantissa between sqrt(2)/2 and sqrt(2)
@@ -1105,115 +1105,115 @@ double log1p_rz(double x) {
      index = (shdb.i[HI] & 0x000fffff);
      shdb.i[HI] =  index | 0x3ff00000;	/* do exponent = 0 */
      index = (index + (1<<(20-L-1))) >> (20-L);
-     
+
      /* reduce  such that sqrt(2)/2 < xdb.d < sqrt(2) */
      if (index >= MAXINDEX){ /* corresponds to xdb>sqrt(2)*/
-       shdb.i[HI] -= 0x00100000; 
+       shdb.i[HI] -= 0x00100000;
        E++;
      }
-     
-     
+
+
      /* Transform shdb to yh */
      yh = shdb.d;
-     
-    
+
+
      /* Compute the index to the table */
      index = index & INDEXMASK;
-     
+
      /* Cast integer E into double ed for multiplication later */
      ed = (double) E;
-     
-     /* 
+
+     /*
 	Read tables:
 	Read one float for ri
 	Read the first two doubles for -log(r_i) (out of three)
-	    
+	
 	Organization of the table:
 	
-	one struct entry per index, the struct entry containing 
+	one struct entry per index, the struct entry containing
 	r, logih, logim and logil in this order
      */
-     
-     
+
+
      ri = argredtable[index].ri;
-     /* 
+     /*
 	Actually we don't need the logarithm entries now
 	Move the following two lines to the eventual reconstruction
-	As long as we don't have any if in the following code, we can overlap 
-	memory access with calculations 
+	As long as we don't have any if in the following code, we can overlap
+	memory access with calculations
      */
      logih = argredtable[index].logih;
      logim = argredtable[index].logim;
-     
-     /* Test if we have a simple range reduction or a complicated one 
+
+     /* Test if we have a simple range reduction or a complicated one
 	
         Simple range reduction for x < 0: x + 1 is exact, sl = 0 exactly
         Simple range reduction for x > 2^(125) (sh > 2^(125)): x + 1 is not exact but its error less than 2^(-125)
-     
-	Complicated range reduction: other cases 
+
+	Complicated range reduction: other cases
 	
      */
 
-     
+
      if ((sl == 0.0) || (E > 125)) {
        /* Simple range reduction */
-       
+
        Mul12(&yhrih, &yhril, yh, ri);
-       t1 = yhrih - 1.0; 
-       Add12Cond(zh, zm, t1, yhril); 
+       t1 = yhrih - 1.0;
+       Add12Cond(zh, zm, t1, yhril);
        zl = 0.0;
-       
+
      } else {
        /* Complicated range reduction; E <= 125 */
-       
-       
-       /* Scale sl accordingly to sh, from which the exponent was extracted 
-	  
+
+
+       /* Scale sl accordingly to sh, from which the exponent was extracted
+	
           We form first 2^(-E) and multiply sl with this value; this gives yl.
        */
-       
+
        scaledb.i[HI] = (-E + 1023) << 20;
        scaledb.i[LO] = 0;
-       
+
        yl = sl * scaledb.d;
-       
-       
+
+
        /* Do complicated range reduction:
 	
-          zh + zm + zl = (yh + yl) * ri - 1.0 
+          zh + zm + zl = (yh + yl) * ri - 1.0
 
 
 	  We use zh + zm in the quick phase and zh + zm + zl in the accurate phase
-	  
+	
 	  The multiplication yl * ri is exact because yl contains at most 9 bits and
 	  ri contains at most 24 bits.
-	  
+	
 	  The substraction yhrih - 1.0 is exact as per Sterbenz' lemma.
 
        */
-     
+
        Mul12(&yhrih,&yhril,yh,ri);
        ylri = yl * ri;
-       
+
        t1 = yhrih - 1.0;
-       
-       /* The unnormalized triple-double t1 + yhril + ylri is equal to (yh + yl) * ri - 1.0 
+
+       /* The unnormalized triple-double t1 + yhril + ylri is equal to (yh + yl) * ri - 1.0
 	  As t1 can move over yhril and yhri can move over ylri, we normalize first these
-	  values pairwise with Add12Conds. Then we renormalize the pairs by a 
+	  values pairwise with Add12Conds. Then we renormalize the pairs by a
 	  "inverted" (A.E.) Renormalize3.
        */
-       
+
        Add12Cond(t2,t3,yhril,ylri);
        Add12Cond(t4,t5,t1,t2);
-       
+
        Add12Cond(t6,zl,t3,t5);
        Add12Cond(zh,zm,t4,t6);
-       
+
      }
    }
-   
-   
-   /* 
+
+
+   /*
       Polynomial evaluation
 
       Use a 7 degree polynomial
@@ -1239,33 +1239,33 @@ double log1p_rz(double x) {
    Add22(&t2h, &t2l, zh, zm, zhSquareHalfh, zhSquareHalfl);
    Add22(&ph, &pl, t2h, t2l, t1h, t1l);
 
-   /* Reconstruction 
+   /* Reconstruction
 
       Read logih and logim in the tables (already done)
-      
+
       Compute log(x) = E * log(2) + log(1+z) - log(ri)
       i.e. log(x) = ed * (log2h + log2m) + (ph + pl) + (logih + logim) + delta
 
       Carry out everything in double double precision
 
    */
-   
-   /* 
+
+   /*
       We store log2 as log2h + log2m + log2l where log2h and log2m have 12 trailing zeros
       Multiplication of ed (double E) and log2h is thus correct
       The overall accuracy of log2h + log2m + log2l is 53 * 3 - 24 = 135 which
       is enough for the accurate phase
       The accuracy suffices also for the quick phase: 53 * 2 - 24 = 82
       Nevertheless the storage with trailing zeros implies an overlap of the tabulated
-      triple double values. We have to take it into account for the accurate phase 
+      triple double values. We have to take it into account for the accurate phase
       basic procedures for addition and multiplication
-      The condition on the next Add12 is verified as log2m is smaller than log2h 
+      The condition on the next Add12 is verified as log2m is smaller than log2h
       and both are scaled by ed
    */
 
    Add12(log2edh, log2edl, log2h * ed, log2m * ed);
 
-   /* Add logih and logim to ph and pl 
+   /* Add logih and logim to ph and pl
 
       We must use conditioned Add22 as logih can move over ph
    */
@@ -1284,12 +1284,12 @@ double log1p_rz(double x) {
       roundcst = RDROUNDCST2;
 
    TEST_AND_RETURN_RZ(logh, logm, roundcst);
-       
+
 #if DEBUG
        printf("Going for Accurate Phase for x=%1.50e\n",x);
 #endif
 
-       log1p_td_accurate(&logh, &logm, &logl, ed, index, zh, zm, zl, logih, logim); 
-       
+       log1p_td_accurate(&logh, &logm, &logl, ed, index, zh, zm, zl, logih, logim);
+
        ReturnRoundTowardsZero3(logh, logm, logl);
 }

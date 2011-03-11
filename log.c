@@ -35,7 +35,7 @@ double p_t_18_0h, p_t_18_0m, p_t_18_0l;
 double p_t_19_0h, p_t_19_0m, p_t_19_0l;
 double p_t_20_0h, p_t_20_0m, p_t_20_0l;
 double p_t_21_0h, p_t_21_0m, p_t_21_0l;
- 
+
 
 #if EVAL_PERF
   crlibm_second_step_taken++;
@@ -76,7 +76,7 @@ Renormalize3(p_resh,p_resm,p_resl,p_t_21_0h,p_t_21_0m,p_t_21_0l);
  *               ROUNDED  TO NEAREST			     *
  *************************************************************
  *************************************************************/
- double log_rn(double x){ 
+ double log_rn(double x){
    db_number xdb, yhdb;
    double yh, yl, ed, ri, logih, logim, logil, yrih, yril, th, zh, zl;
    double ph, pl, pm, log2edh, log2edl, log2edm, logTabPolyh, logTabPolyl, logh, logm, logl;
@@ -96,22 +96,22 @@ Renormalize3(p_resh,p_resm,p_resl,p_t_21_0h,p_t_21_0m,p_t_21_0l);
    /* Filter cases */
    if (xdb.i[HI] < 0x00100000){        /* x < 2^(-1022)    */
      if (((xdb.i[HI] & 0x7fffffff)|xdb.i[LO])==0){
-       return -1.0/0.0;     
+       return -1.0/0.0;
      }                    		   /* log(+/-0) = -Inf */
-     if (xdb.i[HI] < 0){ 
+     if (xdb.i[HI] < 0){
        return (x-x)/0;                      /* log(-x) = Nan    */
      }
      /* Subnormal number */
      E = -52; 		
-     xdb.d *= two52; 	  /* make x a normal number    */ 
+     xdb.d *= two52; 	  /* make x a normal number    */
    }
-    
+
    if (xdb.i[HI] >= 0x7ff00000){
      return  x+x;				 /* Inf or Nan       */
    }
-   
-   
-   /* Extract exponent and mantissa 
+
+
+   /* Extract exponent and mantissa
       Do range reduction,
       yielding to E holding the exponent and
       y the mantissa between sqrt(2)/2 and sqrt(2)
@@ -120,10 +120,10 @@ Renormalize3(p_resh,p_resm,p_resl,p_t_21_0h,p_t_21_0m,p_t_21_0l);
    index = (xdb.i[HI] & 0x000fffff);
    xdb.i[HI] =  index | 0x3ff00000;	/* do exponent = 0 */
    index = (index + (1<<(20-L-1))) >> (20-L);
- 
+
    /* reduce  such that sqrt(2)/2 < xdb.d < sqrt(2) */
    if (index >= MAXINDEX){ /* corresponds to xdb>sqrt(2)*/
-     xdb.i[HI] -= 0x00100000; 
+     xdb.i[HI] -= 0x00100000;
      E++;
    }
 
@@ -136,24 +136,24 @@ Renormalize3(p_resh,p_resm,p_resl,p_t_21_0h,p_t_21_0m,p_t_21_0l);
    /* Cast integer E into double ed for multiplication later */
    ed = (double) E;
 
-   /* 
+   /*
       Read tables:
       Read one float for ri
       Read the first two doubles for -log(r_i) (out of three)
 
       Organization of the table:
 
-      one struct entry per index, the struct entry containing 
+      one struct entry per index, the struct entry containing
       r, logih, logim and logil in this order
    */
-   
+
 
    ri = argredtable[index].ri;
-   /* 
+   /*
       Actually we don't need the logarithm entries now
       Move the following two lines to the eventual reconstruction
-      As long as we don't have any if in the following code, we can overlap 
-      memory access with calculations 
+      As long as we don't have any if in the following code, we can overlap
+      memory access with calculations
    */
    logih = argredtable[index].logih;
    logim = argredtable[index].logim;
@@ -169,8 +169,8 @@ Renormalize3(p_resh,p_resm,p_resl,p_t_21_0h,p_t_21_0m,p_t_21_0l);
 
    yrih = yh * ri;
    yril = yl * ri;
-   th = yrih - 1.0; 
-   Add12Cond(zh, zl, th, yril); 
+   th = yrih - 1.0;
+   Add12Cond(zh, zl, th, yril);
 
    /* Polynomial approximation */
 
@@ -186,30 +186,30 @@ Renormalize3(p_resh,p_resm,p_resl,p_t_21_0h,p_t_21_0m,p_t_21_0l);
   zhSquareHalfPlusZl = zhSquareHalf + zl; /* 3 */
 
   pUpper = zhSquareHalfPlusZl + p36; /* 5 */
-  
+
   Add12(ph,pl,zh,pUpper); /* 8 */
 
-   /* Reconstruction 
+   /* Reconstruction
 
       Read logih and logim in the tables (already done)
-      
+
       Compute log(x) = E * log(2) + log(1+z) - log(ri)
       i.e. log(x) = ed * (log2h + log2m) + (ph + pl) + (logih + logim) + delta
 
       Carry out everything in double double precision
 
    */
-   
-   /* 
+
+   /*
       We store log2 as log2h + log2m + log2l where log2h and log2m have 12 trailing zeros
       Multiplication of ed (double E) and log2h is thus exact
       The overall accuracy of log2h + log2m + log2l is 53 * 3 - 24 = 135 which
       is enough for the accurate phase
       The accuracy suffices also for the quick phase: 53 * 2 - 24 = 82
       Nevertheless the storage with trailing zeros implies an overlap of the tabulated
-      triple double values. We have to take it into account for the accurate phase 
+      triple double values. We have to take it into account for the accurate phase
       basic procedures for addition and multiplication
-      The condition on the next Add12 is verified as log2m is smaller than log2h 
+      The condition on the next Add12 is verified as log2m is smaller than log2h
       and both are scaled by ed
    */
 
@@ -227,7 +227,7 @@ Renormalize3(p_resh,p_resm,p_resl,p_t_21_0h,p_t_21_0m,p_t_21_0l);
 
    if(logh == (logh + (logm * RNROUNDCST)))
      return logh;
-   else 
+   else
      {
 
        logil = argredtable[index].logil;
@@ -243,7 +243,7 @@ Renormalize3(p_resh,p_resm,p_resl,p_t_21_0h,p_t_21_0m,p_t_21_0l);
        Add33(&loghover, &logmover, &loglover, log2edh, log2edm, log2edl, logyh, logym, logyl);
 
        Renormalize3(&logh,&logm,&logl,loghover,logmover,loglover);
-                     
+
        ReturnRoundToNearest3(logh, logm, logl);
 
      } /* Accurate phase launched */
@@ -255,7 +255,7 @@ Renormalize3(p_resh,p_resm,p_resl,p_t_21_0h,p_t_21_0m,p_t_21_0l);
  *               ROUNDED UPWARDS			     *
  *************************************************************
  *************************************************************/
- double log_ru(double x){ 
+ double log_ru(double x){
    db_number xdb, yhdb;
    double yh, yl, ed, ri, logih, logim, logil, yrih, yril, th, zh, zl;
    double ph, pl, pm, log2edh, log2edl, log2edm, logTabPolyh, logTabPolyl, logh, logm, logl;
@@ -276,22 +276,22 @@ Renormalize3(p_resh,p_resm,p_resl,p_t_21_0h,p_t_21_0m,p_t_21_0l);
    /* Filter cases */
    if (xdb.i[HI] < 0x00100000){        /* x < 2^(-1022)    */
      if (((xdb.i[HI] & 0x7fffffff)|xdb.i[LO])==0){
-       return -1.0/0.0;     
+       return -1.0/0.0;
      }                    		   /* log(+/-0) = -Inf */
-     if (xdb.i[HI] < 0){ 
+     if (xdb.i[HI] < 0){
        return (x-x)/0;                      /* log(-x) = Nan    */
      }
      /* Subnormal number */
      E = -52; 		
-     xdb.d *= two52; 	  /* make x a normal number    */ 
+     xdb.d *= two52; 	  /* make x a normal number    */
    }
-    
+
    if (xdb.i[HI] >= 0x7ff00000){
      return  x+x;				 /* Inf or Nan       */
    }
-   
-   
-   /* Extract exponent and mantissa 
+
+
+   /* Extract exponent and mantissa
       Do range reduction,
       yielding to E holding the exponent and
       y the mantissa between sqrt(2)/2 and sqrt(2)
@@ -300,10 +300,10 @@ Renormalize3(p_resh,p_resm,p_resl,p_t_21_0h,p_t_21_0m,p_t_21_0l);
    index = (xdb.i[HI] & 0x000fffff);
    xdb.i[HI] =  index | 0x3ff00000;	/* do exponent = 0 */
    index = (index + (1<<(20-L-1))) >> (20-L);
- 
+
    /* reduce  such that sqrt(2)/2 < xdb.d < sqrt(2) */
    if (index >= MAXINDEX){ /* corresponds to xdb>sqrt(2)*/
-     xdb.i[HI] -= 0x00100000; 
+     xdb.i[HI] -= 0x00100000;
      E++;
    }
 
@@ -316,24 +316,24 @@ Renormalize3(p_resh,p_resm,p_resl,p_t_21_0h,p_t_21_0m,p_t_21_0l);
    /* Cast integer E into double ed for multiplication later */
    ed = (double) E;
 
-   /* 
+   /*
       Read tables:
       Read one float for ri
       Read the first two doubles for -log(r_i) (out of three)
 
       Organization of the table:
 
-      one struct entry per index, the struct entry containing 
+      one struct entry per index, the struct entry containing
       r, logih, logim and logil in this order
    */
-   
+
 
    ri = argredtable[index].ri;
-   /* 
+   /*
       Actually we don't need the logarithm entries now
       Move the following two lines to the eventual reconstruction
-      As long as we don't have any if in the following code, we can overlap 
-      memory access with calculations 
+      As long as we don't have any if in the following code, we can overlap
+      memory access with calculations
    */
    logih = argredtable[index].logih;
    logim = argredtable[index].logim;
@@ -349,8 +349,8 @@ Renormalize3(p_resh,p_resm,p_resl,p_t_21_0h,p_t_21_0m,p_t_21_0l);
 
    yrih = yh * ri;
    yril = yl * ri;
-   th = yrih - 1.0; 
-   Add12Cond(zh, zl, th, yril); 
+   th = yrih - 1.0;
+   Add12Cond(zh, zl, th, yril);
 
    /* Polynomial approximation */
 
@@ -366,30 +366,30 @@ Renormalize3(p_resh,p_resm,p_resl,p_t_21_0h,p_t_21_0m,p_t_21_0l);
   zhSquareHalfPlusZl = zhSquareHalf + zl; /* 3 */
 
   pUpper = zhSquareHalfPlusZl + p36; /* 5 */
-  
+
   Add12(ph,pl,zh,pUpper); /* 8 */
 
-   /* Reconstruction 
+   /* Reconstruction
 
       Read logih and logim in the tables (already done)
-      
+
       Compute log(x) = E * log(2) + log(1+z) - log(ri)
       i.e. log(x) = ed * (log2h + log2m) + (ph + pl) + (logih + logim) + delta
 
       Carry out everything in double double precision
 
    */
-   
-   /* 
+
+   /*
       We store log2 as log2h + log2m + log2l where log2h and log2m have 12 trailing zeros
       Multiplication of ed (double E) and log2h is thus exact
       The overall accuracy of log2h + log2m + log2l is 53 * 3 - 24 = 135 which
       is enough for the accurate phase
       The accuracy suffices also for the quick phase: 53 * 2 - 24 = 82
       Nevertheless the storage with trailing zeros implies an overlap of the tabulated
-      triple double values. We have to take it into account for the accurate phase 
+      triple double values. We have to take it into account for the accurate phase
       basic procedures for addition and multiplication
-      The condition on the next Add12 is verified as log2m is smaller than log2h 
+      The condition on the next Add12 is verified as log2m is smaller than log2h
       and both are scaled by ed
    */
 
@@ -422,7 +422,7 @@ Renormalize3(p_resh,p_resm,p_resl,p_t_21_0h,p_t_21_0m,p_t_21_0l);
        Add33(&loghover, &logmover, &loglover, log2edh, log2edm, log2edl, logyh, logym, logyl);
 
        Renormalize3(&logh,&logm,&logl,loghover,logmover,loglover);
-                     
+
        ReturnRoundUpwards3(logh, logm, logl);
 
      } /* Accurate phase launched */
@@ -434,7 +434,7 @@ Renormalize3(p_resh,p_resm,p_resl,p_t_21_0h,p_t_21_0m,p_t_21_0l);
  *               ROUNDED DOWNWARDS			     *
  *************************************************************
  *************************************************************/
- double log_rd(double x){ 
+ double log_rd(double x){
    db_number xdb, yhdb;
    double yh, yl, ed, ri, logih, logim, logil, yrih, yril, th, zh, zl;
    double ph, pl, pm, log2edh, log2edl, log2edm, logTabPolyh, logTabPolyl, logh, logm, logl;
@@ -455,22 +455,22 @@ Renormalize3(p_resh,p_resm,p_resl,p_t_21_0h,p_t_21_0m,p_t_21_0l);
    /* Filter cases */
    if (xdb.i[HI] < 0x00100000){        /* x < 2^(-1022)    */
      if (((xdb.i[HI] & 0x7fffffff)|xdb.i[LO])==0){
-       return -1.0/0.0;     
+       return -1.0/0.0;
      }                    		   /* log(+/-0) = -Inf */
-     if (xdb.i[HI] < 0){ 
+     if (xdb.i[HI] < 0){
        return (x-x)/0;                      /* log(-x) = Nan    */
      }
      /* Subnormal number */
      E = -52; 		
-     xdb.d *= two52; 	  /* make x a normal number    */ 
+     xdb.d *= two52; 	  /* make x a normal number    */
    }
-    
+
    if (xdb.i[HI] >= 0x7ff00000){
      return  x+x;				 /* Inf or Nan       */
    }
-   
-   
-   /* Extract exponent and mantissa 
+
+
+   /* Extract exponent and mantissa
       Do range reduction,
       yielding to E holding the exponent and
       y the mantissa between sqrt(2)/2 and sqrt(2)
@@ -479,10 +479,10 @@ Renormalize3(p_resh,p_resm,p_resl,p_t_21_0h,p_t_21_0m,p_t_21_0l);
    index = (xdb.i[HI] & 0x000fffff);
    xdb.i[HI] =  index | 0x3ff00000;	/* do exponent = 0 */
    index = (index + (1<<(20-L-1))) >> (20-L);
- 
+
    /* reduce  such that sqrt(2)/2 < xdb.d < sqrt(2) */
    if (index >= MAXINDEX){ /* corresponds to xdb>sqrt(2)*/
-     xdb.i[HI] -= 0x00100000; 
+     xdb.i[HI] -= 0x00100000;
      E++;
    }
 
@@ -495,24 +495,24 @@ Renormalize3(p_resh,p_resm,p_resl,p_t_21_0h,p_t_21_0m,p_t_21_0l);
    /* Cast integer E into double ed for multiplication later */
    ed = (double) E;
 
-   /* 
+   /*
       Read tables:
       Read one float for ri
       Read the first two doubles for -log(r_i) (out of three)
 
       Organization of the table:
 
-      one struct entry per index, the struct entry containing 
+      one struct entry per index, the struct entry containing
       r, logih, logim and logil in this order
    */
-   
+
 
    ri = argredtable[index].ri;
-   /* 
+   /*
       Actually we don't need the logarithm entries now
       Move the following two lines to the eventual reconstruction
-      As long as we don't have any if in the following code, we can overlap 
-      memory access with calculations 
+      As long as we don't have any if in the following code, we can overlap
+      memory access with calculations
    */
    logih = argredtable[index].logih;
    logim = argredtable[index].logim;
@@ -528,8 +528,8 @@ Renormalize3(p_resh,p_resm,p_resl,p_t_21_0h,p_t_21_0m,p_t_21_0l);
 
    yrih = yh * ri;
    yril = yl * ri;
-   th = yrih - 1.0; 
-   Add12Cond(zh, zl, th, yril); 
+   th = yrih - 1.0;
+   Add12Cond(zh, zl, th, yril);
 
    /* Polynomial approximation */
 
@@ -545,30 +545,30 @@ Renormalize3(p_resh,p_resm,p_resl,p_t_21_0h,p_t_21_0m,p_t_21_0l);
   zhSquareHalfPlusZl = zhSquareHalf + zl; /* 3 */
 
   pUpper = zhSquareHalfPlusZl + p36; /* 5 */
-  
+
   Add12(ph,pl,zh,pUpper); /* 8 */
 
-   /* Reconstruction 
+   /* Reconstruction
 
       Read logih and logim in the tables (already done)
-      
+
       Compute log(x) = E * log(2) + log(1+z) - log(ri)
       i.e. log(x) = ed * (log2h + log2m) + (ph + pl) + (logih + logim) + delta
 
       Carry out everything in double double precision
 
    */
-   
-   /* 
+
+   /*
       We store log2 as log2h + log2m + log2l where log2h and log2m have 12 trailing zeros
       Multiplication of ed (double E) and log2h is thus exact
       The overall accuracy of log2h + log2m + log2l is 53 * 3 - 24 = 135 which
       is enough for the accurate phase
       The accuracy suffices also for the quick phase: 53 * 2 - 24 = 82
       Nevertheless the storage with trailing zeros implies an overlap of the tabulated
-      triple double values. We have to take it into account for the accurate phase 
+      triple double values. We have to take it into account for the accurate phase
       basic procedures for addition and multiplication
-      The condition on the next Add12 is verified as log2m is smaller than log2h 
+      The condition on the next Add12 is verified as log2m is smaller than log2h
       and both are scaled by ed
    */
 
@@ -601,7 +601,7 @@ Renormalize3(p_resh,p_resm,p_resl,p_t_21_0h,p_t_21_0m,p_t_21_0l);
        Add33(&loghover, &logmover, &loglover, log2edh, log2edm, log2edl, logyh, logym, logyl);
 
        Renormalize3(&logh,&logm,&logl,loghover,logmover,loglover);
-                     
+
        ReturnRoundDownwards3(logh, logm, logl);
 
      } /* Accurate phase launched */
@@ -613,7 +613,7 @@ Renormalize3(p_resh,p_resm,p_resl,p_t_21_0h,p_t_21_0m,p_t_21_0l);
  *               ROUNDED TOWARDS ZERO			     *
  *************************************************************
  *************************************************************/
- double log_rz(double x){ 
+ double log_rz(double x){
    db_number xdb, yhdb;
    double yh, yl, ed, ri, logih, logim, logil, yrih, yril, th, zh, zl;
    double ph, pl, pm, log2edh, log2edl, log2edm, logTabPolyh, logTabPolyl, logh, logm, logl;
@@ -634,22 +634,22 @@ Renormalize3(p_resh,p_resm,p_resl,p_t_21_0h,p_t_21_0m,p_t_21_0l);
    /* Filter cases */
    if (xdb.i[HI] < 0x00100000){        /* x < 2^(-1022)    */
      if (((xdb.i[HI] & 0x7fffffff)|xdb.i[LO])==0){
-       return -1.0/0.0;     
+       return -1.0/0.0;
      }                    		   /* log(+/-0) = -Inf */
-     if (xdb.i[HI] < 0){ 
+     if (xdb.i[HI] < 0){
        return (x-x)/0;                      /* log(-x) = Nan    */
      }
      /* Subnormal number */
      E = -52; 		
-     xdb.d *= two52; 	  /* make x a normal number    */ 
+     xdb.d *= two52; 	  /* make x a normal number    */
    }
-    
+
    if (xdb.i[HI] >= 0x7ff00000){
      return  x+x;				 /* Inf or Nan       */
    }
-   
-   
-   /* Extract exponent and mantissa 
+
+
+   /* Extract exponent and mantissa
       Do range reduction,
       yielding to E holding the exponent and
       y the mantissa between sqrt(2)/2 and sqrt(2)
@@ -658,10 +658,10 @@ Renormalize3(p_resh,p_resm,p_resl,p_t_21_0h,p_t_21_0m,p_t_21_0l);
    index = (xdb.i[HI] & 0x000fffff);
    xdb.i[HI] =  index | 0x3ff00000;	/* do exponent = 0 */
    index = (index + (1<<(20-L-1))) >> (20-L);
- 
+
    /* reduce  such that sqrt(2)/2 < xdb.d < sqrt(2) */
    if (index >= MAXINDEX){ /* corresponds to xdb>sqrt(2)*/
-     xdb.i[HI] -= 0x00100000; 
+     xdb.i[HI] -= 0x00100000;
      E++;
    }
 
@@ -674,24 +674,24 @@ Renormalize3(p_resh,p_resm,p_resl,p_t_21_0h,p_t_21_0m,p_t_21_0l);
    /* Cast integer E into double ed for multiplication later */
    ed = (double) E;
 
-   /* 
+   /*
       Read tables:
       Read one float for ri
       Read the first two doubles for -log(r_i) (out of three)
 
       Organization of the table:
 
-      one struct entry per index, the struct entry containing 
+      one struct entry per index, the struct entry containing
       r, logih, logim and logil in this order
    */
-   
+
 
    ri = argredtable[index].ri;
-   /* 
+   /*
       Actually we don't need the logarithm entries now
       Move the following two lines to the eventual reconstruction
-      As long as we don't have any if in the following code, we can overlap 
-      memory access with calculations 
+      As long as we don't have any if in the following code, we can overlap
+      memory access with calculations
    */
    logih = argredtable[index].logih;
    logim = argredtable[index].logim;
@@ -707,8 +707,8 @@ Renormalize3(p_resh,p_resm,p_resl,p_t_21_0h,p_t_21_0m,p_t_21_0l);
 
    yrih = yh * ri;
    yril = yl * ri;
-   th = yrih - 1.0; 
-   Add12Cond(zh, zl, th, yril); 
+   th = yrih - 1.0;
+   Add12Cond(zh, zl, th, yril);
 
    /* Polynomial approximation */
 
@@ -724,30 +724,30 @@ Renormalize3(p_resh,p_resm,p_resl,p_t_21_0h,p_t_21_0m,p_t_21_0l);
   zhSquareHalfPlusZl = zhSquareHalf + zl; /* 3 */
 
   pUpper = zhSquareHalfPlusZl + p36; /* 5 */
-  
+
   Add12(ph,pl,zh,pUpper); /* 8 */
 
-   /* Reconstruction 
+   /* Reconstruction
 
       Read logih and logim in the tables (already done)
-      
+
       Compute log(x) = E * log(2) + log(1+z) - log(ri)
       i.e. log(x) = ed * (log2h + log2m) + (ph + pl) + (logih + logim) + delta
 
       Carry out everything in double double precision
 
    */
-   
-   /* 
+
+   /*
       We store log2 as log2h + log2m + log2l where log2h and log2m have 12 trailing zeros
       Multiplication of ed (double E) and log2h is thus exact
       The overall accuracy of log2h + log2m + log2l is 53 * 3 - 24 = 135 which
       is enough for the accurate phase
       The accuracy suffices also for the quick phase: 53 * 2 - 24 = 82
       Nevertheless the storage with trailing zeros implies an overlap of the tabulated
-      triple double values. We have to take it into account for the accurate phase 
+      triple double values. We have to take it into account for the accurate phase
       basic procedures for addition and multiplication
-      The condition on the next Add12 is verified as log2m is smaller than log2h 
+      The condition on the next Add12 is verified as log2m is smaller than log2h
       and both are scaled by ed
    */
 
@@ -780,7 +780,7 @@ Renormalize3(p_resh,p_resm,p_resl,p_t_21_0h,p_t_21_0m,p_t_21_0l);
        Add33(&loghover, &logmover, &loglover, log2edh, log2edm, log2edl, logyh, logym, logyl);
 
        Renormalize3(&logh,&logm,&logl,loghover,logmover,loglover);
-                     
+
        ReturnRoundTowardsZero3(logh, logm, logl);
 
      } /* Accurate phase launched */
@@ -791,7 +791,7 @@ Renormalize3(p_resh,p_resm,p_resl,p_t_21_0h,p_t_21_0m,p_t_21_0l);
  *               ROUNDED  TO NEAREST			     *
  *************************************************************
  *************************************************************/
- double log2_rn(double x){ 
+ double log2_rn(double x){
    db_number xdb, yhdb;
    double yh, yl, ed, ri, logih, logim, logil, yrih, yril, th, zh, zl;
    double ph, pl, pm, logTabPolyh, logTabPolyl, logh, logm, logl;
@@ -812,22 +812,22 @@ Renormalize3(p_resh,p_resm,p_resl,p_t_21_0h,p_t_21_0m,p_t_21_0l);
    /* Filter cases */
    if (xdb.i[HI] < 0x00100000){        /* x < 2^(-1022)    */
      if (((xdb.i[HI] & 0x7fffffff)|xdb.i[LO])==0){
-       return -1.0/0.0;     
+       return -1.0/0.0;
      }                    		   /* log(+/-0) = -Inf */
-     if (xdb.i[HI] < 0){ 
+     if (xdb.i[HI] < 0){
        return (x-x)/0;                      /* log(-x) = Nan    */
      }
      /* Subnormal number */
      E = -52; 		
-     xdb.d *= two52; 	  /* make x a normal number    */ 
+     xdb.d *= two52; 	  /* make x a normal number    */
    }
-    
+
    if (xdb.i[HI] >= 0x7ff00000){
      return  x+x;				 /* Inf or Nan       */
    }
-   
-   
-   /* Extract exponent and mantissa 
+
+
+   /* Extract exponent and mantissa
       Do range reduction,
       yielding to E holding the exponent and
       y the mantissa between sqrt(2)/2 and sqrt(2)
@@ -836,10 +836,10 @@ Renormalize3(p_resh,p_resm,p_resl,p_t_21_0h,p_t_21_0m,p_t_21_0l);
    index = (xdb.i[HI] & 0x000fffff);
    xdb.i[HI] =  index | 0x3ff00000;	/* do exponent = 0 */
    index = (index + (1<<(20-L-1))) >> (20-L);
- 
+
    /* reduce  such that sqrt(2)/2 < xdb.d < sqrt(2) */
    if (index >= MAXINDEX){ /* corresponds to xdb>sqrt(2)*/
-     xdb.i[HI] -= 0x00100000; 
+     xdb.i[HI] -= 0x00100000;
      E++;
    }
 
@@ -852,24 +852,24 @@ Renormalize3(p_resh,p_resm,p_resl,p_t_21_0h,p_t_21_0m,p_t_21_0l);
    /* Cast integer E into double ed for multiplication later */
    ed = (double) E;
 
-   /* 
+   /*
       Read tables:
       Read one float for ri
       Read the first two doubles for -log(r_i) (out of three)
 
       Organization of the table:
 
-      one struct entry per index, the struct entry containing 
+      one struct entry per index, the struct entry containing
       r, logih, logim and logil in this order
    */
-   
+
 
    ri = argredtable[index].ri;
-   /* 
+   /*
       Actually we don't need the logarithm entries now
       Move the following two lines to the eventual reconstruction
-      As long as we don't have any if in the following code, we can overlap 
-      memory access with calculations 
+      As long as we don't have any if in the following code, we can overlap
+      memory access with calculations
    */
    logih = argredtable[index].logih;
    logim = argredtable[index].logim;
@@ -885,8 +885,8 @@ Renormalize3(p_resh,p_resm,p_resl,p_t_21_0h,p_t_21_0m,p_t_21_0l);
 
    yrih = yh * ri;
    yril = yl * ri;
-   th = yrih - 1.0; 
-   Add12Cond(zh, zl, th, yril); 
+   th = yrih - 1.0;
+   Add12Cond(zh, zl, th, yril);
 
    /* Polynomial approximation */
 
@@ -902,20 +902,20 @@ Renormalize3(p_resh,p_resm,p_resl,p_t_21_0h,p_t_21_0m,p_t_21_0l);
   zhSquareHalfPlusZl = zhSquareHalf + zl; /* 3 */
 
   pUpper = zhSquareHalfPlusZl + p36; /* 5 */
-  
+
   Add12(ph,pl,zh,pUpper); /* 8 */
 
-   /* Reconstruction 
+   /* Reconstruction
 
       Read logih and logim in the tables (already done)
-      
+
       Compute log2(x) = E + 1/log(2) * (log(1+z) - log(ri))
 
 
       Carry out everything in double double precision
 
    */
-   
+
    /* Add logih and logim to ph and pl */
 
    Add22(&logTabPolyh, &logTabPolyl, logih, logim, ph, pl);
@@ -925,14 +925,14 @@ Renormalize3(p_resh,p_resm,p_resl,p_t_21_0h,p_t_21_0m,p_t_21_0l);
    Mul22(&log2TabPolyh,&log2TabPolyl, RECPRLOG2H, RECPRLOG2L, logTabPolyh, logTabPolyl);
 
    /* Add E */
-   
+
    Add122(&logh, &logm, ed, log2TabPolyh, log2TabPolyl);
 
    /* Rounding test and possible return or call to the accurate function */
 
    if(logh == (logh + (logm * RNROUNDCST)))
      return logh;
-   else 
+   else
      {
 
        logil = argredtable[index].logil;
@@ -942,11 +942,11 @@ Renormalize3(p_resh,p_resm,p_resl,p_t_21_0h,p_t_21_0m,p_t_21_0l);
        Add33(&logyh, &logym, &logyl, logih, logim, logil, ph, pm, pl);
 
        Mul233(&log2yh,&log2ym,&log2yl,RECPRLOG2H,RECPRLOG2L,logyh,logym,logyl);
-       
+
        Add133(&loghover,&logmover,&loglover,ed,log2yh,log2ym,log2yl);
 
        Renormalize3(&logh,&logm,&logl,loghover,logmover,loglover);
-                     
+
        ReturnRoundToNearest3(logh, logm, logl);
 
      } /* Accurate phase launched */
@@ -957,7 +957,7 @@ Renormalize3(p_resh,p_resm,p_resl,p_t_21_0h,p_t_21_0m,p_t_21_0l);
  *               ROUNDED  UPWARDS			     *
  *************************************************************
  *************************************************************/
- double log2_ru(double x){ 
+ double log2_ru(double x){
    db_number xdb, yhdb;
    double yh, yl, ed, ri, logih, logim, logil, yrih, yril, th, zh, zl;
    double ph, pl, pm, logTabPolyh, logTabPolyl, logh, logm, logl;
@@ -978,22 +978,22 @@ Renormalize3(p_resh,p_resm,p_resl,p_t_21_0h,p_t_21_0m,p_t_21_0l);
    /* Filter cases */
    if (xdb.i[HI] < 0x00100000){        /* x < 2^(-1022)    */
      if (((xdb.i[HI] & 0x7fffffff)|xdb.i[LO])==0){
-       return -1.0/0.0;     
+       return -1.0/0.0;
      }                    		   /* log(+/-0) = -Inf */
-     if (xdb.i[HI] < 0){ 
+     if (xdb.i[HI] < 0){
        return (x-x)/0;                      /* log(-x) = Nan    */
      }
      /* Subnormal number */
      E = -52; 		
-     xdb.d *= two52; 	  /* make x a normal number    */ 
+     xdb.d *= two52; 	  /* make x a normal number    */
    }
-    
+
    if (xdb.i[HI] >= 0x7ff00000){
      return  x+x;				 /* Inf or Nan       */
    }
-   
-   
-   /* Extract exponent and mantissa 
+
+
+   /* Extract exponent and mantissa
       Do range reduction,
       yielding to E holding the exponent and
       y the mantissa between sqrt(2)/2 and sqrt(2)
@@ -1002,16 +1002,16 @@ Renormalize3(p_resh,p_resm,p_resl,p_t_21_0h,p_t_21_0m,p_t_21_0l);
    index = (xdb.i[HI] & 0x000fffff);
 
    /* Test now if the argument is an exact power of 2
-      i.e. if the mantissa is exactly 1 (0x0..0 with the implicit bit) 
-      This test is necessary for filtering out the cases where the final 
-      rounding test cannot distinguish between an exact algebraic 
-      number and a hard case to round 
+      i.e. if the mantissa is exactly 1 (0x0..0 with the implicit bit)
+      This test is necessary for filtering out the cases where the final
+      rounding test cannot distinguish between an exact algebraic
+      number and a hard case to round
    */
 
    if ((index | xdb.i[LO]) == 0) {
-     /* Handle the "trivial" case for log2: 
+     /* Handle the "trivial" case for log2:
 	The argument is an exact power of 2, return thus
-	just the exponant of the number 
+	just the exponant of the number
      */
 
      return (double) E;
@@ -1020,10 +1020,10 @@ Renormalize3(p_resh,p_resm,p_resl,p_t_21_0h,p_t_21_0m,p_t_21_0l);
 
    xdb.i[HI] =  index | 0x3ff00000;	/* do exponent = 0 */
    index = (index + (1<<(20-L-1))) >> (20-L);
- 
+
    /* reduce  such that sqrt(2)/2 < xdb.d < sqrt(2) */
    if (index >= MAXINDEX){ /* corresponds to xdb>sqrt(2)*/
-     xdb.i[HI] -= 0x00100000; 
+     xdb.i[HI] -= 0x00100000;
      E++;
    }
 
@@ -1036,24 +1036,24 @@ Renormalize3(p_resh,p_resm,p_resl,p_t_21_0h,p_t_21_0m,p_t_21_0l);
    /* Cast integer E into double ed for multiplication later */
    ed = (double) E;
 
-   /* 
+   /*
       Read tables:
       Read one float for ri
       Read the first two doubles for -log(r_i) (out of three)
 
       Organization of the table:
 
-      one struct entry per index, the struct entry containing 
+      one struct entry per index, the struct entry containing
       r, logih, logim and logil in this order
    */
-   
+
 
    ri = argredtable[index].ri;
-   /* 
+   /*
       Actually we don't need the logarithm entries now
       Move the following two lines to the eventual reconstruction
-      As long as we don't have any if in the following code, we can overlap 
-      memory access with calculations 
+      As long as we don't have any if in the following code, we can overlap
+      memory access with calculations
    */
    logih = argredtable[index].logih;
    logim = argredtable[index].logim;
@@ -1069,8 +1069,8 @@ Renormalize3(p_resh,p_resm,p_resl,p_t_21_0h,p_t_21_0m,p_t_21_0l);
 
    yrih = yh * ri;
    yril = yl * ri;
-   th = yrih - 1.0; 
-   Add12Cond(zh, zl, th, yril); 
+   th = yrih - 1.0;
+   Add12Cond(zh, zl, th, yril);
 
    /* Polynomial approximation */
 
@@ -1086,20 +1086,20 @@ Renormalize3(p_resh,p_resm,p_resl,p_t_21_0h,p_t_21_0m,p_t_21_0l);
   zhSquareHalfPlusZl = zhSquareHalf + zl; /* 3 */
 
   pUpper = zhSquareHalfPlusZl + p36; /* 5 */
-  
+
   Add12(ph,pl,zh,pUpper); /* 8 */
 
-   /* Reconstruction 
+   /* Reconstruction
 
       Read logih and logim in the tables (already done)
-      
+
       Compute log2(x) = E + 1/log(2) * (log(1+z) - log(ri))
 
 
       Carry out everything in double double precision
 
    */
-   
+
    /* Add logih and logim to ph and pl */
 
    Add22(&logTabPolyh, &logTabPolyl, logih, logim, ph, pl);
@@ -1109,7 +1109,7 @@ Renormalize3(p_resh,p_resm,p_resl,p_t_21_0h,p_t_21_0m,p_t_21_0l);
    Mul22(&log2TabPolyh,&log2TabPolyl, RECPRLOG2H, RECPRLOG2L, logTabPolyh, logTabPolyl);
 
    /* Add E */
-   
+
    Add122(&logh, &logm, ed, log2TabPolyh, log2TabPolyl);
 
    /* Rounding test and eventual return or call to the accurate function */
@@ -1124,11 +1124,11 @@ Renormalize3(p_resh,p_resm,p_resl,p_t_21_0h,p_t_21_0m,p_t_21_0l);
        Add33(&logyh, &logym, &logyl, logih, logim, logil, ph, pm, pl);
 
        Mul233(&log2yh,&log2ym,&log2yl,RECPRLOG2H,RECPRLOG2L,logyh,logym,logyl);
-       
+
        Add133(&loghover,&logmover,&loglover,ed,log2yh,log2ym,log2yl);
 
        Renormalize3(&logh,&logm,&logl,loghover,logmover,loglover);
-                     
+
        ReturnRoundUpwards3(logh, logm, logl);
 
      } /* Accurate phase launched */
@@ -1139,7 +1139,7 @@ Renormalize3(p_resh,p_resm,p_resl,p_t_21_0h,p_t_21_0m,p_t_21_0l);
  *               ROUNDED DOWNWARDS			     *
  *************************************************************
  *************************************************************/
- double log2_rd(double x){ 
+ double log2_rd(double x){
    db_number xdb, yhdb;
    double yh, yl, ed, ri, logih, logim, logil, yrih, yril, th, zh, zl;
    double ph, pl, pm, logTabPolyh, logTabPolyl, logh, logm, logl;
@@ -1160,22 +1160,22 @@ Renormalize3(p_resh,p_resm,p_resl,p_t_21_0h,p_t_21_0m,p_t_21_0l);
    /* Filter cases */
    if (xdb.i[HI] < 0x00100000){        /* x < 2^(-1022)    */
      if (((xdb.i[HI] & 0x7fffffff)|xdb.i[LO])==0){
-       return -1.0/0.0;     
+       return -1.0/0.0;
      }                    		   /* log(+/-0) = -Inf */
-     if (xdb.i[HI] < 0){ 
+     if (xdb.i[HI] < 0){
        return (x-x)/0;                      /* log(-x) = Nan    */
      }
      /* Subnormal number */
      E = -52; 		
-     xdb.d *= two52; 	  /* make x a normal number    */ 
+     xdb.d *= two52; 	  /* make x a normal number    */
    }
-    
+
    if (xdb.i[HI] >= 0x7ff00000){
      return  x+x;				 /* Inf or Nan       */
    }
-   
-   
-   /* Extract exponent and mantissa 
+
+
+   /* Extract exponent and mantissa
       Do range reduction,
       yielding to E holding the exponent and
       y the mantissa between sqrt(2)/2 and sqrt(2)
@@ -1184,16 +1184,16 @@ Renormalize3(p_resh,p_resm,p_resl,p_t_21_0h,p_t_21_0m,p_t_21_0l);
    index = (xdb.i[HI] & 0x000fffff);
 
    /* Test now if the argument is an exact power of 2
-      i.e. if the mantissa is exactly 1 (0x0..0 with the implicit bit) 
-      This test is necessary for filtering out the cases where the final 
-      rounding test cannot distinguish between an exact algebraic 
-      number and a hard case to round 
+      i.e. if the mantissa is exactly 1 (0x0..0 with the implicit bit)
+      This test is necessary for filtering out the cases where the final
+      rounding test cannot distinguish between an exact algebraic
+      number and a hard case to round
    */
 
    if ((index | xdb.i[LO]) == 0) {
-     /* Handle the "trivial" case for log2: 
+     /* Handle the "trivial" case for log2:
 	The argument is an exact power of 2, return thus
-	just the exponant of the number 
+	just the exponant of the number
      */
 
      return (double) E;
@@ -1202,10 +1202,10 @@ Renormalize3(p_resh,p_resm,p_resl,p_t_21_0h,p_t_21_0m,p_t_21_0l);
 
    xdb.i[HI] =  index | 0x3ff00000;	/* do exponent = 0 */
    index = (index + (1<<(20-L-1))) >> (20-L);
- 
+
    /* reduce  such that sqrt(2)/2 < xdb.d < sqrt(2) */
    if (index >= MAXINDEX){ /* corresponds to xdb>sqrt(2)*/
-     xdb.i[HI] -= 0x00100000; 
+     xdb.i[HI] -= 0x00100000;
      E++;
    }
 
@@ -1218,24 +1218,24 @@ Renormalize3(p_resh,p_resm,p_resl,p_t_21_0h,p_t_21_0m,p_t_21_0l);
    /* Cast integer E into double ed for multiplication later */
    ed = (double) E;
 
-   /* 
+   /*
       Read tables:
       Read one float for ri
       Read the first two doubles for -log(r_i) (out of three)
 
       Organization of the table:
 
-      one struct entry per index, the struct entry containing 
+      one struct entry per index, the struct entry containing
       r, logih, logim and logil in this order
    */
-   
+
 
    ri = argredtable[index].ri;
-   /* 
+   /*
       Actually we don't need the logarithm entries now
       Move the following two lines to the eventual reconstruction
-      As long as we don't have any if in the following code, we can overlap 
-      memory access with calculations 
+      As long as we don't have any if in the following code, we can overlap
+      memory access with calculations
    */
    logih = argredtable[index].logih;
    logim = argredtable[index].logim;
@@ -1251,8 +1251,8 @@ Renormalize3(p_resh,p_resm,p_resl,p_t_21_0h,p_t_21_0m,p_t_21_0l);
 
    yrih = yh * ri;
    yril = yl * ri;
-   th = yrih - 1.0; 
-   Add12Cond(zh, zl, th, yril); 
+   th = yrih - 1.0;
+   Add12Cond(zh, zl, th, yril);
 
    /* Polynomial approximation */
 
@@ -1268,20 +1268,20 @@ Renormalize3(p_resh,p_resm,p_resl,p_t_21_0h,p_t_21_0m,p_t_21_0l);
   zhSquareHalfPlusZl = zhSquareHalf + zl; /* 3 */
 
   pUpper = zhSquareHalfPlusZl + p36; /* 5 */
-  
+
   Add12(ph,pl,zh,pUpper); /* 8 */
 
-   /* Reconstruction 
+   /* Reconstruction
 
       Read logih and logim in the tables (already done)
-      
+
       Compute log2(x) = E + 1/log(2) * (log(1+z) - log(ri))
 
 
       Carry out everything in double double precision
 
    */
-   
+
    /* Add logih and logim to ph and pl */
 
    Add22(&logTabPolyh, &logTabPolyl, logih, logim, ph, pl);
@@ -1291,7 +1291,7 @@ Renormalize3(p_resh,p_resm,p_resl,p_t_21_0h,p_t_21_0m,p_t_21_0l);
    Mul22(&log2TabPolyh,&log2TabPolyl, RECPRLOG2H, RECPRLOG2L, logTabPolyh, logTabPolyl);
 
    /* Add E */
-   
+
    Add122(&logh, &logm, ed, log2TabPolyh, log2TabPolyl);
 
    /* Rounding test and eventual return or call to the accurate function */
@@ -1306,11 +1306,11 @@ Renormalize3(p_resh,p_resm,p_resl,p_t_21_0h,p_t_21_0m,p_t_21_0l);
        Add33(&logyh, &logym, &logyl, logih, logim, logil, ph, pm, pl);
 
        Mul233(&log2yh,&log2ym,&log2yl,RECPRLOG2H,RECPRLOG2L,logyh,logym,logyl);
-       
+
        Add133(&loghover,&logmover,&loglover,ed,log2yh,log2ym,log2yl);
 
        Renormalize3(&logh,&logm,&logl,loghover,logmover,loglover);
-                     
+
        ReturnRoundDownwards3(logh, logm, logl);
 
      } /* Accurate phase launched */
@@ -1321,7 +1321,7 @@ Renormalize3(p_resh,p_resm,p_resl,p_t_21_0h,p_t_21_0m,p_t_21_0l);
  *               ROUNDED TOWARDS ZERO			     *
  *************************************************************
  *************************************************************/
- double log2_rz(double x){ 
+ double log2_rz(double x){
    db_number xdb, yhdb;
    double yh, yl, ed, ri, logih, logim, logil, yrih, yril, th, zh, zl;
    double ph, pl, pm, logTabPolyh, logTabPolyl, logh, logm, logl;
@@ -1342,22 +1342,22 @@ Renormalize3(p_resh,p_resm,p_resl,p_t_21_0h,p_t_21_0m,p_t_21_0l);
    /* Filter cases */
    if (xdb.i[HI] < 0x00100000){        /* x < 2^(-1022)    */
      if (((xdb.i[HI] & 0x7fffffff)|xdb.i[LO])==0){
-       return -1.0/0.0;     
+       return -1.0/0.0;
      }                    		   /* log(+/-0) = -Inf */
-     if (xdb.i[HI] < 0){ 
+     if (xdb.i[HI] < 0){
        return (x-x)/0;                      /* log(-x) = Nan    */
      }
      /* Subnormal number */
      E = -52; 		
-     xdb.d *= two52; 	  /* make x a normal number    */ 
+     xdb.d *= two52; 	  /* make x a normal number    */
    }
-    
+
    if (xdb.i[HI] >= 0x7ff00000){
      return  x+x;				 /* Inf or Nan       */
    }
-   
-   
-   /* Extract exponent and mantissa 
+
+
+   /* Extract exponent and mantissa
       Do range reduction,
       yielding to E holding the exponent and
       y the mantissa between sqrt(2)/2 and sqrt(2)
@@ -1366,16 +1366,16 @@ Renormalize3(p_resh,p_resm,p_resl,p_t_21_0h,p_t_21_0m,p_t_21_0l);
    index = (xdb.i[HI] & 0x000fffff);
 
    /* Test now if the argument is an exact power of 2
-      i.e. if the mantissa is exactly 1 (0x0..0 with the implicit bit) 
-      This test is necessary for filtering out the cases where the final 
-      rounding test cannot distinguish between an exact algebraic 
-      number and a hard case to round 
+      i.e. if the mantissa is exactly 1 (0x0..0 with the implicit bit)
+      This test is necessary for filtering out the cases where the final
+      rounding test cannot distinguish between an exact algebraic
+      number and a hard case to round
    */
 
    if ((index | xdb.i[LO]) == 0) {
-     /* Handle the "trivial" case for log2: 
+     /* Handle the "trivial" case for log2:
 	The argument is an exact power of 2, return thus
-	just the exponant of the number 
+	just the exponant of the number
      */
 
      return (double) E;
@@ -1384,10 +1384,10 @@ Renormalize3(p_resh,p_resm,p_resl,p_t_21_0h,p_t_21_0m,p_t_21_0l);
 
    xdb.i[HI] =  index | 0x3ff00000;	/* do exponent = 0 */
    index = (index + (1<<(20-L-1))) >> (20-L);
- 
+
    /* reduce  such that sqrt(2)/2 < xdb.d < sqrt(2) */
    if (index >= MAXINDEX){ /* corresponds to xdb>sqrt(2)*/
-     xdb.i[HI] -= 0x00100000; 
+     xdb.i[HI] -= 0x00100000;
      E++;
    }
 
@@ -1400,24 +1400,24 @@ Renormalize3(p_resh,p_resm,p_resl,p_t_21_0h,p_t_21_0m,p_t_21_0l);
    /* Cast integer E into double ed for multiplication later */
    ed = (double) E;
 
-   /* 
+   /*
       Read tables:
       Read one float for ri
       Read the first two doubles for -log(r_i) (out of three)
 
       Organization of the table:
 
-      one struct entry per index, the struct entry containing 
+      one struct entry per index, the struct entry containing
       r, logih, logim and logil in this order
    */
-   
+
 
    ri = argredtable[index].ri;
-   /* 
+   /*
       Actually we don't need the logarithm entries now
       Move the following two lines to the eventual reconstruction
-      As long as we don't have any if in the following code, we can overlap 
-      memory access with calculations 
+      As long as we don't have any if in the following code, we can overlap
+      memory access with calculations
    */
    logih = argredtable[index].logih;
    logim = argredtable[index].logim;
@@ -1433,8 +1433,8 @@ Renormalize3(p_resh,p_resm,p_resl,p_t_21_0h,p_t_21_0m,p_t_21_0l);
 
    yrih = yh * ri;
    yril = yl * ri;
-   th = yrih - 1.0; 
-   Add12Cond(zh, zl, th, yril); 
+   th = yrih - 1.0;
+   Add12Cond(zh, zl, th, yril);
 
    /* Polynomial approximation */
 
@@ -1450,20 +1450,20 @@ Renormalize3(p_resh,p_resm,p_resl,p_t_21_0h,p_t_21_0m,p_t_21_0l);
   zhSquareHalfPlusZl = zhSquareHalf + zl; /* 3 */
 
   pUpper = zhSquareHalfPlusZl + p36; /* 5 */
-  
+
   Add12(ph,pl,zh,pUpper); /* 8 */
 
-   /* Reconstruction 
+   /* Reconstruction
 
       Read logih and logim in the tables (already done)
-      
+
       Compute log2(x) = E + 1/log(2) * (log(1+z) - log(ri))
 
 
       Carry out everything in double double precision
 
    */
-   
+
    /* Add logih and logim to ph and pl */
 
    Add22(&logTabPolyh, &logTabPolyl, logih, logim, ph, pl);
@@ -1473,7 +1473,7 @@ Renormalize3(p_resh,p_resm,p_resl,p_t_21_0h,p_t_21_0m,p_t_21_0l);
    Mul22(&log2TabPolyh,&log2TabPolyl, RECPRLOG2H, RECPRLOG2L, logTabPolyh, logTabPolyl);
 
    /* Add E */
-   
+
    Add122(&logh, &logm, ed, log2TabPolyh, log2TabPolyl);
 
    /* Rounding test and possible return or call to the accurate function */
@@ -1488,11 +1488,11 @@ Renormalize3(p_resh,p_resm,p_resl,p_t_21_0h,p_t_21_0m,p_t_21_0l);
        Add33(&logyh, &logym, &logyl, logih, logim, logil, ph, pm, pl);
 
        Mul233(&log2yh,&log2ym,&log2yl,RECPRLOG2H,RECPRLOG2L,logyh,logym,logyl);
-       
+
        Add133(&loghover,&logmover,&loglover,ed,log2yh,log2ym,log2yl);
 
        Renormalize3(&logh,&logm,&logl,loghover,logmover,loglover);
-                     
+
        ReturnRoundTowardsZero3(logh, logm, logl);
 
      } /* Accurate phase launched */
@@ -1503,7 +1503,7 @@ Renormalize3(p_resh,p_resm,p_resl,p_t_21_0h,p_t_21_0m,p_t_21_0l);
  *               ROUNDED  TO NEAREST			     *
  *************************************************************
  *************************************************************/
- double log10_rn(double x){ 
+ double log10_rn(double x){
    db_number xdb, yhdb;
    double yh, yl, ed, ri, logih, logim, logil, yrih, yril, th, zh, zl;
    double ph, pl, pm, log2edh, log2edl, log2edm, logTabPolyh, logTabPolyl, logh, logm, logl;
@@ -1525,22 +1525,22 @@ Renormalize3(p_resh,p_resm,p_resl,p_t_21_0h,p_t_21_0m,p_t_21_0l);
    /* Filter cases */
    if (xdb.i[HI] < 0x00100000){        /* x < 2^(-1022)    */
      if (((xdb.i[HI] & 0x7fffffff)|xdb.i[LO])==0){
-       return -1.0/0.0;     
+       return -1.0/0.0;
      }                    		   /* log(+/-0) = -Inf */
-     if (xdb.i[HI] < 0){ 
+     if (xdb.i[HI] < 0){
        return (x-x)/0;                      /* log(-x) = Nan    */
      }
      /* Subnormal number */
      E = -52; 		
-     xdb.d *= two52; 	  /* make x a normal number    */ 
+     xdb.d *= two52; 	  /* make x a normal number    */
    }
-    
+
    if (xdb.i[HI] >= 0x7ff00000){
      return  x+x;				 /* Inf or Nan       */
    }
-   
-   
-   /* Extract exponent and mantissa 
+
+
+   /* Extract exponent and mantissa
       Do range reduction,
       yielding to E holding the exponent and
       y the mantissa between sqrt(2)/2 and sqrt(2)
@@ -1549,10 +1549,10 @@ Renormalize3(p_resh,p_resm,p_resl,p_t_21_0h,p_t_21_0m,p_t_21_0l);
    index = (xdb.i[HI] & 0x000fffff);
    xdb.i[HI] =  index | 0x3ff00000;	/* do exponent = 0 */
    index = (index + (1<<(20-L-1))) >> (20-L);
- 
+
    /* reduce  such that sqrt(2)/2 < xdb.d < sqrt(2) */
    if (index >= MAXINDEX){ /* corresponds to xdb>sqrt(2)*/
-     xdb.i[HI] -= 0x00100000; 
+     xdb.i[HI] -= 0x00100000;
      E++;
    }
 
@@ -1565,24 +1565,24 @@ Renormalize3(p_resh,p_resm,p_resl,p_t_21_0h,p_t_21_0m,p_t_21_0l);
    /* Cast integer E into double ed for multiplication later */
    ed = (double) E;
 
-   /* 
+   /*
       Read tables:
       Read one float for ri
       Read the first two doubles for -log(r_i) (out of three)
 
       Organization of the table:
 
-      one struct entry per index, the struct entry containing 
+      one struct entry per index, the struct entry containing
       r, logih, logim and logil in this order
    */
-   
+
 
    ri = argredtable[index].ri;
-   /* 
+   /*
       Actually we don't need the logarithm entries now
       Move the following two lines to the eventual reconstruction
-      As long as we don't have any if in the following code, we can overlap 
-      memory access with calculations 
+      As long as we don't have any if in the following code, we can overlap
+      memory access with calculations
    */
    logih = argredtable[index].logih;
    logim = argredtable[index].logim;
@@ -1598,8 +1598,8 @@ Renormalize3(p_resh,p_resm,p_resl,p_t_21_0h,p_t_21_0m,p_t_21_0l);
 
    yrih = yh * ri;
    yril = yl * ri;
-   th = yrih - 1.0; 
-   Add12Cond(zh, zl, th, yril); 
+   th = yrih - 1.0;
+   Add12Cond(zh, zl, th, yril);
 
    /* Polynomial approximation */
 
@@ -1615,30 +1615,30 @@ Renormalize3(p_resh,p_resm,p_resl,p_t_21_0h,p_t_21_0m,p_t_21_0l);
   zhSquareHalfPlusZl = zhSquareHalf + zl; /* 3 */
 
   pUpper = zhSquareHalfPlusZl + p36; /* 5 */
-  
+
   Add12(ph,pl,zh,pUpper); /* 8 */
 
-   /* Reconstruction 
+   /* Reconstruction
 
       Read logih and logim in the tables (already done)
-      
+
       Compute log(x) = E * log(2) + log(1+z) - log(ri)
       i.e. log(x) = ed * (log2h + log2m) + (ph + pl) + (logih + logim) + delta
 
       Carry out everything in double double precision
 
    */
-   
-   /* 
+
+   /*
       We store log_10(2) as log210h + log210m + log210l where log210h and log210m have 10 trailing zeros
       Multiplication of ed (double E) and log210h and m is thus exact
       The overall accuracy of log10h + log10m + log10l is 53 * 3 - 24 = 135 which
       is enough for the accurate phase
       The accuracy suffices also for the quick phase: 53 * 2 - 24 = 82
       Nevertheless the storage with trailing zeros implies an overlap of the tabulated
-      triple double values. We have to take it into account for the accurate phase 
+      triple double values. We have to take it into account for the accurate phase
       basic procedures for addition and multiplication
-      The condition on the next Add12 is verified as log210m is smaller than log210h 
+      The condition on the next Add12 is verified as log210m is smaller than log210h
       and both are scaled by ed
    */
 
@@ -1660,7 +1660,7 @@ Renormalize3(p_resh,p_resm,p_resl,p_t_21_0h,p_t_21_0m,p_t_21_0l);
 
    if(logh == (logh + (logm * RNROUNDCST)))
      return logh;
-   else 
+   else
      {
 
        logil = argredtable[index].logil;
@@ -1678,7 +1678,7 @@ Renormalize3(p_resh,p_resm,p_resl,p_t_21_0h,p_t_21_0m,p_t_21_0l);
        Add33(&loghover, &logmover, &loglover, log2edh, log2edm, log2edl, log10yh, log10ym, log10yl);
 
        Renormalize3(&logh,&logm,&logl,loghover,logmover,loglover);
-                     
+
        ReturnRoundToNearest3(logh, logm, logl);
 
      } /* Accurate phase launched */
@@ -1690,7 +1690,7 @@ Renormalize3(p_resh,p_resm,p_resl,p_t_21_0h,p_t_21_0m,p_t_21_0l);
  *               ROUNDED UPWARDS			     *
  *************************************************************
  *************************************************************/
- double log10_ru(double x){ 
+ double log10_ru(double x){
    db_number xdb, yhdb;
    double yh, yl, ed, ri, logih, logim, logil, yrih, yril, th, zh, zl;
    double ph, pl, pm, log2edh, log2edl, log2edm, logTabPolyh, logTabPolyl, logh, logm, logl;
@@ -1712,22 +1712,22 @@ Renormalize3(p_resh,p_resm,p_resl,p_t_21_0h,p_t_21_0m,p_t_21_0l);
    /* Filter cases */
    if (xdb.i[HI] < 0x00100000){        /* x < 2^(-1022)    */
      if (((xdb.i[HI] & 0x7fffffff)|xdb.i[LO])==0){
-       return -1.0/0.0;     
+       return -1.0/0.0;
      }                    		   /* log(+/-0) = -Inf */
-     if (xdb.i[HI] < 0){ 
+     if (xdb.i[HI] < 0){
        return (x-x)/0;                      /* log(-x) = Nan    */
      }
      /* Subnormal number */
      E = -52; 		
-     xdb.d *= two52; 	  /* make x a normal number    */ 
+     xdb.d *= two52; 	  /* make x a normal number    */
    }
-    
+
    if (xdb.i[HI] >= 0x7ff00000){
      return  x+x;				 /* Inf or Nan       */
    }
-   
-   
-   /* Extract exponent and mantissa 
+
+
+   /* Extract exponent and mantissa
       Do range reduction,
       yielding to E holding the exponent and
       y the mantissa between sqrt(2)/2 and sqrt(2)
@@ -1736,10 +1736,10 @@ Renormalize3(p_resh,p_resm,p_resl,p_t_21_0h,p_t_21_0m,p_t_21_0l);
    index = (xdb.i[HI] & 0x000fffff);
    xdb.i[HI] =  index | 0x3ff00000;	/* do exponent = 0 */
    index = (index + (1<<(20-L-1))) >> (20-L);
- 
+
    /* reduce  such that sqrt(2)/2 < xdb.d < sqrt(2) */
    if (index >= MAXINDEX){ /* corresponds to xdb>sqrt(2)*/
-     xdb.i[HI] -= 0x00100000; 
+     xdb.i[HI] -= 0x00100000;
      E++;
    }
 
@@ -1752,24 +1752,24 @@ Renormalize3(p_resh,p_resm,p_resl,p_t_21_0h,p_t_21_0m,p_t_21_0l);
    /* Cast integer E into double ed for multiplication later */
    ed = (double) E;
 
-   /* 
+   /*
       Read tables:
       Read one float for ri
       Read the first two doubles for -log(r_i) (out of three)
 
       Organization of the table:
 
-      one struct entry per index, the struct entry containing 
+      one struct entry per index, the struct entry containing
       r, logih, logim and logil in this order
    */
-   
+
 
    ri = argredtable[index].ri;
-   /* 
+   /*
       Actually we don't need the logarithm entries now
       Move the following two lines to the eventual reconstruction
-      As long as we don't have any if in the following code, we can overlap 
-      memory access with calculations 
+      As long as we don't have any if in the following code, we can overlap
+      memory access with calculations
    */
    logih = argredtable[index].logih;
    logim = argredtable[index].logim;
@@ -1785,8 +1785,8 @@ Renormalize3(p_resh,p_resm,p_resl,p_t_21_0h,p_t_21_0m,p_t_21_0l);
 
    yrih = yh * ri;
    yril = yl * ri;
-   th = yrih - 1.0; 
-   Add12Cond(zh, zl, th, yril); 
+   th = yrih - 1.0;
+   Add12Cond(zh, zl, th, yril);
 
    /* Polynomial approximation */
 
@@ -1802,30 +1802,30 @@ Renormalize3(p_resh,p_resm,p_resl,p_t_21_0h,p_t_21_0m,p_t_21_0l);
   zhSquareHalfPlusZl = zhSquareHalf + zl; /* 3 */
 
   pUpper = zhSquareHalfPlusZl + p36; /* 5 */
-  
+
   Add12(ph,pl,zh,pUpper); /* 8 */
 
-   /* Reconstruction 
+   /* Reconstruction
 
       Read logih and logim in the tables (already done)
-      
+
       Compute log(x) = E * log(2) + log(1+z) - log(ri)
       i.e. log(x) = ed * (log2h + log2m) + (ph + pl) + (logih + logim) + delta
 
       Carry out everything in double double precision
 
    */
-   
-   /* 
+
+   /*
       We store log_10(2) as log210h + log210m + log210l where log210h and log210m have 10 trailing zeros
       Multiplication of ed (double E) and log210h and m is thus exact
       The overall accuracy of log10h + log10m + log10l is 53 * 3 - 24 = 135 which
       is enough for the accurate phase
       The accuracy suffices also for the quick phase: 53 * 2 - 24 = 82
       Nevertheless the storage with trailing zeros implies an overlap of the tabulated
-      triple double values. We have to take it into account for the accurate phase 
+      triple double values. We have to take it into account for the accurate phase
       basic procedures for addition and multiplication
-      The condition on the next Add12 is verified as log210m is smaller than log210h 
+      The condition on the next Add12 is verified as log210m is smaller than log210h
       and both are scaled by ed
    */
 
@@ -1865,7 +1865,7 @@ Renormalize3(p_resh,p_resm,p_resl,p_t_21_0h,p_t_21_0m,p_t_21_0l);
 
        Renormalize3(&logh,&logm,&logl,loghover,logmover,loglover);
 
-       ReturnRoundUpwards3Unfiltered(logh, logm, logl, WORSTCASEACCURACY);                     
+       ReturnRoundUpwards3Unfiltered(logh, logm, logl, WORSTCASEACCURACY);
 
      } /* Accurate phase launched */
 }
@@ -1877,7 +1877,7 @@ Renormalize3(p_resh,p_resm,p_resl,p_t_21_0h,p_t_21_0m,p_t_21_0l);
  *               ROUNDED DOWNWARDS			     *
  *************************************************************
  *************************************************************/
- double log10_rd(double x){ 
+ double log10_rd(double x){
    db_number xdb, yhdb;
    double yh, yl, ed, ri, logih, logim, logil, yrih, yril, th, zh, zl;
    double ph, pl, pm, log2edh, log2edl, log2edm, logTabPolyh, logTabPolyl, logh, logm, logl;
@@ -1899,22 +1899,22 @@ Renormalize3(p_resh,p_resm,p_resl,p_t_21_0h,p_t_21_0m,p_t_21_0l);
    /* Filter cases */
    if (xdb.i[HI] < 0x00100000){        /* x < 2^(-1022)    */
      if (((xdb.i[HI] & 0x7fffffff)|xdb.i[LO])==0){
-       return -1.0/0.0;     
+       return -1.0/0.0;
      }                    		   /* log(+/-0) = -Inf */
-     if (xdb.i[HI] < 0){ 
+     if (xdb.i[HI] < 0){
        return (x-x)/0;                      /* log(-x) = Nan    */
      }
      /* Subnormal number */
      E = -52; 		
-     xdb.d *= two52; 	  /* make x a normal number    */ 
+     xdb.d *= two52; 	  /* make x a normal number    */
    }
-    
+
    if (xdb.i[HI] >= 0x7ff00000){
      return  x+x;				 /* Inf or Nan       */
    }
-   
-   
-   /* Extract exponent and mantissa 
+
+
+   /* Extract exponent and mantissa
       Do range reduction,
       yielding to E holding the exponent and
       y the mantissa between sqrt(2)/2 and sqrt(2)
@@ -1923,10 +1923,10 @@ Renormalize3(p_resh,p_resm,p_resl,p_t_21_0h,p_t_21_0m,p_t_21_0l);
    index = (xdb.i[HI] & 0x000fffff);
    xdb.i[HI] =  index | 0x3ff00000;	/* do exponent = 0 */
    index = (index + (1<<(20-L-1))) >> (20-L);
- 
+
    /* reduce  such that sqrt(2)/2 < xdb.d < sqrt(2) */
    if (index >= MAXINDEX){ /* corresponds to xdb>sqrt(2)*/
-     xdb.i[HI] -= 0x00100000; 
+     xdb.i[HI] -= 0x00100000;
      E++;
    }
 
@@ -1939,24 +1939,24 @@ Renormalize3(p_resh,p_resm,p_resl,p_t_21_0h,p_t_21_0m,p_t_21_0l);
    /* Cast integer E into double ed for multiplication later */
    ed = (double) E;
 
-   /* 
+   /*
       Read tables:
       Read one float for ri
       Read the first two doubles for -log(r_i) (out of three)
 
       Organization of the table:
 
-      one struct entry per index, the struct entry containing 
+      one struct entry per index, the struct entry containing
       r, logih, logim and logil in this order
    */
-   
+
 
    ri = argredtable[index].ri;
-   /* 
+   /*
       Actually we don't need the logarithm entries now
       Move the following two lines to the eventual reconstruction
-      As long as we don't have any if in the following code, we can overlap 
-      memory access with calculations 
+      As long as we don't have any if in the following code, we can overlap
+      memory access with calculations
    */
    logih = argredtable[index].logih;
    logim = argredtable[index].logim;
@@ -1972,8 +1972,8 @@ Renormalize3(p_resh,p_resm,p_resl,p_t_21_0h,p_t_21_0m,p_t_21_0l);
 
    yrih = yh * ri;
    yril = yl * ri;
-   th = yrih - 1.0; 
-   Add12Cond(zh, zl, th, yril); 
+   th = yrih - 1.0;
+   Add12Cond(zh, zl, th, yril);
 
    /* Polynomial approximation */
 
@@ -1989,30 +1989,30 @@ Renormalize3(p_resh,p_resm,p_resl,p_t_21_0h,p_t_21_0m,p_t_21_0l);
   zhSquareHalfPlusZl = zhSquareHalf + zl; /* 3 */
 
   pUpper = zhSquareHalfPlusZl + p36; /* 5 */
-  
+
   Add12(ph,pl,zh,pUpper); /* 8 */
 
-   /* Reconstruction 
+   /* Reconstruction
 
       Read logih and logim in the tables (already done)
-      
+
       Compute log(x) = E * log(2) + log(1+z) - log(ri)
       i.e. log(x) = ed * (log2h + log2m) + (ph + pl) + (logih + logim) + delta
 
       Carry out everything in double double precision
 
    */
-   
-   /* 
+
+   /*
       We store log_10(2) as log210h + log210m + log210l where log210h and log210m have 10 trailing zeros
       Multiplication of ed (double E) and log210h and m is thus exact
       The overall accuracy of log10h + log10m + log10l is 53 * 3 - 24 = 135 which
       is enough for the accurate phase
       The accuracy suffices also for the quick phase: 53 * 2 - 24 = 82
       Nevertheless the storage with trailing zeros implies an overlap of the tabulated
-      triple double values. We have to take it into account for the accurate phase 
+      triple double values. We have to take it into account for the accurate phase
       basic procedures for addition and multiplication
-      The condition on the next Add12 is verified as log210m is smaller than log210h 
+      The condition on the next Add12 is verified as log210m is smaller than log210h
       and both are scaled by ed
    */
 
@@ -2052,7 +2052,7 @@ Renormalize3(p_resh,p_resm,p_resl,p_t_21_0h,p_t_21_0m,p_t_21_0l);
 
        Renormalize3(&logh,&logm,&logl,loghover,logmover,loglover);
 
-       ReturnRoundDownwards3Unfiltered(logh, logm, logl, WORSTCASEACCURACY);                     
+       ReturnRoundDownwards3Unfiltered(logh, logm, logl, WORSTCASEACCURACY);
 
      } /* Accurate phase launched */
 }
@@ -2063,7 +2063,7 @@ Renormalize3(p_resh,p_resm,p_resl,p_t_21_0h,p_t_21_0m,p_t_21_0l);
  *               ROUNDED TOWARDS ZERO			     *
  *************************************************************
  *************************************************************/
- double log10_rz(double x){ 
+ double log10_rz(double x){
    db_number xdb, yhdb;
    double yh, yl, ed, ri, logih, logim, logil, yrih, yril, th, zh, zl;
    double ph, pl, pm, log2edh, log2edl, log2edm, logTabPolyh, logTabPolyl, logh, logm, logl;
@@ -2085,22 +2085,22 @@ Renormalize3(p_resh,p_resm,p_resl,p_t_21_0h,p_t_21_0m,p_t_21_0l);
    /* Filter cases */
    if (xdb.i[HI] < 0x00100000){        /* x < 2^(-1022)    */
      if (((xdb.i[HI] & 0x7fffffff)|xdb.i[LO])==0){
-       return -1.0/0.0;     
+       return -1.0/0.0;
      }                    		   /* log(+/-0) = -Inf */
-     if (xdb.i[HI] < 0){ 
+     if (xdb.i[HI] < 0){
        return (x-x)/0;                      /* log(-x) = Nan    */
      }
      /* Subnormal number */
      E = -52; 		
-     xdb.d *= two52; 	  /* make x a normal number    */ 
+     xdb.d *= two52; 	  /* make x a normal number    */
    }
-    
+
    if (xdb.i[HI] >= 0x7ff00000){
      return  x+x;				 /* Inf or Nan       */
    }
-   
-   
-   /* Extract exponent and mantissa 
+
+
+   /* Extract exponent and mantissa
       Do range reduction,
       yielding to E holding the exponent and
       y the mantissa between sqrt(2)/2 and sqrt(2)
@@ -2109,10 +2109,10 @@ Renormalize3(p_resh,p_resm,p_resl,p_t_21_0h,p_t_21_0m,p_t_21_0l);
    index = (xdb.i[HI] & 0x000fffff);
    xdb.i[HI] =  index | 0x3ff00000;	/* do exponent = 0 */
    index = (index + (1<<(20-L-1))) >> (20-L);
- 
+
    /* reduce  such that sqrt(2)/2 < xdb.d < sqrt(2) */
    if (index >= MAXINDEX){ /* corresponds to xdb>sqrt(2)*/
-     xdb.i[HI] -= 0x00100000; 
+     xdb.i[HI] -= 0x00100000;
      E++;
    }
 
@@ -2125,24 +2125,24 @@ Renormalize3(p_resh,p_resm,p_resl,p_t_21_0h,p_t_21_0m,p_t_21_0l);
    /* Cast integer E into double ed for multiplication later */
    ed = (double) E;
 
-   /* 
+   /*
       Read tables:
       Read one float for ri
       Read the first two doubles for -log(r_i) (out of three)
 
       Organization of the table:
 
-      one struct entry per index, the struct entry containing 
+      one struct entry per index, the struct entry containing
       r, logih, logim and logil in this order
    */
-   
+
 
    ri = argredtable[index].ri;
-   /* 
+   /*
       Actually we don't need the logarithm entries now
       Move the following two lines to the eventual reconstruction
-      As long as we don't have any if in the following code, we can overlap 
-      memory access with calculations 
+      As long as we don't have any if in the following code, we can overlap
+      memory access with calculations
    */
    logih = argredtable[index].logih;
    logim = argredtable[index].logim;
@@ -2158,8 +2158,8 @@ Renormalize3(p_resh,p_resm,p_resl,p_t_21_0h,p_t_21_0m,p_t_21_0l);
 
    yrih = yh * ri;
    yril = yl * ri;
-   th = yrih - 1.0; 
-   Add12Cond(zh, zl, th, yril); 
+   th = yrih - 1.0;
+   Add12Cond(zh, zl, th, yril);
 
    /* Polynomial approximation */
 
@@ -2175,30 +2175,30 @@ Renormalize3(p_resh,p_resm,p_resl,p_t_21_0h,p_t_21_0m,p_t_21_0l);
   zhSquareHalfPlusZl = zhSquareHalf + zl; /* 3 */
 
   pUpper = zhSquareHalfPlusZl + p36; /* 5 */
-  
+
   Add12(ph,pl,zh,pUpper); /* 8 */
 
-   /* Reconstruction 
+   /* Reconstruction
 
       Read logih and logim in the tables (already done)
-      
+
       Compute log(x) = E * log(2) + log(1+z) - log(ri)
       i.e. log(x) = ed * (log2h + log2m) + (ph + pl) + (logih + logim) + delta
 
       Carry out everything in double double precision
 
    */
-   
-   /* 
+
+   /*
       We store log_10(2) as log210h + log210m + log210l where log210h and log210m have 10 trailing zeros
       Multiplication of ed (double E) and log210h and m is thus exact
       The overall accuracy of log10h + log10m + log10l is 53 * 3 - 24 = 135 which
       is enough for the accurate phase
       The accuracy suffices also for the quick phase: 53 * 2 - 24 = 82
       Nevertheless the storage with trailing zeros implies an overlap of the tabulated
-      triple double values. We have to take it into account for the accurate phase 
+      triple double values. We have to take it into account for the accurate phase
       basic procedures for addition and multiplication
-      The condition on the next Add12 is verified as log210m is smaller than log210h 
+      The condition on the next Add12 is verified as log210m is smaller than log210h
       and both are scaled by ed
    */
 
@@ -2238,7 +2238,7 @@ Renormalize3(p_resh,p_resm,p_resl,p_t_21_0h,p_t_21_0m,p_t_21_0l);
 
        Renormalize3(&logh,&logm,&logl,loghover,logmover,loglover);
 
-       ReturnRoundTowardsZero3Unfiltered(logh, logm, logl, WORSTCASEACCURACY);                     
+       ReturnRoundTowardsZero3Unfiltered(logh, logm, logl, WORSTCASEACCURACY);
 
      } /* Accurate phase launched */
 }

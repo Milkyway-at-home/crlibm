@@ -1,9 +1,9 @@
-/* 
- * This function computes exp, correctly rounded, 
+/*
+ * This function computes exp, correctly rounded,
  * using experimental techniques based on triple double arithmetics
 
  THIS IS EXPERIMENTAL SOFTWARE
- 
+
  *
  * Author :  Christoph Lauter
  * christoph.lauter at ens-lyon.fr
@@ -11,8 +11,8 @@
 
  To have it replace the crlibm exp, do:
 
- gcc -DHAVE_CONFIG_H -I.  -fPIC  -O2 -c exp-td.c;   mv exp-td.o exp_fast.o; make 
- 
+ gcc -DHAVE_CONFIG_H -I.  -fPIC  -O2 -c exp-td.c;   mv exp-td.o exp_fast.o; make
+
 */
 
 
@@ -35,8 +35,8 @@
 
 
 
-void exp_td_accurate(double *polyTblh, double *polyTblm, double *polyTbll, 
-		     double rh, double rm, double rl, 
+void exp_td_accurate(double *polyTblh, double *polyTblm, double *polyTbll,
+		     double rh, double rm, double rl,
 		     double tbl1h, double tbl1m, double tbl1l,
 		     double tbl2h, double tbl2m, double tbl2l) {
   double highPoly, highPolyMulth, highPolyMultm, highPolyMultl;
@@ -70,7 +70,7 @@ void exp_td_accurate(double *polyTblh, double *polyTblm, double *polyTbll,
   Mul23(&rhCubeh,&rhCubem,&rhCubel,rh,0,rhSquareh,rhSquarel);
 
   rhSquareHalfh = 0.5 * rhSquareh;
-  rhSquareHalfl = 0.5 * rhSquarel;  
+  rhSquareHalfl = 0.5 * rhSquarel;
 
   Renormalize3(&lowPolyh,&lowPolym,&lowPolyl,rh,rhSquareHalfh,rhSquareHalfl);
 
@@ -103,7 +103,7 @@ void exp_td_accurate(double *polyTblh, double *polyTblm, double *polyTbll,
  *               ROUNDED  TO NEAREST			     *
  *************************************************************
  *************************************************************/
-double exp_rn(double x){ 
+double exp_rn(double x){
   double rh, rm, rl, tbl1h, tbl1m, tbl1l;
   double tbl2h, tbl2m, tbl2l;
   double xMultLog2InvMult2L, shiftedXMult, kd;
@@ -117,7 +117,7 @@ double exp_rn(double x){
   double tablesh, tablesl;
   double s1, s2, s3, s4, s5;
   double res;
-   
+
   /* Argument reduction and filtering for special cases */
 
   /* Compute k as a double and as an int */
@@ -126,7 +126,7 @@ double exp_rn(double x){
   shiftedXMult = xMultLog2InvMult2L + shiftConst;
   kd = shiftedXMult - shiftConst;
   shiftedXMultdb.d = shiftedXMult;
-  
+
   /* Special cases tests */
   xIntHi = xdb.i[HI];
   mightBeDenorm = 0;
@@ -135,7 +135,7 @@ double exp_rn(double x){
     /* We are in the RN case, return 1.0 in all cases */
     return 1.0;
   }
- 
+
   /* Test if argument is greater than approx. 709 in magnitude */
   if ((xIntHi & 0x7fffffff) >= OVRUDRFLWSMPLBOUND) {
     /* If we are here, the result might be overflowed, underflowed, inf, or NaN */
@@ -152,7 +152,7 @@ double exp_rn(double x){
 	/* +/- Inf */
 
 	/* Test sign */
-	if ((xIntHi & 0x80000000)==0) 
+	if ((xIntHi & 0x80000000)==0)
 	  /* x = +Inf, return +Inf */
 	  return x;
 	else
@@ -160,8 +160,8 @@ double exp_rn(double x){
 	  return 0;
       } /* End which in NaN, Inf */
     } /* End NaN or Inf ? */
-    
-    /* If we are here, we might be overflowed, denormalized or underflowed in the result 
+
+    /* If we are here, we might be overflowed, denormalized or underflowed in the result
        but there is no special case (NaN, Inf) left */
 
     /* Test if actually overflowed */
@@ -172,29 +172,29 @@ double exp_rn(double x){
 
     /* Test if surely underflowed */
     if (x <= UNDERFLWBOUND) {
-      /* We are actually sure to be underflowed and not denormalized any more 
+      /* We are actually sure to be underflowed and not denormalized any more
 	 So we return 0 and raise the inexact flag */
       return SMALLEST * SMALLEST;
     }
-       
+
     /* Test if possibly denormalized */
     if (x <= DENORMBOUND) {
       /* We know now that we are not sure to be normalized in the result
-	 We just set an internal flag for a further test 
+	 We just set an internal flag for a further test
       */
       mightBeDenorm = 1;
     }
   } /* End might be a special case */
 
   /* If we are here, we are sure to be neither +/- Inf nor NaN nor overflowed nor denormalized in the argument
-     but we might be denormalized in the result 
+     but we might be denormalized in the result
 
      We continue the argument reduction for the quick phase and table reads for both phases
   */
 
   Mul12(&s1,&s2,msLog2Div2Lh,kd);
   s3 = kd * msLog2Div2Lm;
-  s4 = s2 + s3; 
+  s4 = s2 + s3;
   s5 = x + s1;
   Add12Cond(rh,rm,s5,s4);
 
@@ -225,9 +225,9 @@ double exp_rn(double x){
      tbl2l = twoPowerIndex2[index2].lo;
 
      /* Call accurate phase */
-     exp_td_accurate(&polyTblh, &polyTblm, &polyTbll, rh, rm, rl, tbl1h, tbl1m, tbl1l, tbl2h, tbl2m, tbl2l); 
+     exp_td_accurate(&polyTblh, &polyTblm, &polyTbll, rh, rm, rl, tbl1h, tbl1m, tbl1l, tbl2h, tbl2m, tbl2l);
 
-     /* Final rounding and multiplication with 2^M 
+     /* Final rounding and multiplication with 2^M
 
         We first multiply the highest significant byte by 2^M in two steps
 	and adjust it then depending on the lower significant parts.
@@ -236,7 +236,7 @@ double exp_rn(double x){
 	We first multiply by 2^(-1000) and then by 2^(M+1000).
 
      */
-     
+
      t3 = polyTblh * twoPowerM1000;
 
      /* Form now twoPowerM with adjusted M */
@@ -250,7 +250,7 @@ double exp_rn(double x){
      /* For x86, force the compiler to pass through memory for having the right rounding */
 
      t4db.d = t4;   /* Do not #if-ify this line, we need the copy */
-#if defined(CRLIBM_TYPECPU_AMD64) || defined(CRLIBM_TYPECPU_X86) 
+#if defined(CRLIBM_TYPECPU_AMD64) || defined(CRLIBM_TYPECPU_X86)
      t4db2.i[HI] = t4db.i[HI];
      t4db2.i[LO] = t4db.i[LO];
      t4 = t4db2.d;
@@ -263,10 +263,10 @@ double exp_rn(double x){
      t5 = t4 * twoPowerMdb.d;
      t6 = t5 * twoPower1000;
      t7 = polyTblh - t6;
-     
+
      /* The rounding decision is made at 1/2 ulp of a denormal, i.e. at 2^(-1075)
-	We construct this number and by comparing with it we get to know 
-	whether we are in a difficult rounding case or not. If not we just return 
+	We construct this number and by comparing with it we get to know
+	whether we are in a difficult rounding case or not. If not we just return
 	the known result. Otherwise we continue with further tests.
      */
 
@@ -276,10 +276,10 @@ double exp_rn(double x){
      if (ABS(t7) != twoPowerMdb.d) return t4;
 
      /* If we are here, we are in a difficult rounding case */
-     
-     /* We have to adjust the result iff the sign of the error on 
-	rounding 2^M * polyTblh (which must be an ulp of a denormal) 
-	and polyTblm +arith polyTbll is the same which means that 
+
+     /* We have to adjust the result iff the sign of the error on
+	rounding 2^M * polyTblh (which must be an ulp of a denormal)
+	and polyTblm +arith polyTbll is the same which means that
 	the error made was greater than an ulp of an denormal.
      */
 
@@ -300,7 +300,7 @@ double exp_rn(double x){
 
   /* No more underflow nor denormal is possible. There may be the case where
      M is 1024 and the value 2^M is to be multiplied may be less than 1
-     So the final result will be normalized and representable by the multiplication must be 
+     So the final result will be normalized and representable by the multiplication must be
      made in 2 steps
   */
 
@@ -314,7 +314,7 @@ double exp_rn(double x){
   rhFour = rhSquare * rhSquare;
 
   monomialFour = c4 * rhFour;
-  
+
   highPoly = monomialCube + monomialFour;
 
   highPolyWithSquare = rhSquareHalf + highPoly;
@@ -325,14 +325,14 @@ double exp_rn(double x){
   t9 = rh + t8;
 
   t10 = tablesh * t9;
-  
+
   Add12(t11,t12,tablesh,t10);
   t13 = t12 + tablesl;
   Add12(polyTblh,polyTblm,t11,t13);
-  
-  /* Rounding test 
-     Since we know that the result of the final multiplication with 2^M 
-     will always be representable, we can do the rounding test on the 
+
+  /* Rounding test
+     Since we know that the result of the final multiplication with 2^M
+     will always be representable, we can do the rounding test on the
      factors and multiply only the final result.
      We implement the multiplication in integer computations to overcome
      the problem of the non-representability of 2^1024 if M = 1024
@@ -342,7 +342,7 @@ double exp_rn(double x){
     polyTblhdb.d = polyTblh;
     polyTblhdb.i[HI] += M << 20;
     return polyTblhdb.d;
-  } else 
+  } else
     {
       /* Rest of argument reduction for accurate phase */
 
@@ -354,18 +354,18 @@ double exp_rn(double x){
       /* Table reads for accurate phase */
       tbl1l = twoPowerIndex1[index1].lo;
       tbl2l = twoPowerIndex2[index2].lo;
-      
+
       /* Call accurate phase */
-      exp_td_accurate(&polyTblh, &polyTblm, &polyTbll, rh, rm, rl, tbl1h, tbl1m, tbl1l, tbl2h, tbl2m, tbl2l); 
+      exp_td_accurate(&polyTblh, &polyTblm, &polyTbll, rh, rm, rl, tbl1h, tbl1m, tbl1l, tbl2h, tbl2m, tbl2l);
 
       /* Since the final multiplication is exact, we can do the final rounding before multiplying
 	 We overcome this way also the cases where the final result is not underflowed whereas the
 	 lower parts of the intermediate final result are.
       */
-      
+
       RoundToNearest3(&res,polyTblh,polyTblm,polyTbll);
 
-      /* Final multiplication with 2^M 
+      /* Final multiplication with 2^M
 	 We implement the multiplication in integer computations to overcome
 	 the problem of the non-representability of 2^1024 if M = 1024
       */
@@ -382,7 +382,7 @@ double exp_rn(double x){
  *               ROUNDED  UPWARDS			     *
  *************************************************************
  *************************************************************/
-double exp_ru(double x) { 
+double exp_ru(double x) {
   double rh, rm, rl, tbl1h, tbl1m, tbl1l;
   double tbl2h, tbl2m, tbl2l;
   double xMultLog2InvMult2L, shiftedXMult, kd;
@@ -396,7 +396,7 @@ double exp_ru(double x) {
   double tablesh, tablesl;
   double s1, s2, s3, s4, s5;
   double res;
- 
+
   /* Argument reduction and filtering for special cases */
 
   /* Compute k as a double and as an int */
@@ -405,7 +405,7 @@ double exp_ru(double x) {
   shiftedXMult = xMultLog2InvMult2L + shiftConst;
   kd = shiftedXMult - shiftConst;
   shiftedXMultdb.d = shiftedXMult;
-  
+
   /* Special cases tests */
   xIntHi = xdb.i[HI];
   mightBeDenorm = 0;
@@ -416,13 +416,13 @@ double exp_ru(double x) {
     */
     if (x == 0.0) return 1.0;
 
-    /* If the argument is a negative denormal, we 
+    /* If the argument is a negative denormal, we
        must return 1.0 and raise the inexact flag.
     */
 
     if (x < 0.0) return 1.0 + SMALLEST;
 
-    /* Otherwise, we return 1.0 + 1ulp since 
+    /* Otherwise, we return 1.0 + 1ulp since
        exp(greatest denorm) < 1.0 + 1ulp
        We must do the addition dynamically for
        raising the inexact flag.
@@ -430,7 +430,7 @@ double exp_ru(double x) {
 
     return 1.0 + twoM52;
   }
- 
+
   /* Test if argument is greater than approx. 709 in magnitude */
   if ((xIntHi & 0x7fffffff) >= OVRUDRFLWSMPLBOUND) {
     /* If we are here, the result might be overflowed, underflowed, inf, or NaN */
@@ -447,7 +447,7 @@ double exp_ru(double x) {
 	/* +/- Inf */
 
 	/* Test sign */
-	if ((xIntHi & 0x80000000)==0) 
+	if ((xIntHi & 0x80000000)==0)
 	  /* x = +Inf, return +Inf */
 	  return x;
 	else
@@ -455,8 +455,8 @@ double exp_ru(double x) {
 	  return 0;
       } /* End which in NaN, Inf */
     } /* End NaN or Inf ? */
-    
-    /* If we are here, we might be overflowed, denormalized or underflowed in the result 
+
+    /* If we are here, we might be overflowed, denormalized or underflowed in the result
        but there is no special case (NaN, Inf) left */
 
     /* Test if actually overflowed */
@@ -467,31 +467,31 @@ double exp_ru(double x) {
 
     /* Test if surely underflowed */
     if (x <= UNDERFLWBOUND) {
-      /* We are actually sure to be underflowed and not denormalized any more 
-	 (at least where computing makes sense); since we are in the round 
+      /* We are actually sure to be underflowed and not denormalized any more
+	 (at least where computing makes sense); since we are in the round
 	 upwards case, we return the smallest denormal possible.
       */
       return SMALLEST;
     }
-       
+
     /* Test if possibly denormalized */
     if (x <= DENORMBOUND) {
       /* We know now that we are not sure to be normalized in the result
-	 We just set an internal flag for a further test 
+	 We just set an internal flag for a further test
       */
       mightBeDenorm = 1;
     }
   } /* End might be a special case */
 
   /* If we are here, we are sure to be neither +/- Inf nor NaN nor overflowed nor denormalized in the argument
-     but we might be denormalized in the result 
+     but we might be denormalized in the result
 
      We continue the argument reduction for the quick phase and table reads for both phases
   */
 
   Mul12(&s1,&s2,msLog2Div2Lh,kd);
   s3 = kd * msLog2Div2Lm;
-  s4 = s2 + s3; 
+  s4 = s2 + s3;
   s5 = x + s1;
   Add12Cond(rh,rm,s5,s4);
 
@@ -522,9 +522,9 @@ double exp_ru(double x) {
      tbl2l = twoPowerIndex2[index2].lo;
 
      /* Call accurate phase */
-     exp_td_accurate(&polyTblh, &polyTblm, &polyTbll, rh, rm, rl, tbl1h, tbl1m, tbl1l, tbl2h, tbl2m, tbl2l); 
+     exp_td_accurate(&polyTblh, &polyTblm, &polyTbll, rh, rm, rl, tbl1h, tbl1m, tbl1l, tbl2h, tbl2m, tbl2l);
 
-     /* Final rounding and multiplication with 2^M 
+     /* Final rounding and multiplication with 2^M
 
         We first multiply the highest significant byte by 2^M in two steps
 	and adjust it then depending on the lower significant parts.
@@ -533,7 +533,7 @@ double exp_ru(double x) {
 	We first multiply by 2^(-1000) and then by 2^(M+1000).
 
      */
-     
+
      t3 = polyTblh * twoPowerM1000;
 
      /* Form now twoPowerM with adjusted M */
@@ -547,7 +547,7 @@ double exp_ru(double x) {
      /* For x86, force the compiler to pass through memory for having the right rounding */
 
      t4db.d = t4;   /* Do not #if-ify this line, we need the copy */
-#if defined(CRLIBM_TYPECPU_AMD64) || defined(CRLIBM_TYPECPU_X86) 
+#if defined(CRLIBM_TYPECPU_AMD64) || defined(CRLIBM_TYPECPU_X86)
      t4db2.i[HI] = t4db.i[HI];
      t4db2.i[LO] = t4db.i[LO];
      t4 = t4db2.d;
@@ -564,25 +564,25 @@ double exp_ru(double x) {
 
      /* The rounding can be decided using the sign of the arithmetical sum of the
 	round-to-nearest-error (i.e. t7) and the lower part(s) of the final result.
-	We add first the lower parts and add the result to the error in t7. We have to 
+	We add first the lower parts and add the result to the error in t7. We have to
 	keep in mind that everything is scaled by 2^(-M).
-	t8 can never be exactly 0 since we filter out the cases where the image of the 
+	t8 can never be exactly 0 since we filter out the cases where the image of the
 	function is algebraic and the implementation is exacter than the TMD worst case.
      */
- 
+
      polyTblm = polyTblm + polyTbll;
      t8 = t7 + polyTblm;
 
-     /* Since we are rounding upwards, the round-to-nearest-rounding result in t4 is 
+     /* Since we are rounding upwards, the round-to-nearest-rounding result in t4 is
 	equal to the final result if the rounding error (i.e. the error plus the lower parts)
 	is negative, i.e. if the rounding-to-nearest was upwards.
      */
-     
+
      if (t8 < 0.0) return t4;
 
-     /* If we are here, we must adjust the final result by +1ulp 
+     /* If we are here, we must adjust the final result by +1ulp
 	Relying on the fact that the exponential is always positive, we can simplify this
-	adjustment 
+	adjustment
      */
 
      t4db.l++;
@@ -591,7 +591,7 @@ double exp_ru(double x) {
 
   /* No more underflow nor denormal is possible. There may be the case where
      M is 1024 and the value 2^M is to be multiplied may be less than 1
-     So the final result will be normalized and representable by the multiplication must be 
+     So the final result will be normalized and representable by the multiplication must be
      made in 2 steps
   */
 
@@ -605,7 +605,7 @@ double exp_ru(double x) {
   rhFour = rhSquare * rhSquare;
 
   monomialFour = c4 * rhFour;
-  
+
   highPoly = monomialCube + monomialFour;
 
   highPolyWithSquare = rhSquareHalf + highPoly;
@@ -616,14 +616,14 @@ double exp_ru(double x) {
   t9 = rh + t8;
 
   t10 = tablesh * t9;
-  
+
   Add12(t11,t12,tablesh,t10);
   t13 = t12 + tablesl;
   Add12(polyTblh,polyTblm,t11,t13);
-  
-  /* Rounding test 
-     Since we know that the result of the final multiplication with 2^M 
-     will always be representable, we can do the rounding test on the 
+
+  /* Rounding test
+     Since we know that the result of the final multiplication with 2^M
+     will always be representable, we can do the rounding test on the
      factors and multiply only the final result.
      We implement the multiplication in integer computations to overcome
      the problem of the non-representability of 2^1024 if M = 1024
@@ -635,7 +635,7 @@ double exp_ru(double x) {
     resdb.d = res;
     resdb.i[HI] += M << 20;
     return resdb.d;
-  } else 
+  } else
     {
       /* Rest of argument reduction for accurate phase */
 
@@ -647,18 +647,18 @@ double exp_ru(double x) {
       /* Table reads for accurate phase */
       tbl1l = twoPowerIndex1[index1].lo;
       tbl2l = twoPowerIndex2[index2].lo;
-      
+
       /* Call accurate phase */
-      exp_td_accurate(&polyTblh, &polyTblm, &polyTbll, rh, rm, rl, tbl1h, tbl1m, tbl1l, tbl2h, tbl2m, tbl2l); 
+      exp_td_accurate(&polyTblh, &polyTblm, &polyTbll, rh, rm, rl, tbl1h, tbl1m, tbl1l, tbl2h, tbl2m, tbl2l);
 
       /* Since the final multiplication is exact, we can do the final rounding before multiplying
 	 We overcome this way also the cases where the final result is not underflowed whereas the
 	 lower parts of the intermediate final result are.
       */
-      
+
       RoundUpwards3(&res,polyTblh,polyTblm,polyTbll);
 
-      /* Final multiplication with 2^M 
+      /* Final multiplication with 2^M
 	 We implement the multiplication in integer computations to overcome
 	 the problem of the non-representability of 2^1024 if M = 1024
       */
@@ -667,7 +667,7 @@ double exp_ru(double x) {
       resdb.i[HI] += M << 20;
       return resdb.d;
     } /* Accurate phase launched after rounding test*/
-} 
+}
 
 
 /*************************************************************
@@ -675,7 +675,7 @@ double exp_ru(double x) {
  *               ROUNDED  DOWNWARDS			     *
  *************************************************************
  *************************************************************/
-double exp_rd(double x) { 
+double exp_rd(double x) {
   double rh, rm, rl, tbl1h, tbl1m, tbl1l;
   double tbl2h, tbl2m, tbl2l;
   double xMultLog2InvMult2L, shiftedXMult, kd;
@@ -689,7 +689,7 @@ double exp_rd(double x) {
   double tablesh, tablesl;
   double s1, s2, s3, s4, s5;
   double res;
- 
+
   /* Argument reduction and filtering for special cases */
 
   /* Compute k as a double and as an int */
@@ -698,7 +698,7 @@ double exp_rd(double x) {
   shiftedXMult = xMultLog2InvMult2L + shiftConst;
   kd = shiftedXMult - shiftConst;
   shiftedXMultdb.d = shiftedXMult;
-  
+
   /* Special cases tests */
   xIntHi = xdb.i[HI];
   mightBeDenorm = 0;
@@ -709,22 +709,22 @@ double exp_rd(double x) {
     */
     if (x == 0.0) return 1.0;
 
-    /* If the argument is a positive denormal, we 
+    /* If the argument is a positive denormal, we
        must return 1.0 and raise the inexact flag.
     */
-    
+
     if (x > 0.0) return 1.0 + SMALLEST;
 
-    /* Otherwise, we return 1.0 - 1ulp since 
+    /* Otherwise, we return 1.0 - 1ulp since
        exp(-greatest denorm) > 1.0 - 1ulp
        We must do the addition dynamically for
        raising the inexact flag.
     */
-    
+
     return 1.0 + mTwoM53;
 
   }
- 
+
   /* Test if argument is greater than approx. 709 in magnitude */
   if ((xIntHi & 0x7fffffff) >= OVRUDRFLWSMPLBOUND) {
     /* If we are here, the result might be overflowed, underflowed, inf, or NaN */
@@ -741,7 +741,7 @@ double exp_rd(double x) {
 	/* +/- Inf */
 
 	/* Test sign */
-	if ((xIntHi & 0x80000000)==0) 
+	if ((xIntHi & 0x80000000)==0)
 	  /* x = +Inf, return +Inf */
 	  return x;
 	else
@@ -749,14 +749,14 @@ double exp_rd(double x) {
 	  return 0;
       } /* End which in NaN, Inf */
     } /* End NaN or Inf ? */
-    
-    /* If we are here, we might be overflowed, denormalized or underflowed in the result 
+
+    /* If we are here, we might be overflowed, denormalized or underflowed in the result
        but there is no special case (NaN, Inf) left */
 
     /* Test if actually overflowed */
     if (x > OVRFLWBOUND) {
       /* We would be overflowed but as we are rounding downwards
-	 the nearest number lesser than the exact result is the greatest 
+	 the nearest number lesser than the exact result is the greatest
 	 normal. In any case, we must raise the inexact flag.
       */
       return LARGEST * (1.0 + SMALLEST);
@@ -764,31 +764,31 @@ double exp_rd(double x) {
 
     /* Test if surely underflowed */
     if (x <= UNDERFLWBOUND) {
-      /* We are actually sure to be underflowed and not denormalized any more 
-	 (at least where computing makes sense); since we are in the round 
+      /* We are actually sure to be underflowed and not denormalized any more
+	 (at least where computing makes sense); since we are in the round
 	 upwards case, we return the smallest denormal possible.
       */
       return SMALLEST * SMALLEST;
     }
-       
+
     /* Test if possibly denormalized */
     if (x <= DENORMBOUND) {
       /* We know now that we are not sure to be normalized in the result
-	 We just set an internal flag for a further test 
+	 We just set an internal flag for a further test
       */
       mightBeDenorm = 1;
     }
   } /* End might be a special case */
 
   /* If we are here, we are sure to be neither +/- Inf nor NaN nor overflowed nor denormalized in the argument
-     but we might be denormalized in the result 
+     but we might be denormalized in the result
 
      We continue the argument reduction for the quick phase and table reads for both phases
   */
 
   Mul12(&s1,&s2,msLog2Div2Lh,kd);
   s3 = kd * msLog2Div2Lm;
-  s4 = s2 + s3; 
+  s4 = s2 + s3;
   s5 = x + s1;
   Add12Cond(rh,rm,s5,s4);
 
@@ -819,9 +819,9 @@ double exp_rd(double x) {
      tbl2l = twoPowerIndex2[index2].lo;
 
      /* Call accurate phase */
-     exp_td_accurate(&polyTblh, &polyTblm, &polyTbll, rh, rm, rl, tbl1h, tbl1m, tbl1l, tbl2h, tbl2m, tbl2l); 
+     exp_td_accurate(&polyTblh, &polyTblm, &polyTbll, rh, rm, rl, tbl1h, tbl1m, tbl1l, tbl2h, tbl2m, tbl2l);
 
-     /* Final rounding and multiplication with 2^M 
+     /* Final rounding and multiplication with 2^M
 
         We first multiply the highest significant byte by 2^M in two steps
 	and adjust it then depending on the lower significant parts.
@@ -830,7 +830,7 @@ double exp_rd(double x) {
 	We first multiply by 2^(-1000) and then by 2^(M+1000).
 
      */
-     
+
      t3 = polyTblh * twoPowerM1000;
 
      /* Form now twoPowerM with adjusted M */
@@ -844,7 +844,7 @@ double exp_rd(double x) {
      /* For x86, force the compiler to pass through memory for having the right rounding */
 
      t4db.d = t4;   /* Do not #if-ify this line, we need the copy */
-#if defined(CRLIBM_TYPECPU_AMD64) || defined(CRLIBM_TYPECPU_X86) 
+#if defined(CRLIBM_TYPECPU_AMD64) || defined(CRLIBM_TYPECPU_X86)
      t4db2.i[HI] = t4db.i[HI];
      t4db2.i[LO] = t4db.i[LO];
      t4 = t4db2.d;
@@ -860,25 +860,25 @@ double exp_rd(double x) {
 
      /* The rounding can be decided using the sign of the arithmetical sum of the
 	round-to-nearest-error (i.e. t7) and the lower part(s) of the final result.
-	We add first the lower parts and add the result to the error in t7. We have to 
+	We add first the lower parts and add the result to the error in t7. We have to
 	keep in mind that everything is scaled by 2^(-M).
-	t8 can never be exactly 0 since we filter out the cases where the image of the 
+	t8 can never be exactly 0 since we filter out the cases where the image of the
 	function is algebraic and the implementation is exacter than the TMD worst case.
      */
- 
+
      polyTblm = polyTblm + polyTbll;
      t8 = t7 + polyTblm;
 
-     /* Since we are rounding downwards, the round-to-nearest-rounding result in t4 is 
+     /* Since we are rounding downwards, the round-to-nearest-rounding result in t4 is
 	equal to the final result if the rounding error (i.e. the error plus the lower parts)
 	is positive, i.e. if the rounding-to-nearest was downwards.
      */
-     
+
      if (t8 > 0.0) return t4;
 
-     /* If we are here, we must adjust the final result by +1ulp 
+     /* If we are here, we must adjust the final result by +1ulp
 	Relying on the fact that the exponential is always positive, we can simplify this
-	adjustment 
+	adjustment
      */
 
      t4db.l--;
@@ -887,7 +887,7 @@ double exp_rd(double x) {
 
   /* No more underflow nor denormal is possible. There may be the case where
      M is 1024 and the value 2^M is to be multiplied may be less than 1
-     So the final result will be normalized and representable by the multiplication must be 
+     So the final result will be normalized and representable by the multiplication must be
      made in 2 steps
   */
 
@@ -901,7 +901,7 @@ double exp_rd(double x) {
   rhFour = rhSquare * rhSquare;
 
   monomialFour = c4 * rhFour;
-  
+
   highPoly = monomialCube + monomialFour;
 
   highPolyWithSquare = rhSquareHalf + highPoly;
@@ -912,14 +912,14 @@ double exp_rd(double x) {
   t9 = rh + t8;
 
   t10 = tablesh * t9;
-  
+
   Add12(t11,t12,tablesh,t10);
   t13 = t12 + tablesl;
   Add12(polyTblh,polyTblm,t11,t13);
-  
-  /* Rounding test 
-     Since we know that the result of the final multiplication with 2^M 
-     will always be representable, we can do the rounding test on the 
+
+  /* Rounding test
+     Since we know that the result of the final multiplication with 2^M
+     will always be representable, we can do the rounding test on the
      factors and multiply only the final result.
      We implement the multiplication in integer computations to overcome
      the problem of the non-representability of 2^1024 if M = 1024
@@ -931,7 +931,7 @@ double exp_rd(double x) {
     resdb.d = res;
     resdb.i[HI] += M << 20;
     return resdb.d;
-  } else {      
+  } else {
       /* Rest of argument reduction for accurate phase */
 
       Mul133(&msLog2Div2LMultKh,&msLog2Div2LMultKm,&msLog2Div2LMultKl,kd,msLog2Div2Lh,msLog2Div2Lm,msLog2Div2Ll);
@@ -942,18 +942,18 @@ double exp_rd(double x) {
       /* Table reads for accurate phase */
       tbl1l = twoPowerIndex1[index1].lo;
       tbl2l = twoPowerIndex2[index2].lo;
-      
+
       /* Call accurate phase */
-      exp_td_accurate(&polyTblh, &polyTblm, &polyTbll, rh, rm, rl, tbl1h, tbl1m, tbl1l, tbl2h, tbl2m, tbl2l); 
+      exp_td_accurate(&polyTblh, &polyTblm, &polyTbll, rh, rm, rl, tbl1h, tbl1m, tbl1l, tbl2h, tbl2m, tbl2l);
 
       /* Since the final multiplication is exact, we can do the final rounding before multiplying
 	 We overcome this way also the cases where the final result is not underflowed whereas the
 	 lower parts of the intermediate final result are.
       */
-      
+
       RoundDownwards3(&res,polyTblh,polyTblm,polyTbll);
 
-      /* Final multiplication with 2^M 
+      /* Final multiplication with 2^M
 	 We implement the multiplication in integer computations to overcome
 	 the problem of the non-representability of 2^1024 if M = 1024
       */
@@ -962,8 +962,8 @@ double exp_rd(double x) {
       resdb.i[HI] += M << 20;
       return resdb.d;
     } /* Accurate phase launched after rounding test*/
-} 
- 
+}
+
 
 #ifdef BUILD_INTERVAL_FUNCTIONS
 interval j_exp(interval x)
@@ -1029,7 +1029,7 @@ interval j_exp(interval x)
 
   if ( __builtin_expect(
        ((xIntHi_sup & 0x7ff00000) == 0)
-    || (((xIntHi_sup & 0x7ff00000) == 0)  && (x_sup == 0.0)) 
+    || (((xIntHi_sup & 0x7ff00000) == 0)  && (x_sup == 0.0))
     || (((xIntHi_sup & 0x7ff00000) == 0)  && (x_sup < 0.0))
     || (((xIntHi_sup & 0x7fffffff) >= OVRUDRFLWSMPLBOUND) && ((xIntHi_sup & 0x7fffffff) >= 0x7ff00000))
     || (((xIntHi_sup & 0x7fffffff) >= OVRUDRFLWSMPLBOUND) && ((xIntHi_sup & 0x7fffffff) >= 0x7ff00000) && (((xIntHi_sup & 0x000fffff) | xdb_sup.i[LO]) != 0))
@@ -1055,7 +1055,7 @@ interval j_exp(interval x)
 
   /* Test if argument is a denormal or zero */
   /* If we are here, we are sure to be neither +/- Inf nor NaN nor overflowed nor denormalized in the argument
-     but we might be denormalized in the result 
+     but we might be denormalized in the result
 
      We continue the argument reduction for the quick phase and table reads for both phases
   */
@@ -1064,8 +1064,8 @@ interval j_exp(interval x)
   Mul12(&s1_inf,&s2_inf,msLog2Div2Lh,kd_inf);
   s3_sup = kd_sup * msLog2Div2Lm;
   s3_inf = kd_inf * msLog2Div2Lm;
-  s4_sup = s2_sup + s3_sup; 
-  s4_inf = s2_inf + s3_inf; 
+  s4_sup = s2_sup + s3_sup;
+  s4_inf = s2_inf + s3_inf;
   s5_sup = x_sup + s1_sup;
   s5_inf = x_inf + s1_inf;
   Add12Cond(rh_sup,rm_sup,s5_sup,s4_sup);
@@ -1094,7 +1094,7 @@ interval j_exp(interval x)
 
   /* No more underflow nor denormal is possible. There may be the case where
      M is 1024 and the value 2^M is to be multiplied may be less than 1
-     So the final result will be normalized and representable by the multiplication must be 
+     So the final result will be normalized and representable by the multiplication must be
      made in 2 steps
   */
 
@@ -1130,10 +1130,10 @@ interval j_exp(interval x)
   t13_inf = t12_inf + tablesl_inf;
   Add12(polyTblh_sup,polyTblm_sup,t11_sup,t13_sup);
   Add12(polyTblh_inf,polyTblm_inf,t11_inf,t13_inf);
-  
-  /* Rounding test 
-     Since we know that the result of the final multiplication with 2^M 
-     will always be representable, we can do the rounding test on the 
+
+  /* Rounding test
+     Since we know that the result of the final multiplication with 2^M
+     will always be representable, we can do the rounding test on the
      factors and multiply only the final result.
      We implement the multiplication in integer computations to overcome
      the problem of the non-representability of 2^1024 if M = 1024
@@ -1223,13 +1223,13 @@ interval j_exp(interval x)
     tbl1l_sup = twoPowerIndex1[index1_sup].lo;
     tbl2l_sup = twoPowerIndex2[index2_sup].lo;
     /* Call accurate phase */
-    exp_td_accurate(&polyTblh_sup, &polyTblm_sup, &polyTbll_sup, rh_sup, rm_sup, rl_sup, tbl1h_sup, tbl1m_sup, tbl1l_sup, tbl2h_sup, tbl2m_sup, tbl2l_sup); 
+    exp_td_accurate(&polyTblh_sup, &polyTblm_sup, &polyTbll_sup, rh_sup, rm_sup, rl_sup, tbl1h_sup, tbl1m_sup, tbl1l_sup, tbl2h_sup, tbl2m_sup, tbl2l_sup);
     /* Since the final multiplication is exact, we can do the final rounding before multiplying
        We overcome this way also the cases where the final result is not underflowed whereas the
        lower parts of the intermediate final result are.
     */
     RoundUpwards3(&res_sup,polyTblh_sup,polyTblm_sup,polyTbll_sup);
-    /* Final multiplication with 2^M 
+    /* Final multiplication with 2^M
        We implement the multiplication in integer computations to overcome
        the problem of the non-representability of 2^1024 if M = 1024
     */
@@ -1239,7 +1239,7 @@ interval j_exp(interval x)
     ASSIGN_UP(res,resdb_sup.d);
     return res;
   } /* Accurate phase launched after rounding test*/
-    
+
   if (roundable==2) {
     if (infDone==0){
     /* Rest of argument reduction for accurate phase */
@@ -1251,14 +1251,14 @@ interval j_exp(interval x)
     tbl1l_inf = twoPowerIndex1[index1_inf].lo;
     tbl2l_inf = twoPowerIndex2[index2_inf].lo;
     /* Call accurate phase */
-    exp_td_accurate(&polyTblh_inf, &polyTblm_inf, &polyTbll_inf, rh_inf, rm_inf, rl_inf, tbl1h_inf, tbl1m_inf, tbl1l_inf, tbl2h_inf, tbl2m_inf, tbl2l_inf); 
+    exp_td_accurate(&polyTblh_inf, &polyTblm_inf, &polyTbll_inf, rh_inf, rm_inf, rl_inf, tbl1h_inf, tbl1m_inf, tbl1l_inf, tbl2h_inf, tbl2m_inf, tbl2l_inf);
     /* Since the final multiplication is exact, we can do the final rounding before multiplying
        We overcome this way also the cases where the final result is not underflowed whereas the
        lower parts of the intermediate final result are.
     */
 
     RoundDownwards3(&res_inf,polyTblh_inf,polyTblm_inf,polyTbll_inf);
-    /* Final multiplication with 2^M 
+    /* Final multiplication with 2^M
        We implement the multiplication in integer computations to overcome
        the problem of the non-representability of 2^1024 if M = 1024
     */
@@ -1270,7 +1270,7 @@ interval j_exp(interval x)
     if(supDone==0){
       resdb_sup.i[HI] += M_sup << 20;
     }
-    ASSIGN_UP(res,resdb_sup.d);    
+    ASSIGN_UP(res,resdb_sup.d);
     return res;
   } /* Accurate phase launched after rounding test*/
   if(roundable==0)
@@ -1285,13 +1285,13 @@ interval j_exp(interval x)
     tbl1l_sup = twoPowerIndex1[index1_sup].lo;
     tbl2l_sup = twoPowerIndex2[index2_sup].lo;
     /* Call accurate phase */
-    exp_td_accurate(&polyTblh_sup, &polyTblm_sup, &polyTbll_sup, rh_sup, rm_sup, rl_sup, tbl1h_sup, tbl1m_sup, tbl1l_sup, tbl2h_sup, tbl2m_sup, tbl2l_sup); 
+    exp_td_accurate(&polyTblh_sup, &polyTblm_sup, &polyTbll_sup, rh_sup, rm_sup, rl_sup, tbl1h_sup, tbl1m_sup, tbl1l_sup, tbl2h_sup, tbl2m_sup, tbl2l_sup);
     /* Since the final multiplication is exact, we can do the final rounding before multiplying
        We overcome this way also the cases where the final result is not underflowed whereas the
        lower parts of the intermediate final result are.
     */
     RoundUpwards3(&res_sup,polyTblh_sup,polyTblm_sup,polyTbll_sup);
-    /* Final multiplication with 2^M 
+    /* Final multiplication with 2^M
        We implement the multiplication in integer computations to overcome
        the problem of the non-representability of 2^1024 if M = 1024
     */
@@ -1309,14 +1309,14 @@ interval j_exp(interval x)
     tbl1l_inf = twoPowerIndex1[index1_inf].lo;
     tbl2l_inf = twoPowerIndex2[index2_inf].lo;
     /* Call accurate phase */
-    exp_td_accurate(&polyTblh_inf, &polyTblm_inf, &polyTbll_inf, rh_inf, rm_inf, rl_inf, tbl1h_inf, tbl1m_inf, tbl1l_inf, tbl2h_inf, tbl2m_inf, tbl2l_inf); 
+    exp_td_accurate(&polyTblh_inf, &polyTblm_inf, &polyTbll_inf, rh_inf, rm_inf, rl_inf, tbl1h_inf, tbl1m_inf, tbl1l_inf, tbl2h_inf, tbl2m_inf, tbl2l_inf);
     /* Since the final multiplication is exact, we can do the final rounding before multiplying
        We overcome this way also the cases where the final result is not underflowed whereas the
        lower parts of the intermediate final result are.
     */
 
     RoundDownwards3(&res_inf,polyTblh_inf,polyTblm_inf,polyTbll_inf);
-    /* Final multiplication with 2^M 
+    /* Final multiplication with 2^M
        We implement the multiplication in integer computations to overcome
        the problem of the non-representability of 2^1024 if M = 1024
     */

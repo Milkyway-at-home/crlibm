@@ -8,9 +8,9 @@
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or 
+ * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -18,7 +18,7 @@
  *
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 */
 
 #include <stdio.h>
@@ -56,15 +56,15 @@ void acos_accurate_lower(double *acosh, double *acosm, double *acosl, double x, 
 
      Compute monomials 27 to 37 in double precision
      monomials 13 to 25 in double-double and
-     1 to 11 in triple-double precision in a 
+     1 to 11 in triple-double precision in a
      modified Horner form
 
   */
 
   /* Double computations */
-  
+
 #if defined(PROCESSOR_HAS_FMA) && !defined(AVOID_FMA)
-  highPoly = FMA(FMA(FMA(FMA(FMA(tbl[33],xSqh,tbl[32]),xSqh,tbl[31]),xSqh,tbl[30]),xSqh,tbl[29]),xSqh,tbl[28]);		 
+  highPoly = FMA(FMA(FMA(FMA(FMA(tbl[33],xSqh,tbl[32]),xSqh,tbl[31]),xSqh,tbl[30]),xSqh,tbl[29]),xSqh,tbl[28]);
 #else
   highPoly = tbl[28] + xSqh * (tbl[29] + xSqh * (tbl[30] + xSqh * (tbl[31] + xSqh * (tbl[32] + xSqh * tbl[33]))));
 #endif
@@ -98,13 +98,13 @@ void acos_accurate_lower(double *acosh, double *acosm, double *acosl, double x, 
   Add33(&t12h,&t12m,&t12l,tbl[0],tbl[1],tbl[2],tt12h,tt12m,tt12l);        /* 140 - 38/53 */
 
   Mul123(&xCubeh,&xCubem,&xCubel,x,xSqh,xSql);                            /* 154 - 47/53 */
- 
+
   Mul33(&tt13h,&tt13m,&tt13l,xCubeh,xCubem,xCubel,t12h,t12m,t12l);        /* 136 - 34/53 */
   Add133(&t13h,&t13m,&t13l,x,tt13h,tt13m,tt13l);                          /* 138 - 32/53 */
 
   Renormalize3(&polyh,&polym,&polyl,t13h,t13m,t13l);                      /* infty - 52/53 */
-  
-  /* Reconstruction: 
+
+  /* Reconstruction:
 
      - Multiply by the inverted sign
      - Add Pi/2 in triple-double
@@ -117,7 +117,7 @@ void acos_accurate_lower(double *acosh, double *acosm, double *acosl, double x, 
   zw1l = -sign * polyl;
 
   Add33(&acoshover,&acosmover,&acoslover,PIHALFH,PIHALFM,PIHALFL,zw1h,zw1m,zw1l);
-  
+
   Renormalize3(acosh,acosm,acosl,acoshover,acosmover,acoslover);
 
 }
@@ -140,23 +140,23 @@ void  acos_accurate_middle(double *acosh, double *acosm, double *acosl, double z
 #endif
 
   /* Evaluate the polynomial of degree 35
-     Its coefficients start at tbl[i+1] 
+     Its coefficients start at tbl[i+1]
      Evaluate degrees 35 to 20 in double precision,
      degrees 20 to 7 in double-double precision and
-     finally degrees 6 to 1 in triple-double. 
-     The constant coefficient is a double-double, the 
-     computations are nevertheless in triple-double 
+     finally degrees 6 to 1 in triple-double.
+     The constant coefficient is a double-double, the
+     computations are nevertheless in triple-double
   */
 
   /* Double computations */
-  
+
 #if defined(PROCESSOR_HAS_FMA) && !defined(AVOID_FMA)
   highPoly = FMA(FMA(FMA(FMA(FMA(FMA(FMA(FMA(FMA(FMA(FMA(FMA(FMA(FMA(FMA(FMA(FMA(FMA(FMA(
              tbl[i+58] ,z,tbl[i+57]),z,tbl[i+56]),z,tbl[i+55]),z,tbl[i+54]),z,
              tbl[i+53]),z,tbl[i+52]),z,tbl[i+51]),z,tbl[i+50]),z,tbl[i+49]),z,
              tbl[i+48]),z,tbl[i+47]),z,tbl[i+46]),z,tbl[i+45]),z,tbl[i+44]),z,
 	     tbl[i+43]),z,tbl[i+42]),z,tbl[i+41]),z,tbl[i+40]),z,tbl[i+39]);
-								 
+
 #else
   highPoly = tbl[i+39] + z * (tbl[i+40] + z * (tbl[i+41] + z * (tbl[i+42] + z * (
              tbl[i+43] + z * (tbl[i+44] + z * (tbl[i+45] + z * (tbl[i+46] + z * (
@@ -165,9 +165,9 @@ void  acos_accurate_middle(double *acosh, double *acosm, double *acosl, double z
              tbl[i+55] + z * (tbl[i+56] + z * (tbl[i+57] + z * tbl[i+58]))))))))))))))))));
 #endif
 
-  
+
   /* Double-double computations */
-  
+
   Mul12(&tt1h,&tt1l,z,highPoly);
   Add22(&t1h,&t1l,tbl[i+37],tbl[i+38],tt1h,tt1l);
 
@@ -202,7 +202,7 @@ void  acos_accurate_middle(double *acosh, double *acosm, double *acosl, double z
 
   Renormalize3(&polyh,&polym,&polyl,t16h,t16m,t16l);                               /* infty - 52/53 */
 
-  /* Reconstruction: 
+  /* Reconstruction:
 
      - Multiply by the inverted sign
      - Add Pi/2 in triple-double
@@ -215,7 +215,7 @@ void  acos_accurate_middle(double *acosh, double *acosm, double *acosl, double z
   zw1l = -sign * polyl;
 
   Add33(&acoshover,&acosmover,&acoslover,PIHALFH,PIHALFM,PIHALFL,zw1h,zw1m,zw1l);
-  
+
   Renormalize3(acosh,acosm,acosl,acoshover,acosmover,acoslover);
 
 }
@@ -239,9 +239,9 @@ void acos_accurate_higher(double *acosh, double *acosm, double *acosl, double z,
   crlibm_second_step_taken++;
 #endif
 
-  /* We evaluate acos(x) with x > 0 as 
+  /* We evaluate acos(x) with x > 0 as
 
-     acos(x) = -1 * f(z) * sqrt(2*z) 
+     acos(x) = -1 * f(z) * sqrt(2*z)
 
      with z = 1 - x and
 
@@ -250,16 +250,16 @@ void acos_accurate_higher(double *acosh, double *acosm, double *acosl, double z,
      f(z) is approximated by p(z)
 
      The polynomial p(z) is of degree 29
-     Its coefficients start at tbl[TBLIDX10] 
+     Its coefficients start at tbl[TBLIDX10]
      Coefficients for degrees 29 to 18 are in double precision,
      for degrees 17 to 9 in double-double precision and
-     finally for degrees 8 to 1 in triple-double. 
-     The constant coefficient (-1) is not stored in the table, 
-     the computations are nevertheless in triple-double 
+     finally for degrees 8 to 1 in triple-double.
+     The constant coefficient (-1) is not stored in the table,
+     the computations are nevertheless in triple-double
      We evaluate the monomials in the precision in which
      the correspondant coefficients are stored
-     The coefficients' values decrease very quickly 
-     so even with |z| < 2^-2.18 we can compute degree 18 
+     The coefficients' values decrease very quickly
+     so even with |z| < 2^-2.18 we can compute degree 18
      already in double precision
 
      Compute than sqrt(2*z) as a triple-double
@@ -274,14 +274,14 @@ void acos_accurate_higher(double *acosh, double *acosm, double *acosl, double z,
              tbl[TBLIDX10+53] ,z,tbl[TBLIDX10+52]),z,tbl[TBLIDX10+51]),z,
              tbl[TBLIDX10+50]),z,tbl[TBLIDX10+49]),z,tbl[TBLIDX10+48]),z,
              tbl[TBLIDX10+47]),z,tbl[TBLIDX10+46]),z,tbl[TBLIDX10+45]),z,
-             tbl[TBLIDX10+44]),z,tbl[TBLIDX10+43]),z,tbl[TBLIDX10+42]);						 
+             tbl[TBLIDX10+44]),z,tbl[TBLIDX10+43]),z,tbl[TBLIDX10+42]);
 #else
   highPoly = tbl[TBLIDX10+42] + z * (tbl[TBLIDX10+43] + z * (tbl[TBLIDX10+44] + z * (
              tbl[TBLIDX10+45] + z * (tbl[TBLIDX10+46] + z * (tbl[TBLIDX10+47] + z * (
              tbl[TBLIDX10+48] + z * (tbl[TBLIDX10+49] + z * (tbl[TBLIDX10+50] + z * (
              tbl[TBLIDX10+51] + z * (tbl[TBLIDX10+52] + z *  tbl[TBLIDX10+53]))))))))));
 #endif
-  
+
   /* Double-double computations */
 
   Mul12(&tt1h,&tt1l,z,highPoly);
@@ -334,15 +334,15 @@ void acos_accurate_higher(double *acosh, double *acosm, double *acosl, double z,
 
   Mul33(&pTimesSh,&pTimesSm,&pTimesSl,polyh,polym,polyl,sqrtzh,sqrtzm,sqrtzl);                    /* 139 - 48/53 */
 
-  /* Reconstruction: 
+  /* Reconstruction:
 
      If the sign of x in acos(x) was positive:
-      - Multiply pTimesSh + pTimesSm + pTimesSl approx f(x) * sqrt(2 * z) by -1 
+      - Multiply pTimesSh + pTimesSm + pTimesSl approx f(x) * sqrt(2 * z) by -1
       - Renormalize
       - Return
 
      Otherwise:
-      - Add Pi in triple-double to pTimesSh + pTimesSm + pTimesSl approx f(x) * sqrt(2 * z) 
+      - Add Pi in triple-double to pTimesSh + pTimesSm + pTimesSl approx f(x) * sqrt(2 * z)
       - Renormalize
       - Return
 
@@ -350,8 +350,8 @@ void acos_accurate_higher(double *acosh, double *acosm, double *acosl, double z,
 
   if (sign > 0) {
 
-    allh = -1.0 * pTimesSh;    
-    allm = -1.0 * pTimesSm;    
+    allh = -1.0 * pTimesSh;
+    allm = -1.0 * pTimesSm;
     alll = -1.0 * pTimesSl;                                                                       /* 139 - 48/53 */
 
   } else {
@@ -380,7 +380,7 @@ double acos_rn(double x) {
 
   /*
 #if CRLIBM_REQUIRES_ROUNDING_MODE_CHANGE
-  SAVE_STATE_AND_SET_RNDOUBLE 
+  SAVE_STATE_AND_SET_RNDOUBLE
 #endif
   */
 
@@ -403,10 +403,10 @@ double acos_rn(double x) {
   }
 
   /* If |x| < 2^(-120) we have
-     
+
      round(acos(x)) = round(pi/2)
-          
-     So we can decide the rounding without any computation 
+
+     So we can decide the rounding without any computation
   */
   if (xdb.i[HI] < 0x38700000) {
     return PIHALFDOUBLERN;
@@ -420,7 +420,7 @@ double acos_rn(double x) {
   */
 
   if (xdb.i[HI] < BOUND1) {
-    /* Special interval 0..BOUND1 
+    /* Special interval 0..BOUND1
        The polynomial has no even monomials
        We must prove extra accuracy in the interval 0..sin(2^(-18))
     */
@@ -445,7 +445,7 @@ double acos_rn(double x) {
       /* Double-double precision evaluation */
       Mul12(&tt1h,&tt1l,xSqh,highPoly);
       Add22(&t1h,&t1l,tbl[12],tbl[13],tt1h,tt1l);
-      
+
       MulAdd212(&t2h,&t2l,tbl[9],tbl[10],xSqh,t1h,t1l);
       MulAdd212(&t3h,&t3l,tbl[6],tbl[7],xSqh,t2h,t2l);
       MulAdd22(&t4h,&t4l,tmp4,tmp5,xSqh,xSql,t3h,t3l);
@@ -455,7 +455,7 @@ double acos_rn(double x) {
 
     Mul122(&xCubeh,&xCubel,x,xSqh,xSql);
     Mul22(&tt6h,&tt6l,xCubeh,xCubel,t5h,t5l);
-    
+
     Add12(tmp1,tmp2,x,tt6h);
     tmp3 = tmp2 + tt6l;
     Add12(polyh,polyl,tmp1,tmp3);
@@ -463,7 +463,7 @@ double acos_rn(double x) {
     /* Reconstruction:
 
        - Multiply by the inverted sign
-       - Add Pi/2 in double-double precision 
+       - Add Pi/2 in double-double precision
 
     */
 
@@ -472,17 +472,17 @@ double acos_rn(double x) {
 
     Add22(&acosh,&acosm,PIHALFH,PIHALFM,zw1h,zw1l);
 
-    /* Rounding test 
+    /* Rounding test
        The RN rounding constant is at tbl[34]
     */
-    if(acosh == (acosh + (acosm * tbl[34]))) 
+    if(acosh == (acosh + (acosm * tbl[34])))
       return acosh;
 
     /* Launch accurate phase */
 
     acos_accurate_lower(&acosh,&acosm,&acosl,x,xSqh,xSql,sign);
 
-    ReturnRoundToNearest3(acosh,acosm,acosl); 
+    ReturnRoundToNearest3(acosh,acosm,acosl);
   }
 
   if (xdb.i[HI] >= BOUND9) {
@@ -509,10 +509,10 @@ double acos_rn(double x) {
 #else
     highPoly = tbl[TBLIDX10+24] + z * (tbl[TBLIDX10+26] + z * (tbl[TBLIDX10+28] + z * (
 	       tbl[TBLIDX10+30] + z * (tbl[TBLIDX10+32] + z * (tbl[TBLIDX10+34] + z * (
-	       tbl[TBLIDX10+36] + z * (tbl[TBLIDX10+38] + z * (tbl[TBLIDX10+40] + z * 
+	       tbl[TBLIDX10+36] + z * (tbl[TBLIDX10+38] + z * (tbl[TBLIDX10+40] + z *
                tbl[TBLIDX10+42]))))))));
 #endif
-    
+
     /* Double-double precision evaluation */
     Mul12(&tt1h,&tt1l,z,highPoly);
     Add22(&t1h,&t1l,tbl[TBLIDX10+21],tbl[TBLIDX10+22],tt1h,tt1l);
@@ -529,54 +529,54 @@ double acos_rn(double x) {
     /* Compute sqrt(2*z) as a double-double */
 
     twoZ = 2 * z;
-    sqrt12(&sqrtzh,&sqrtzl,twoZ);                                                         
+    sqrt12(&sqrtzh,&sqrtzl,twoZ);
 
     /* Multiply p(z) by sqrt(2*z) and add Pi/2 */
 
-    Mul22(&pTimesSh,&pTimesSl,polyh,polyl,sqrtzh,sqrtzl);                    
+    Mul22(&pTimesSh,&pTimesSl,polyh,polyl,sqrtzh,sqrtzl);
 
 
-    /* Reconstruction: 
+    /* Reconstruction:
 
      If the sign of x in acos(x) was positive:
-      - Multiply pTimesSh + pTimesSl approx f(x) * sqrt(2 * z) by -1 
+      - Multiply pTimesSh + pTimesSl approx f(x) * sqrt(2 * z) by -1
       - Return
 
      Otherwise:
-      - Add Pi in triple-double to pTimesSh + pTimesSl approx f(x) * sqrt(2 * z) 
+      - Add Pi in triple-double to pTimesSh + pTimesSl approx f(x) * sqrt(2 * z)
       - Return
 
     */
 
     if (sign > 0) {
-      
+
       acosh = -1.0 * pTimesSh;
       acosm = -1.0 * pTimesSl;
-      
+
     } else {
-      
+
       Add22(&acosh,&acosm,PIH,PIM,pTimesSh,pTimesSl);
 
     }
 
-    /* Rounding test 
+    /* Rounding test
        The RN rounding constant is at tbl[TBLIDX10+54]
     */
-    
-    if(acosh == (acosh + (acosm * tbl[TBLIDX10+54]))) 
+
+    if(acosh == (acosh + (acosm * tbl[TBLIDX10+54])))
       return acosh;
 
     /* Launch accurate phase */
 
     acos_accurate_higher(&acosh,&acosm,&acosl,z,sign);
 
-    ReturnRoundToNearest3(acosh,acosm,acosl); 
+    ReturnRoundToNearest3(acosh,acosm,acosl);
   }
-  
-  /* General 8 main intervals 
+
+  /* General 8 main intervals
      We can already suppose that BOUND1 <= x <= BOUND9
   */
-  
+
   if (xdb.i[HI] < BOUND5) {
     if (xdb.i[HI] < BOUND3) {
       if (xdb.i[HI] < BOUND2) i = TBLIDX2; else i = TBLIDX3;
@@ -591,7 +591,7 @@ double acos_rn(double x) {
     }
   }
 
-  /* Argument reduction 
+  /* Argument reduction
      i points to the interval midpoint value in the table
   */
   z = x - tbl[i];
@@ -606,12 +606,12 @@ double acos_rn(double x) {
              tbl[i+27]),z,tbl[i+25]),z,tbl[i+23]),z,tbl[i+21]);
 #else
   highPoly = tbl[i+21] + z * (tbl[i+23] + z * (tbl[i+25] + z * (
-             tbl[i+27] + z * (tbl[i+29] + z * (tbl[i+31] + z * ( 
+             tbl[i+27] + z * (tbl[i+29] + z * (tbl[i+31] + z * (
              tbl[i+33] + z *  tbl[i+35]))))));
 #endif
 
   /* Double-double precision evaluation */
-    
+
   Mul12(&tt1h,&tt1l,z,highPoly);
   Add22(&t1h,&t1l,tbl[i+18],tbl[i+19],tt1h,tt1l);
 
@@ -623,28 +623,28 @@ double acos_rn(double x) {
   MulAdd212(&polyh,&polyl,tbl[i+1],tbl[i+2],z,t6h,t6l);
 
   /* Reconstruction:
-     
+
      - Multiply by the inverted sign
-     - Add Pi/2 in double-double precision 
+     - Add Pi/2 in double-double precision
 
   */
 
   zw1h = -sign * polyh;
   zw1l = -sign * polyl;
-  
+
   Add22(&acosh,&acosm,PIHALFH,PIHALFM,zw1h,zw1l);
 
-  /* Rounding test 
+  /* Rounding test
      The RN rounding constant is at tbl[i+59]
   */
-  if(acosh == (acosh + (acosm * tbl[i+59]))) 
+  if(acosh == (acosh + (acosm * tbl[i+59])))
     return acosh;
 
   /* Launch accurate phase */
 
   acos_accurate_middle(&acosh,&acosm,&acosl,z,i,sign);
 
-  ReturnRoundToNearest3(acosh,acosm,acosl); 
+  ReturnRoundToNearest3(acosh,acosm,acosl);
 }
 
 double acos_ru(double x) {
@@ -679,10 +679,10 @@ double acos_ru(double x) {
   }
 
   /* If |x| < 2^(-120) we have
-     
+
      round(acos(x)) = round(pi/2)
-          
-     So we can decide the rounding without any computation 
+
+     So we can decide the rounding without any computation
   */
   if (xdb.i[HI] < 0x38700000) {
     return PIHALFDOUBLERU;
@@ -696,7 +696,7 @@ double acos_ru(double x) {
   */
 
   if (xdb.i[HI] < BOUND1) {
-    /* Special interval 0..BOUND1 
+    /* Special interval 0..BOUND1
        The polynomial has no even monomials
        We must prove extra accuracy in the interval 0..sin(2^(-18))
     */
@@ -721,7 +721,7 @@ double acos_ru(double x) {
       /* Double-double precision evaluation */
       Mul12(&tt1h,&tt1l,xSqh,highPoly);
       Add22(&t1h,&t1l,tbl[12],tbl[13],tt1h,tt1l);
-      
+
       MulAdd212(&t2h,&t2l,tbl[9],tbl[10],xSqh,t1h,t1l);
       MulAdd212(&t3h,&t3l,tbl[6],tbl[7],xSqh,t2h,t2l);
       MulAdd22(&t4h,&t4l,tmp4,tmp5,xSqh,xSql,t3h,t3l);
@@ -731,7 +731,7 @@ double acos_ru(double x) {
 
     Mul122(&xCubeh,&xCubel,x,xSqh,xSql);
     Mul22(&tt6h,&tt6l,xCubeh,xCubel,t5h,t5l);
-    
+
     Add12(tmp1,tmp2,x,tt6h);
     tmp3 = tmp2 + tt6l;
     Add12(polyh,polyl,tmp1,tmp3);
@@ -739,7 +739,7 @@ double acos_ru(double x) {
     /* Reconstruction:
 
        - Multiply by the inverted sign
-       - Add Pi/2 in double-double precision 
+       - Add Pi/2 in double-double precision
 
     */
 
@@ -748,7 +748,7 @@ double acos_ru(double x) {
 
     Add22(&acosh,&acosm,PIHALFH,PIHALFM,zw1h,zw1l);
 
-    /* Rounding test 
+    /* Rounding test
        The RU rounding constant is at tbl[35]
     */
     TEST_AND_RETURN_RU(acosh, acosm, tbl[35]);
@@ -757,7 +757,7 @@ double acos_ru(double x) {
 
     acos_accurate_lower(&acosh,&acosm,&acosl,x,xSqh,xSql,sign);
 
-    ReturnRoundUpwards3(acosh,acosm,acosl); 
+    ReturnRoundUpwards3(acosh,acosm,acosl);
   }
 
   if (xdb.i[HI] >= BOUND9) {
@@ -784,10 +784,10 @@ double acos_ru(double x) {
 #else
     highPoly = tbl[TBLIDX10+24] + z * (tbl[TBLIDX10+26] + z * (tbl[TBLIDX10+28] + z * (
 	       tbl[TBLIDX10+30] + z * (tbl[TBLIDX10+32] + z * (tbl[TBLIDX10+34] + z * (
-	       tbl[TBLIDX10+36] + z * (tbl[TBLIDX10+38] + z * (tbl[TBLIDX10+40] + z * 
+	       tbl[TBLIDX10+36] + z * (tbl[TBLIDX10+38] + z * (tbl[TBLIDX10+40] + z *
                tbl[TBLIDX10+42]))))))));
 #endif
-    
+
     /* Double-double precision evaluation */
     Mul12(&tt1h,&tt1l,z,highPoly);
     Add22(&t1h,&t1l,tbl[TBLIDX10+21],tbl[TBLIDX10+22],tt1h,tt1l);
@@ -804,37 +804,37 @@ double acos_ru(double x) {
     /* Compute sqrt(2*z) as a double-double */
 
     twoZ = 2 * z;
-    sqrt12(&sqrtzh,&sqrtzl,twoZ);                                                         
+    sqrt12(&sqrtzh,&sqrtzl,twoZ);
 
     /* Multiply p(z) by sqrt(2*z) and add Pi/2 */
 
-    Mul22(&pTimesSh,&pTimesSl,polyh,polyl,sqrtzh,sqrtzl);                    
+    Mul22(&pTimesSh,&pTimesSl,polyh,polyl,sqrtzh,sqrtzl);
 
 
-    /* Reconstruction: 
+    /* Reconstruction:
 
      If the sign of x in acos(x) was positive:
-      - Multiply pTimesSh + pTimesSl approx f(x) * sqrt(2 * z) by -1 
+      - Multiply pTimesSh + pTimesSl approx f(x) * sqrt(2 * z) by -1
       - Return
 
      Otherwise:
-      - Add Pi in triple-double to pTimesSh + pTimesSl approx f(x) * sqrt(2 * z) 
+      - Add Pi in triple-double to pTimesSh + pTimesSl approx f(x) * sqrt(2 * z)
       - Return
 
     */
 
     if (sign > 0) {
-      
+
       acosh = -1.0 * pTimesSh;
       acosm = -1.0 * pTimesSl;
-      
+
     } else {
-      
+
       Add22(&acosh,&acosm,PIH,PIM,pTimesSh,pTimesSl);
 
     }
 
-    /* Rounding test 
+    /* Rounding test
        The RU rounding constant is at tbl[TBLIDX10+55]
     */
     TEST_AND_RETURN_RU(acosh, acosm, tbl[TBLIDX10+55]);
@@ -843,13 +843,13 @@ double acos_ru(double x) {
 
     acos_accurate_higher(&acosh,&acosm,&acosl,z,sign);
 
-    ReturnRoundUpwards3(acosh,acosm,acosl); 
+    ReturnRoundUpwards3(acosh,acosm,acosl);
   }
-  
-  /* General 8 main intervals 
+
+  /* General 8 main intervals
      We can already suppose that BOUND1 <= x <= BOUND9
   */
-  
+
   if (xdb.i[HI] < BOUND5) {
     if (xdb.i[HI] < BOUND3) {
       if (xdb.i[HI] < BOUND2) i = TBLIDX2; else i = TBLIDX3;
@@ -864,7 +864,7 @@ double acos_ru(double x) {
     }
   }
 
-  /* Argument reduction 
+  /* Argument reduction
      i points to the interval midpoint value in the table
   */
   z = x - tbl[i];
@@ -879,12 +879,12 @@ double acos_ru(double x) {
              tbl[i+27]),z,tbl[i+25]),z,tbl[i+23]),z,tbl[i+21]);
 #else
   highPoly = tbl[i+21] + z * (tbl[i+23] + z * (tbl[i+25] + z * (
-             tbl[i+27] + z * (tbl[i+29] + z * (tbl[i+31] + z * ( 
+             tbl[i+27] + z * (tbl[i+29] + z * (tbl[i+31] + z * (
              tbl[i+33] + z *  tbl[i+35]))))));
 #endif
 
   /* Double-double precision evaluation */
-    
+
   Mul12(&tt1h,&tt1l,z,highPoly);
   Add22(&t1h,&t1l,tbl[i+18],tbl[i+19],tt1h,tt1l);
 
@@ -896,18 +896,18 @@ double acos_ru(double x) {
   MulAdd212(&polyh,&polyl,tbl[i+1],tbl[i+2],z,t6h,t6l);
 
   /* Reconstruction:
-     
+
      - Multiply by the inverted sign
-     - Add Pi/2 in double-double precision 
+     - Add Pi/2 in double-double precision
 
   */
 
   zw1h = -sign * polyh;
   zw1l = -sign * polyl;
-  
+
   Add22(&acosh,&acosm,PIHALFH,PIHALFM,zw1h,zw1l);
 
-  /* Rounding test 
+  /* Rounding test
      The RU rounding constant is at tbl[i+60]
   */
   TEST_AND_RETURN_RU(acosh, acosm, tbl[i+60]);
@@ -916,7 +916,7 @@ double acos_ru(double x) {
 
   acos_accurate_middle(&acosh,&acosm,&acosl,z,i,sign);
 
-  ReturnRoundUpwards3(acosh,acosm,acosl); 
+  ReturnRoundUpwards3(acosh,acosm,acosl);
 }
 
 
@@ -953,10 +953,10 @@ double acos_rd(double x) {
   }
 
   /* If |x| < 2^(-120) we have
-     
+
      round(acos(x)) = round(pi/2)
-          
-     So we can decide the rounding without any computation 
+
+     So we can decide the rounding without any computation
   */
   if (xdb.i[HI] < 0x38700000) {
     return PIHALFDOUBLERD;
@@ -970,7 +970,7 @@ double acos_rd(double x) {
   */
 
   if (xdb.i[HI] < BOUND1) {
-    /* Special interval 0..BOUND1 
+    /* Special interval 0..BOUND1
        The polynomial has no even monomials
        We must prove extra accuracy in the interval 0..sin(2^(-18))
     */
@@ -995,7 +995,7 @@ double acos_rd(double x) {
       /* Double-double precision evaluation */
       Mul12(&tt1h,&tt1l,xSqh,highPoly);
       Add22(&t1h,&t1l,tbl[12],tbl[13],tt1h,tt1l);
-      
+
       MulAdd212(&t2h,&t2l,tbl[9],tbl[10],xSqh,t1h,t1l);
       MulAdd212(&t3h,&t3l,tbl[6],tbl[7],xSqh,t2h,t2l);
       MulAdd22(&t4h,&t4l,tmp4,tmp5,xSqh,xSql,t3h,t3l);
@@ -1005,7 +1005,7 @@ double acos_rd(double x) {
 
     Mul122(&xCubeh,&xCubel,x,xSqh,xSql);
     Mul22(&tt6h,&tt6l,xCubeh,xCubel,t5h,t5l);
-    
+
     Add12(tmp1,tmp2,x,tt6h);
     tmp3 = tmp2 + tt6l;
     Add12(polyh,polyl,tmp1,tmp3);
@@ -1013,7 +1013,7 @@ double acos_rd(double x) {
     /* Reconstruction:
 
        - Multiply by the inverted sign
-       - Add Pi/2 in double-double precision 
+       - Add Pi/2 in double-double precision
 
     */
 
@@ -1022,7 +1022,7 @@ double acos_rd(double x) {
 
     Add22(&acosh,&acosm,PIHALFH,PIHALFM,zw1h,zw1l);
 
-    /* Rounding test 
+    /* Rounding test
        The RD rounding constant is at tbl[35]
     */
     TEST_AND_RETURN_RD(acosh, acosm, tbl[35]);
@@ -1031,7 +1031,7 @@ double acos_rd(double x) {
 
     acos_accurate_lower(&acosh,&acosm,&acosl,x,xSqh,xSql,sign);
 
-    ReturnRoundDownwards3(acosh,acosm,acosl); 
+    ReturnRoundDownwards3(acosh,acosm,acosl);
   }
 
   if (xdb.i[HI] >= BOUND9) {
@@ -1058,10 +1058,10 @@ double acos_rd(double x) {
 #else
     highPoly = tbl[TBLIDX10+24] + z * (tbl[TBLIDX10+26] + z * (tbl[TBLIDX10+28] + z * (
 	       tbl[TBLIDX10+30] + z * (tbl[TBLIDX10+32] + z * (tbl[TBLIDX10+34] + z * (
-	       tbl[TBLIDX10+36] + z * (tbl[TBLIDX10+38] + z * (tbl[TBLIDX10+40] + z * 
+	       tbl[TBLIDX10+36] + z * (tbl[TBLIDX10+38] + z * (tbl[TBLIDX10+40] + z *
                tbl[TBLIDX10+42]))))))));
 #endif
-    
+
     /* Double-double precision evaluation */
     Mul12(&tt1h,&tt1l,z,highPoly);
     Add22(&t1h,&t1l,tbl[TBLIDX10+21],tbl[TBLIDX10+22],tt1h,tt1l);
@@ -1078,37 +1078,37 @@ double acos_rd(double x) {
     /* Compute sqrt(2*z) as a double-double */
 
     twoZ = 2 * z;
-    sqrt12(&sqrtzh,&sqrtzl,twoZ);                                                         
+    sqrt12(&sqrtzh,&sqrtzl,twoZ);
 
     /* Multiply p(z) by sqrt(2*z) and add Pi/2 */
 
-    Mul22(&pTimesSh,&pTimesSl,polyh,polyl,sqrtzh,sqrtzl);                    
+    Mul22(&pTimesSh,&pTimesSl,polyh,polyl,sqrtzh,sqrtzl);
 
 
-    /* Reconstruction: 
+    /* Reconstruction:
 
      If the sign of x in acos(x) was positive:
-      - Multiply pTimesSh + pTimesSl approx f(x) * sqrt(2 * z) by -1 
+      - Multiply pTimesSh + pTimesSl approx f(x) * sqrt(2 * z) by -1
       - Return
 
      Otherwise:
-      - Add Pi in triple-double to pTimesSh + pTimesSl approx f(x) * sqrt(2 * z) 
+      - Add Pi in triple-double to pTimesSh + pTimesSl approx f(x) * sqrt(2 * z)
       - Return
 
     */
 
     if (sign > 0) {
-      
+
       acosh = -1.0 * pTimesSh;
       acosm = -1.0 * pTimesSl;
-      
+
     } else {
-      
+
       Add22(&acosh,&acosm,PIH,PIM,pTimesSh,pTimesSl);
 
     }
 
-    /* Rounding test 
+    /* Rounding test
        The RD rounding constant is at tbl[TBLIDX10+55]
     */
     TEST_AND_RETURN_RD(acosh, acosm, tbl[TBLIDX10+55]);
@@ -1117,13 +1117,13 @@ double acos_rd(double x) {
 
     acos_accurate_higher(&acosh,&acosm,&acosl,z,sign);
 
-    ReturnRoundDownwards3(acosh,acosm,acosl); 
+    ReturnRoundDownwards3(acosh,acosm,acosl);
   }
-  
-  /* General 8 main intervals 
+
+  /* General 8 main intervals
      We can already suppose that BOUND1 <= x <= BOUND9
   */
-  
+
   if (xdb.i[HI] < BOUND5) {
     if (xdb.i[HI] < BOUND3) {
       if (xdb.i[HI] < BOUND2) i = TBLIDX2; else i = TBLIDX3;
@@ -1138,7 +1138,7 @@ double acos_rd(double x) {
     }
   }
 
-  /* Argument reduction 
+  /* Argument reduction
      i points to the interval midpoint value in the table
   */
   z = x - tbl[i];
@@ -1153,12 +1153,12 @@ double acos_rd(double x) {
              tbl[i+27]),z,tbl[i+25]),z,tbl[i+23]),z,tbl[i+21]);
 #else
   highPoly = tbl[i+21] + z * (tbl[i+23] + z * (tbl[i+25] + z * (
-             tbl[i+27] + z * (tbl[i+29] + z * (tbl[i+31] + z * ( 
+             tbl[i+27] + z * (tbl[i+29] + z * (tbl[i+31] + z * (
              tbl[i+33] + z *  tbl[i+35]))))));
 #endif
 
   /* Double-double precision evaluation */
-    
+
   Mul12(&tt1h,&tt1l,z,highPoly);
   Add22(&t1h,&t1l,tbl[i+18],tbl[i+19],tt1h,tt1l);
 
@@ -1170,18 +1170,18 @@ double acos_rd(double x) {
   MulAdd212(&polyh,&polyl,tbl[i+1],tbl[i+2],z,t6h,t6l);
 
   /* Reconstruction:
-     
+
      - Multiply by the inverted sign
-     - Add Pi/2 in double-double precision 
+     - Add Pi/2 in double-double precision
 
   */
 
   zw1h = -sign * polyh;
   zw1l = -sign * polyl;
-  
+
   Add22(&acosh,&acosm,PIHALFH,PIHALFM,zw1h,zw1l);
 
-  /* Rounding test 
+  /* Rounding test
      The RD rounding constant is at tbl[i+60]
   */
   TEST_AND_RETURN_RD(acosh, acosm, tbl[i+60]);
@@ -1190,6 +1190,6 @@ double acos_rd(double x) {
 
   acos_accurate_middle(&acosh,&acosm,&acosl,z,i,sign);
 
-  ReturnRoundDownwards3(acosh,acosm,acosl); 
+  ReturnRoundDownwards3(acosh,acosm,acosl);
 }
 

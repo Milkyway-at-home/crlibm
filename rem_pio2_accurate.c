@@ -8,9 +8,9 @@
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or 
+ * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -18,7 +18,7 @@
  *
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 */
 
 /**
@@ -35,43 +35,43 @@
 
 /**
  * Case X_IND = -1:
- *               0 
- *           2 ^ 
+ *               0
+ *           2 ^
  *  X    :   <> |--| |--| |--|   0   0 0 0 0
  *  2/Pi :   <> |--| |--| |--| |--| .....
  *
  *  Case X_IND = 0:
- *                   0 
- *                2 ^ 
+ *                   0
+ *                2 ^
  *  X    :   |--| <> |--| |--|   0   0 0 0 0
  *  2/Pi :        <> |--| |--| |--| |--| .....
  *
  *  Case X_IND = 1:
- *                       0 
- *                    2 ^ 
+ *                       0
+ *                    2 ^
  *  X    :   |--| |--| <> |--| |--|   0   0 0 0 0
  *  2/Pi :             <> |--| |--| |--| |--| .....
  *
  *  Case ...
- * 
+ *
  *  Step 1:
  *
- *   Compute r = X . 2/Pi where: 
+ *   Compute r = X . 2/Pi where:
  *    - r[0] hold the integer part. (if x>0 or the once complement integer part if x<0 )
  *    - r[1] to r[SCS_NB_WORDS+2] hold the reduced part
- *      the 3 extra 30 bits are here to prevent possible 
+ *      the 3 extra 30 bits are here to prevent possible
  *      cancellation due to a number x too close to a
  *      multiple of Pi/2.
  *
  *  Step 2:
  *   Compute result = (r[1] ... r[SCS_NB_WORDS]) . Pi/2.
- *       
+ *
  * description of local variables :
  * - ind : where to start multiplying into 2opi table
  *
  */
 
-/* TODO OPTIM 
+/* TODO OPTIM
    better 64-bit multiplication, see in scs_mult */
 
 int rem_pio2_scs(scs_ptr result, const scs_ptr x){
@@ -86,7 +86,7 @@ int rem_pio2_scs(scs_ptr result, const scs_ptr x){
     scs_set(result, x);
     return 0;
   }
-  
+
 
 
   /* Compute the product |x| * 2/Pi */
@@ -98,11 +98,11 @@ int rem_pio2_scs(scs_ptr result, const scs_ptr x){
     r[3] = ((uint64_t)(two_over_pi[0]) * X_HW[1]
 	   +(uint64_t)(two_over_pi[1]) * X_HW[0]);
     if(X_HW[2] == 0){
-      for(i=4; i<(SCS_NB_WORDS+3); i++){   
+      for(i=4; i<(SCS_NB_WORDS+3); i++){
 	r[i] = ((uint64_t)(two_over_pi[i-3]) * X_HW[1]
 	       +(uint64_t)(two_over_pi[i-2]) * X_HW[0]);
       }}else {
-	for(i=4; i<(SCS_NB_WORDS+3); i++){   
+	for(i=4; i<(SCS_NB_WORDS+3); i++){
 	  r[i] = ((uint64_t)(two_over_pi[i-4]) * X_HW[2]
 		 +(uint64_t)(two_over_pi[i-3]) * X_HW[1]
 		 +(uint64_t)(two_over_pi[i-2]) * X_HW[0]);
@@ -115,11 +115,11 @@ int rem_pio2_scs(scs_ptr result, const scs_ptr x){
       r[2] = ((uint64_t)(two_over_pi[0]) * X_HW[1]
 	     +(uint64_t)(two_over_pi[1]) * X_HW[0]);
       if(X_HW[2] == 0){
-	for(i=3; i<(SCS_NB_WORDS+3); i++){   
+	for(i=3; i<(SCS_NB_WORDS+3); i++){
 	  r[i] = ((uint64_t)(two_over_pi[i-2]) * X_HW[1]
 		 +(uint64_t)(two_over_pi[i-1]) * X_HW[0]);
 	}}else {
-	  for(i=3; i<(SCS_NB_WORDS+3); i++){   
+	  for(i=3; i<(SCS_NB_WORDS+3); i++){
 	    r[i] = ((uint64_t)(two_over_pi[i-3]) * X_HW[2]
 		   +(uint64_t)(two_over_pi[i-2]) * X_HW[1]
 		   +(uint64_t)(two_over_pi[i-1]) * X_HW[0]);
@@ -130,11 +130,11 @@ int rem_pio2_scs(scs_ptr result, const scs_ptr x){
 	r[1] = ((uint64_t)(two_over_pi[0]) * X_HW[1]
 	       +(uint64_t)(two_over_pi[1]) * X_HW[0]);
 	if(X_HW[2] == 0){
-	  for(i=2; i<(SCS_NB_WORDS+3); i++){   
+	  for(i=2; i<(SCS_NB_WORDS+3); i++){
 	    r[i] = ((uint64_t)(two_over_pi[i-1]) * X_HW[1]
 		   +(uint64_t)(two_over_pi[ i ]) * X_HW[0]);
 	  }}else {
-	    for(i=2; i<(SCS_NB_WORDS+3); i++){   
+	    for(i=2; i<(SCS_NB_WORDS+3); i++){
 	      r[i] = ((uint64_t)(two_over_pi[i-2]) * X_HW[2]
 		     +(uint64_t)(two_over_pi[i-1]) * X_HW[1]
 		     +(uint64_t)(two_over_pi[ i ]) * X_HW[0]);
@@ -144,11 +144,11 @@ int rem_pio2_scs(scs_ptr result, const scs_ptr x){
   	  r[0] = ((uint64_t)(two_over_pi[0]) * X_HW[1]
 		 +(uint64_t)(two_over_pi[1]) * X_HW[0]);
 	  if(X_HW[2] == 0){
-	    for(i=1; i<(SCS_NB_WORDS+3); i++){   
+	    for(i=1; i<(SCS_NB_WORDS+3); i++){
 	      r[i] = ((uint64_t)(two_over_pi[ i ]) * X_HW[1]
 		     +(uint64_t)(two_over_pi[i+1]) * X_HW[0]);
 	    }}else {
-	      for(i=1; i<(SCS_NB_WORDS+3); i++){   
+	      for(i=1; i<(SCS_NB_WORDS+3); i++){
 		r[i] = ((uint64_t)(two_over_pi[i-1]) * X_HW[2]
 		       +(uint64_t)(two_over_pi[ i ]) * X_HW[1]
 		       +(uint64_t)(two_over_pi[i+1]) * X_HW[0]);
@@ -157,11 +157,11 @@ int rem_pio2_scs(scs_ptr result, const scs_ptr x){
 	  ind = (X_IND - 3);
 	  two_over_pi_pt = (int*)&(two_over_pi[ind]);
 	  if(X_HW[2] == 0){
-	    for(i=0; i<(SCS_NB_WORDS+3); i++){   
+	    for(i=0; i<(SCS_NB_WORDS+3); i++){
 	      r[i] = ((uint64_t)(two_over_pi_pt[i+1]) * X_HW[1]
 		     +(uint64_t)(two_over_pi_pt[i+2]) * X_HW[0]);
 	    }}else {
-	      for(i=0; i<(SCS_NB_WORDS+3); i++){   
+	      for(i=0; i<(SCS_NB_WORDS+3); i++){
 		r[i] = ((uint64_t)(two_over_pi_pt[ i ]) * X_HW[2]
 		       +(uint64_t)(two_over_pi_pt[i+1]) * X_HW[1]
 		       +(uint64_t)(two_over_pi_pt[i+2]) * X_HW[0]);
@@ -171,11 +171,11 @@ int rem_pio2_scs(scs_ptr result, const scs_ptr x){
       }
     }
   }
-      
+
   /* Carry propagate */
   r[SCS_NB_WORDS+1] += r[SCS_NB_WORDS+2]>>30;
-  for(i=(SCS_NB_WORDS+1); i>0; i--) {tmp=r[i]>>30;   r[i-1] += tmp;  r[i] -= (tmp<<30);}  
-      
+  for(i=(SCS_NB_WORDS+1); i>0; i--) {tmp=r[i]>>30;   r[i-1] += tmp;  r[i] -= (tmp<<30);}
+
   /* The integer part is in r[0] */
   N = (unsigned int)(r[0]);
 #if 0
@@ -188,15 +188,15 @@ int rem_pio2_scs(scs_ptr result, const scs_ptr x){
     N += 1;
     sign = -1;
     for(i=1; i<(SCS_NB_WORDS+3); i++) { r[i]=((~(unsigned int)(r[i])) & 0x3fffffff);}
-  } 
+  }
   else
-    sign = 1; 
+    sign = 1;
 
 
   /* Now we get the reduce argument and check for possible
    * cancellation By Kahan algorithm we will have at most 2 digits
    * of cancellations r[1] and r[2] in the worst case.
-   */    
+   */
   if (r[1] == 0)
     if (r[2] == 0) i = 3;
     else           i = 2;
@@ -207,13 +207,13 @@ int rem_pio2_scs(scs_ptr result, const scs_ptr x){
 
   R_EXP   = 1;
   R_IND   = -i;
-  R_SGN   = sign*X_SGN; 
-  
+  R_SGN   = sign*X_SGN;
+
   /* Last step :
    *   Multiplication by pi/2
    */
   scs_mul(result, Pio2_ptr, result);
   return X_SGN*N;
 }
- 
+
 

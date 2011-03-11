@@ -1,12 +1,12 @@
-/* 
- *this function computes log, correctly rounded, 
+/*
+ *this function computes log, correctly rounded,
  using experimental techniques based on  double-extended arithmetic
 
  THIS IS EXPERIMENTAL SOFTWARE
 
 In particular it changes rounding modes all the time without warning
 nor restoring.
- 
+
  *
  * Author :  Florent de Dinechin
  * Florent.de.Dinechin at ens-lyon.fr
@@ -14,15 +14,15 @@ nor restoring.
 
  To have it replace the crlibm log, do:
 
-on pentium, 
- gcc -DHAVE_CONFIG_H -I.  -fPIC  -O2 -c log-de2.c;   mv log-de2.o log_fast.o; make 
+on pentium,
+ gcc -DHAVE_CONFIG_H -I.  -fPIC  -O2 -c log-de2.c;   mv log-de2.o log_fast.o; make
 
 on itanium,
 icc  -I/users/fdedinex/local/IA64/include -mcpu=itanium2\
  -Qoption,cpp,--extended_float_types -IPF_fp_speculationsafe -c log-de2.c;\
  mv log-de2.o log_fast.o; make
 
- 
+
 */
 
 
@@ -65,20 +65,20 @@ double log_rn(double x) {
    if (y.i[HI] < 0x00100000){        /* x < 2^(-1022)    */
 
      if (((y.i[HI] & 0x7fffffff)|y.i[LO])==0){
-       return -1.0/0.0;     
+       return -1.0/0.0;
      }                    		   /* log(+/-0) = -Inf */
-     if (y.i[HI] < 0){ 
+     if (y.i[HI] < 0){
        return (x-x)/0;                      /* log(-x) = Nan    */
      }
      /* Subnormal number */
      E = -64; 		
-     y.d *= two64; 	  /* make x a normal number    */ 
+     y.d *= two64; 	  /* make x a normal number    */
    }
-    
+
    if (y.i[HI] >= 0x7ff00000){
      return  x+x;				 /* Inf or Nan       */
    }
-   
+
    DOUBLE_EXTENDED_MODE;  /* This one should be overlapped with integer computation */
 
 #define X_NEAR_1 (y.i[HI]>MINYFAST) && (y.i[HI]<MAXYFAST)
@@ -95,17 +95,17 @@ double log_rn(double x) {
    //if (__builtin_expect( (i<0x0010000000000000ULL), (1+1==3))){        /* x < 2^(-1022)    */
    if (i<0x0010000000000000LL){        /* x < 2^(-1022)    */
      if ((i & 0x7fffffffffffffffULL)==0){
-       return -1.0/0.0;     
+       return -1.0/0.0;
      }                    		   /* log(+/-0) = -Inf */
      if (i<0){
        return (x-x)/0;                      /* log(-x) = Nan    */
      }
      /* Subnormal number */
-     xe *= two64; 	  /* make x a normal number    */ 
+     xe *= two64; 	  /* make x a normal number    */
      E = -64;
-     i =  _Asm_getf(2/*_FR_D*/, xe); /* and update i */ 
+     i =  _Asm_getf(2/*_FR_D*/, xe); /* and update i */
    }
-    
+
    //if (__builtin_expect(  (i >= 0x7ff0000000000000ULL), (1+1==3) )){
    if (i >= 0x7ff0000000000000ULL){
      return  x+x;				 /* Inf or Nan       */
@@ -130,8 +130,8 @@ double log_rn(double x) {
      t = z*t;
 
      //printf("z= %1.20e,  t=%1.20e  \n  ", (double)z, (double)t);
-     
-   }    
+
+   }
 
    else {
 
@@ -140,9 +140,9 @@ double log_rn(double x) {
      E += (y.i[HI]>>20)-1023;             /* extract the exponent */
      index = (y.i[HI] & 0x000fffff);
      y.i[HI] =  index | 0x3ff00000;	/* do exponent = 0 */
-     index = index  >> (20-L); 
+     index = index  >> (20-L);
      /* now y.d holds 1+f, and E is the exponent */
-     
+
      logirh = argredtable[index].h;
      r = (long double) (argredtable[index].r); /* approx to 1/y.d */
      z = r*(long double)y.d - 1. ; /* even without an FMA, all exact */
@@ -158,8 +158,8 @@ double log_rn(double x) {
        roundtestmask=0x7f0;
        p1 = c5 + z*c6;         z2 = z*z;
        p2 = c3 + z*c4;         p3 = c1+z*c2;
-       
-       t = p2 + z2*p1;     
+
+       t = p2 + z2*p1;
        t = p3 + z2*t;
        t = logirh + z*t;
        t = t + E*ln2h;
@@ -170,11 +170,11 @@ double log_rn(double x) {
        roundtestmask=0x7fe;
      else
        roundtestmask=0x7f0;
-     
+
      p1 = c5 + z*c6;         z2 = z*z;
      p2 = c3 + z*c4;         p3 = c1+z*c2;
-     
-     t = p2 + z2*p1;     
+
+     t = p2 + z2*p1;
      t = p3 + z2*t;
      t = logirh + z*t;
 #endif
@@ -189,7 +189,7 @@ double log_rn(double x) {
      //printf("\nindex= %lld\n", index);
      //printf("\n  ye = %1.20Le\n",(long double)ye);
      /* now ye holds 1+f, and E is the exponent */
-     
+
      logirh = argredtable[index].h;
 
      _Asm_frcpa(&r, 1.0L, ye, 1/*_SF1*/);
@@ -206,8 +206,8 @@ double log_rn(double x) {
        roundtestmask=0x7f0;
        p1 = c5 + z*c6;         z2 = z*z;
        p2 = c3 + z*c4;         p3 = c1+z*c2;
-       
-       t = p2 + z2*p1;     
+
+       t = p2 + z2*p1;
        t = p3 + z2*t;
        t = logirh + z*t;
        t = t + E*ln2h;
@@ -220,8 +220,8 @@ double log_rn(double x) {
      /* Polynomial evaluation, unrolled to go through Gappa */
 
      //printf("t=%1.20e  \n  ", (double)t);
-     
-     
+
+
    }
 
 
@@ -237,11 +237,11 @@ double log_rn(double x) {
    DE_TEST_AND_RETURN_RN(t, roundtestmask);
 
 
-   /* Accurate phase */ 
+   /* Accurate phase */
 #if EVAL_PERF
   crlibm_second_step_taken++;
 #endif
-   
+
    t = c13h;
    t = c12h + z*t;
    t = c11h + z*t;

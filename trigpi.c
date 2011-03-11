@@ -16,9 +16,9 @@
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or 
+ * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -26,12 +26,12 @@
  *
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 */
 #include "crlibm_private.h"
 #include "triple-double.h"
 #include "trigpi.h"
- 
+
 
 /*   TODO
 
@@ -50,7 +50,7 @@ Write decent quick steps. Or hammer Christoph and Sylvain to do so.
 
 /* This ugly bits of code in the beginning are polynomial evaluations
    automagically generated and proven by Chevillard and Lauter's
-   tools 
+   tools
 */
 
 
@@ -89,7 +89,7 @@ static void sincospiacc(double *sinpiacc_resh, double *sinpiacc_resm, double *si
   double sinpiacc_t_8_0h, sinpiacc_t_8_0m;
   double sinpiacc_t_9_0h, sinpiacc_t_9_0m, sinpiacc_t_9_0l;
   double sinpiacc_t_10_0h, sinpiacc_t_10_0m, sinpiacc_t_10_0l;
- 
+
   double cospiacc_t_1_0h;
   double cospiacc_t_2_0h;
   double cospiacc_t_3_0h;
@@ -100,7 +100,7 @@ static void sincospiacc(double *sinpiacc_resh, double *sinpiacc_resm, double *si
   double cospiacc_t_8_0h, cospiacc_t_8_0m;
   double cospiacc_t_9_0h, cospiacc_t_9_0m, cospiacc_t_9_0l;
 
-  Mul12(&x2h,&x2m,x,x);  
+  Mul12(&x2h,&x2m,x,x);
 
   sinpiacc_t_1_0h = sinpiacc_coeff_11h;
   sinpiacc_t_2_0h = sinpiacc_t_1_0h * x2h;
@@ -114,7 +114,7 @@ static void sincospiacc(double *sinpiacc_resh, double *sinpiacc_resm, double *si
   Mul133(&sinpiacc_t_10_0h,&sinpiacc_t_10_0m,&sinpiacc_t_10_0l,x,sinpiacc_t_9_0h,sinpiacc_t_9_0m,sinpiacc_t_9_0l);
   Renormalize3(sinpiacc_resh,sinpiacc_resm,sinpiacc_resl,sinpiacc_t_10_0h,sinpiacc_t_10_0m,sinpiacc_t_10_0l);
 
-  
+
   cospiacc_t_1_0h = cospiacc_coeff_10h;
   cospiacc_t_2_0h = cospiacc_t_1_0h * x2h;
   cospiacc_t_3_0h = cospiacc_coeff_8h + cospiacc_t_2_0h;
@@ -138,18 +138,18 @@ static void sincospiacc(double *sinpiacc_resh, double *sinpiacc_resm, double *si
 
 
 
-/* Comment on comparing sa, ca, sy and cy 
-   either index=0, then sa=0 and ca=1, therefore t2=0, and the Add33 will be exact 
-   or index !=0, and       
+/* Comment on comparing sa, ca, sy and cy
+   either index=0, then sa=0 and ca=1, therefore t2=0, and the Add33 will be exact
+   or index !=0, and
 	-eps1 < sy < eps1  (but sy may be negative)
 	sa > eps1 (sa>0)
 	1-eps2 < cy < 1
 	ca < 1-eps2
-	therefore 
+	therefore
 	sacy = t2 >0
 	casy = t1 may be negative
 	abs(t1) <=  abs(t2)
-	Unfortunately we need a stronger condition to use the Add33 
+	Unfortunately we need a stronger condition to use the Add33
 */
 
 
@@ -162,7 +162,7 @@ static void sinpi_accurate(double *rh, double *rm, double *rl,
    double t1h, t1m, t1l, t2h, t2m, t2l;
 
    sincospiacc(&syh, &sym, &syl, &cyh, &cym, &cyl, y);
-   
+
    sah=sincosTable[index].sh;
    cah=sincosTable[index].ch;
    sam=sincosTable[index].sm;
@@ -179,7 +179,7 @@ static void sinpi_accurate(double *rh, double *rm, double *rl,
    else {
      /* compute cy*ca - sa*sy : t1 = cy*ca,    t2 =  sa*sy */
      Mul33(&t1h,&t1m,&t1l, cyh,cym,cyl, cah,cam,cal);
-     Mul33(&t2h,&t2m,&t2l, sah,sam,sal, syh,sym,syl);     
+     Mul33(&t2h,&t2m,&t2l, sah,sam,sal, syh,sym,syl);
      Add33Cond(rh, rm, rl, t1h,t1m,t1l, -t2h,-t2m,-t2l);
    }
 
@@ -215,7 +215,7 @@ static void cospi_accurate(double *rh, double *rm, double *rl,
    double t1h, t1m, t1l, t2h, t2m, t2l;
 
    sincospiacc(&syh, &sym, &syl, &cyh, &cym, &cyl, y);
-   
+
    sah=sincosTable[index].sh;
    cah=sincosTable[index].ch;
    sam=sincosTable[index].sm;
@@ -226,7 +226,7 @@ static void cospi_accurate(double *rh, double *rm, double *rl,
    if(quadrant==0 || quadrant==2) {
      /* compute cy*ca - sa*sy : t1 = cy*ca,    t2 =  sa*sy */
      Mul33(&t1h,&t1m,&t1l, cyh,cym,cyl, cah,cam,cal);
-     Mul33(&t2h,&t2m,&t2l, sah,sam,sal, syh,sym,syl);     
+     Mul33(&t2h,&t2m,&t2l, sah,sam,sal, syh,sym,syl);
      Add33Cond(rh, rm, rl, t1h,t1m,t1l, -t2h,-t2m,-t2l);
    }
    else {
@@ -271,7 +271,7 @@ void sinpiquick(double *rh, double *rm, double x, int index, int quadrant) {
   double t1h, t1m, t2h, t2m, sah, sam, cah,cam;
 
   Mul12(&x2h,&x2m,x,x);
-  
+
   sah=sincosTable[index].sh;
   cah=sincosTable[index].ch;
   sam=sincosTable[index].sm;
@@ -305,7 +305,7 @@ void sinpiquick(double *rh, double *rm, double x, int index, int quadrant) {
    else {
      /* compute cy*ca - sa*sy : t1 = cy*ca,    t2 =  sa*sy */
      Mul22(&t1h,&t1m, cyh,cym, cah,cam);
-     Mul22(&t2h,&t2m, sah,sam, syh,sym);     
+     Mul22(&t2h,&t2m, sah,sam, syh,sym);
      Add22Cond(rh, rm, t1h,t1m, -t2h,-t2m);
    }
 
@@ -326,8 +326,8 @@ void sinpiquick(double *rh, double *rm, double x, int index, int quadrant) {
    double xs, y,u, rh, rm, rl, sign,absx;
    db_number xdb, t;
    int32_t xih, absxih, index, quadrant;
-   
-   if (x<0) absx = -x;   else absx = x; 
+
+   if (x<0) absx = -x;   else absx = x;
 
    xdb.d = x;
 
@@ -336,9 +336,9 @@ void sinpiquick(double *rh, double *rm, double x, int index, int quadrant) {
    /* argument reduction */
    if(absx>  TWOTO42 ) {  /* x is very large, let us first subtract a large integer from it */
      t.d = xs;
-     t.i[LO] =0; /* remove the low part. The point is somewhere there since x > 2^42. 
+     t.i[LO] =0; /* remove the low part. The point is somewhere there since x > 2^42.
 		    So what remains in t is an FP integer almost as large as x */
-     xs = xs-t.d; /* we are going to throw away the int part anyway */ 
+     xs = xs-t.d; /* we are going to throw away the int part anyway */
    }
 
    t.d = TWOTO5251 + xs;
@@ -359,9 +359,9 @@ void sinpiquick(double *rh, double *rm, double x, int index, int quadrant) {
    /* SPECIAL CASES: x=(Nan, Inf) sin(pi*x)=Nan */
    if (absxih>=0x7ff00000) {
      xdb.l=0xfff8000000000000LL;
-     return xdb.d - xdb.d; 
+     return xdb.d - xdb.d;
    }
-      
+
    if(absxih>=0x43300000) /* 2^52, which entails that x is an integer */
      return sign*0.0; /*signed */
 
@@ -375,13 +375,13 @@ void sinpiquick(double *rh, double *rm, double x, int index, int quadrant) {
        return rh;
      }
      /* First step for Pi*x. TODO: FMA-based optimisation */
-     const double DekkerConst  = 134217729.; /* 2^27 +1 */   
-     double tt, xh, xl;                           
+     const double DekkerConst  = 134217729.; /* 2^27 +1 */
+     double tt, xh, xl;
      /* Splitting of x. Both xh and xl have at least 26 consecutive LSB zeroes */
-     tt = x*DekkerConst;     
+     tt = x*DekkerConst;
      xh = (x-tt)+tt;
-     xl = x-xh;   
-     Add12(rh,rl, xh*PIHH, (xl*PIHH + xh*PIHM) + (xh*PIM + xl*PIHM) );               
+     xl = x-xh;
+     Add12(rh,rl, xh*PIHH, (xl*PIHH + xh*PIHM) + (xh*PIM + xl*PIHM) );
      if(rh == (rh + (rl * PIX_RNCST_SIN)))
        return rh;
    }
@@ -391,10 +391,10 @@ void sinpiquick(double *rh, double *rm, double x, int index, int quadrant) {
    if (rh==rh+1.00001*rm) /* See trigpiquick.gappa. This first step is ridiculously too accurate */
      return rh;
    sinpi_accurate(&rh, &rm, &rl, y, index, quadrant);
-   ReturnRoundToNearest3(rh,rm,rl);   
+   ReturnRoundToNearest3(rh,rm,rl);
  }
 
- 
+
 
 
 
@@ -406,8 +406,8 @@ void sinpiquick(double *rh, double *rm, double x, int index, int quadrant) {
    double xs, y,u, rh, rm, rl, sign,absx;
    db_number xdb, t;
    int32_t xih, absxih, index, quadrant;
-   
-   if (x<0) absx = -x;   else absx = x; 
+
+   if (x<0) absx = -x;   else absx = x;
 
    xdb.d = x;
 
@@ -416,9 +416,9 @@ void sinpiquick(double *rh, double *rm, double x, int index, int quadrant) {
    /* argument reduction */
    if(absx>  TWOTO42 ) {  /* x is very large, let us first subtract a large integer from it */
      t.d = xs;
-     t.i[LO] =0; /* remove the low part. The point is somewhere there since x > 2^42. 
+     t.i[LO] =0; /* remove the low part. The point is somewhere there since x > 2^42.
 		    So what remains in t is an FP integer almost as large as x */
-     xs = xs-t.d; /* we are going to throw away the int part anyway */ 
+     xs = xs-t.d; /* we are going to throw away the int part anyway */
    }
 
    t.d = TWOTO5251 + xs;
@@ -439,9 +439,9 @@ void sinpiquick(double *rh, double *rm, double x, int index, int quadrant) {
    /* SPECIAL CASES: x=(Nan, Inf) sin(pi*x)=Nan */
    if (absxih>=0x7ff00000) {
      xdb.l=0xfff8000000000000LL;
-     return xdb.d - xdb.d; 
+     return xdb.d - xdb.d;
    }
-      
+
    if(absxih>=0x43300000) /* 2^52, which entails that x is an integer */
      return sign*0.0; /*signed */
 
@@ -455,21 +455,21 @@ void sinpiquick(double *rh, double *rm, double x, int index, int quadrant) {
        return rh;
      }
      /* First step for Pi*x. TODO: FMA-based optimisation */
-     const double DekkerConst  = 134217729.; /* 2^27 +1 */   
-     double tt, xh, xl;                           
+     const double DekkerConst  = 134217729.; /* 2^27 +1 */
+     double tt, xh, xl;
      /* Splitting of x. Both xh and xl have at least 26 consecutive LSB zeroes */
-     tt = x*DekkerConst;     
+     tt = x*DekkerConst;
      xh = (x-tt)+tt;
-     xl = x-xh;   
-     Add12(rh,rl, xh*PIHH, (xl*PIHH + xh*PIHM) + (xh*PIM + xl*PIHM) );               
+     xl = x-xh;
+     Add12(rh,rl, xh*PIHH, (xl*PIHH + xh*PIHM) + (xh*PIM + xl*PIHM) );
      TEST_AND_RETURN_RD(rh,rl,PIX_EPS_SIN);
    }
    /* Fall here either if we have a large input, or if we have a small
       input and the rounding test fails.  */
    sinpi_accurate(&rh, &rm, &rl, y, index, quadrant);
 
-   ReturnRoundDownwards3(rh,rm,rl);   
-}; 
+   ReturnRoundDownwards3(rh,rm,rl);
+};
 
 
 
@@ -477,8 +477,8 @@ void sinpiquick(double *rh, double *rm, double x, int index, int quadrant) {
    double xs, y,u, rh, rm, rl, sign,absx;
    db_number xdb, t;
    int32_t xih, absxih, index, quadrant;
-   
-   if (x<0) absx = -x;   else absx = x; 
+
+   if (x<0) absx = -x;   else absx = x;
 
    xdb.d = x;
 
@@ -487,9 +487,9 @@ void sinpiquick(double *rh, double *rm, double x, int index, int quadrant) {
    /* argument reduction */
    if(absx>  TWOTO42 ) {  /* x is very large, let us first subtract a large integer from it */
      t.d = xs;
-     t.i[LO] =0; /* remove the low part. The point is somewhere there since x > 2^42. 
+     t.i[LO] =0; /* remove the low part. The point is somewhere there since x > 2^42.
 		    So what remains in t is an FP integer almost as large as x */
-     xs = xs-t.d; /* we are going to throw away the int part anyway */ 
+     xs = xs-t.d; /* we are going to throw away the int part anyway */
    }
 
    t.d = TWOTO5251 + xs;
@@ -510,9 +510,9 @@ void sinpiquick(double *rh, double *rm, double x, int index, int quadrant) {
    /* SPECIAL CASES: x=(Nan, Inf) sin(pi*x)=Nan */
    if (absxih>=0x7ff00000) {
      xdb.l=0xfff8000000000000LL;
-     return xdb.d - xdb.d; 
+     return xdb.d - xdb.d;
    }
-      
+
    if(absxih>=0x43300000) /* 2^52, which entails that x is an integer */
      return sign*0.0; /*signed */
 
@@ -526,22 +526,22 @@ void sinpiquick(double *rh, double *rm, double x, int index, int quadrant) {
        return rh;
      }
      /* First step for Pi*x. TODO: FMA-based optimisation */
-     const double DekkerConst  = 134217729.; /* 2^27 +1 */   
-     double tt, xh, xl;                           
+     const double DekkerConst  = 134217729.; /* 2^27 +1 */
+     double tt, xh, xl;
      /* Splitting of x. Both xh and xl have at least 26 consecutive LSB zeroes */
-     tt = x*DekkerConst;     
+     tt = x*DekkerConst;
      xh = (x-tt)+tt;
-     xl = x-xh;   
-     Add12(rh,rl, xh*PIHH, (xl*PIHH + xh*PIHM) + (xh*PIM + xl*PIHM) );               
+     xl = x-xh;
+     Add12(rh,rl, xh*PIHH, (xl*PIHH + xh*PIHM) + (xh*PIM + xl*PIHM) );
      TEST_AND_RETURN_RU(rh,rl,PIX_EPS_SIN);
    }
    /* Fall here either if we have a large input, or if we have a small
       input and the rounding test fails.  */
    sinpi_accurate(&rh, &rm, &rl, y, index, quadrant);
 
-   ReturnRoundUpwards3(rh,rm,rl);   
-   
-};  
+   ReturnRoundUpwards3(rh,rm,rl);
+
+};
 
 
 
@@ -550,8 +550,8 @@ void sinpiquick(double *rh, double *rm, double x, int index, int quadrant) {
    double xs, y,u, rh, rm, rl, sign,absx;
    db_number xdb, t;
    int32_t xih, absxih, index, quadrant;
-   
-   if (x<0) absx = -x;   else absx = x; 
+
+   if (x<0) absx = -x;   else absx = x;
 
    xdb.d = x;
 
@@ -560,9 +560,9 @@ void sinpiquick(double *rh, double *rm, double x, int index, int quadrant) {
    /* argument reduction */
    if(absx>  TWOTO42 ) {  /* x is very large, let us first subtract a large integer from it */
      t.d = xs;
-     t.i[LO] =0; /* remove the low part. The point is somewhere there since x > 2^42. 
+     t.i[LO] =0; /* remove the low part. The point is somewhere there since x > 2^42.
 		    So what remains in t is an FP integer almost as large as x */
-     xs = xs-t.d; /* we are going to throw away the int part anyway */ 
+     xs = xs-t.d; /* we are going to throw away the int part anyway */
    }
 
    t.d = TWOTO5251 + xs;
@@ -583,9 +583,9 @@ void sinpiquick(double *rh, double *rm, double x, int index, int quadrant) {
    /* SPECIAL CASES: x=(Nan, Inf) sin(pi*x)=Nan */
    if (absxih>=0x7ff00000) {
      xdb.l=0xfff8000000000000LL;
-     return xdb.d - xdb.d; 
+     return xdb.d - xdb.d;
    }
-      
+
    if(absxih>=0x43300000) /* 2^52, which entails that x is an integer */
      return sign*0.0; /*signed */
 
@@ -599,20 +599,20 @@ void sinpiquick(double *rh, double *rm, double x, int index, int quadrant) {
        return rh;
      }
      /* First step for Pi*x. TODO: FMA-based optimisation */
-     const double DekkerConst  = 134217729.; /* 2^27 +1 */   
-     double tt, xh, xl;                           
+     const double DekkerConst  = 134217729.; /* 2^27 +1 */
+     double tt, xh, xl;
      /* Splitting of x. Both xh and xl have at least 26 consecutive LSB zeroes */
-     tt = x*DekkerConst;     
+     tt = x*DekkerConst;
      xh = (x-tt)+tt;
-     xl = x-xh;   
-     Add12(rh,rl, xh*PIHH, (xl*PIHH + xh*PIHM) + (xh*PIM + xl*PIHM) );               
+     xl = x-xh;
+     Add12(rh,rl, xh*PIHH, (xl*PIHH + xh*PIHM) + (xh*PIM + xl*PIHM) );
      TEST_AND_RETURN_RZ(rh,rl,PIX_EPS_SIN);
    }
    /* Fall here either if we have a large input, or if we have a small
       input and the rounding test fails.  */
    sinpi_accurate(&rh, &rm, &rl, y, index, quadrant);
 
-   ReturnRoundTowardsZero3(rh,rm,rl);   
+   ReturnRoundTowardsZero3(rh,rm,rl);
 };
 
 
@@ -628,20 +628,20 @@ void sinpiquick(double *rh, double *rm, double x, int index, int quadrant) {
    double xs, y,u, rh, rm, rl, absx;
    db_number xdb, t;
    int32_t xih, absxih, index, quadrant;
-   
-   if (x<0) absx =-x; else absx=x; 
+
+   if (x<0) absx =-x; else absx=x;
 
    xdb.d=x;
    xs = x*128.0;
 
-   /* argument reduction. 
-      We do it before the special case tests for performance, 
+   /* argument reduction.
+      We do it before the special case tests for performance,
       it might compute garbage for inf, very large inputs, etc */
    if(absx>  TWOTO42 ) {  /* 2^42, x is very large, let us first subtract a large integer from it */
      t.d = xs;
-     t.i[LO] =0; /* remove the low part, in which was the coma since x > 2^42. 
+     t.i[LO] =0; /* remove the low part, in which was the coma since x > 2^42.
 		    So what remains in t is an FP integer almost as large as x */
-     xs = xs-t.d; /* we are going to throw away the int part anyway */ 
+     xs = xs-t.d; /* we are going to throw away the int part anyway */
    }
 
    t.d = TWOTO5251 + xs;
@@ -659,18 +659,18 @@ void sinpiquick(double *rh, double *rm, double x, int index, int quadrant) {
 
    if (absxih>=0x7ff00000) {
      xdb.l=0xfff8000000000000LL;
-     return xdb.d - xdb.d; 
+     return xdb.d - xdb.d;
    }
 
    if(absxih>=0x43400000) /* 2^53, which entails that x is an even integer */
-     return 1.0; 
+     return 1.0;
 
-   if(index==0 && y==0. && ((quadrant&1)==1)) return +0.; 
+   if(index==0 && y==0. && ((quadrant&1)==1)) return +0.;
    /* Always +0, inpired by LIA2; We do not have cos(x+pi) == - cos(x)
       in this case */
 
-   if(index==0 && y==0. && quadrant==0) return 1.; 
-   if(index==0 && y==0. && quadrant==2) return -1.; 
+   if(index==0 && y==0. && quadrant==0) return 1.;
+   if(index==0 && y==0. && quadrant==2) return -1.;
 
    if (absxih<0x3E26A09E) /* sqrt(2^-53)/4 */
      return 1.0;
@@ -678,7 +678,7 @@ void sinpiquick(double *rh, double *rm, double x, int index, int quadrant) {
     */
 
    cospi_accurate(&rh, &rm, &rl, y, index, quadrant);
-   ReturnRoundToNearest3(rh,rm,rl);   
+   ReturnRoundToNearest3(rh,rm,rl);
 };
 
 
@@ -689,21 +689,21 @@ void sinpiquick(double *rh, double *rm, double x, int index, int quadrant) {
    double xs, y,u, rh, rm, rl, absx;
    db_number xdb, t;
    int32_t xih, absxih, index, quadrant;
-   
-   if (x<0) absx =-x; else absx=x; 
+
+   if (x<0) absx =-x; else absx=x;
 
    xdb.d=x;
    xs = x*128.0;
 
 
-   /* argument reduction. 
-      We do it before the special case tests for performance, 
+   /* argument reduction.
+      We do it before the special case tests for performance,
       it might compute garbage for inf, very large inputs, etc */
    if(absx>  TWOTO42 ) {  /* 2^42, x is very large, let us first subtract a large integer from it */
      t.d = xs;
-     t.i[LO] =0; /* remove the low part, in which was the coma since x > 2^42. 
+     t.i[LO] =0; /* remove the low part, in which was the coma since x > 2^42.
 		    So what remains in t is an FP integer almost as large as x */
-     xs = xs-t.d; /* we are going to throw away the int part anyway */ 
+     xs = xs-t.d; /* we are going to throw away the int part anyway */
    }
 
    t.d = TWOTO5251 + xs;
@@ -722,16 +722,16 @@ void sinpiquick(double *rh, double *rm, double x, int index, int quadrant) {
 
    if (absxih>=0x7ff00000) {
      xdb.l=0xfff8000000000000LL;
-     return xdb.d - xdb.d; 
+     return xdb.d - xdb.d;
    }
-      
+
    if(absxih>=0x43400000) /* 2^53, which entails that x is an even integer */
      return 1.0; /*signed */
 
-   if(index==0 && y==0. && ((quadrant&1)==1)) return -0.; 
+   if(index==0 && y==0. && ((quadrant&1)==1)) return -0.;
 
-   if(index==0 && y==0. && quadrant==0) return 1.; 
-   if(index==0 && y==0. && quadrant==2) return -1.; 
+   if(index==0 && y==0. && quadrant==0) return 1.;
+   if(index==0 && y==0. && quadrant==2) return -1.;
 
    if (absxih<0x3E200000) /* 2^-29 */
      return 0.9999999999999998889776975374843459576368331909179687500; /* 1-2^-53 */
@@ -739,31 +739,31 @@ void sinpiquick(double *rh, double *rm, double x, int index, int quadrant) {
       in this case */
 
    cospi_accurate(&rh, &rm, &rl, y, index, quadrant);
-   ReturnRoundDownwards3(rh,rm,rl);  
- }; 
+   ReturnRoundDownwards3(rh,rm,rl);
+ };
 
 
 
- 
+
  double cospi_ru(double x){
    double xs, y,u, rh, rm, rl, absx;
    db_number xdb, t;
    int32_t xih, absxih, index, quadrant;
-   
-   if (x<0) absx =-x; else absx=x; 
+
+   if (x<0) absx =-x; else absx=x;
 
    xdb.d=x;
    xs = x*128.0;
 
 
-   /* argument reduction. 
-      We do it before the special case tests for performance, 
+   /* argument reduction.
+      We do it before the special case tests for performance,
       it might compute garbage for inf, very large inputs, etc */
    if(absx>  TWOTO42 ) {  /* 2^42, x is very large, let us first subtract a large integer from it */
      t.d = xs;
-     t.i[LO] =0; /* remove the low part, in which was the coma since x > 2^42. 
+     t.i[LO] =0; /* remove the low part, in which was the coma since x > 2^42.
 		    So what remains in t is an FP integer almost as large as x */
-     xs = xs-t.d; /* we are going to throw away the int part anyway */ 
+     xs = xs-t.d; /* we are going to throw away the int part anyway */
    }
 
    t.d = TWOTO5251 + xs;
@@ -781,16 +781,16 @@ void sinpiquick(double *rh, double *rm, double x, int index, int quadrant) {
    /* SPECIAL CASES: x=(Nan, Inf) cos(pi*x)=Nan */
    if (absxih>=0x7ff00000) {
      xdb.l=0xfff8000000000000LL;
-     return xdb.d - xdb.d; 
+     return xdb.d - xdb.d;
    }
-      
+
    if(absxih>=0x43400000) /* 2^53, which entails that x is an even integer */
      return 1.0; /*signed */
 
-   if(index==0 && y==0. && quadrant==0) return 1.; 
-   if(index==0 && y==0. && quadrant==2) return -1.; 
+   if(index==0 && y==0. && quadrant==0) return 1.;
+   if(index==0 && y==0. && quadrant==2) return -1.;
 
-   if(index==0 && y==0. && ((quadrant&1)==1)) return +0.; 
+   if(index==0 && y==0. && ((quadrant&1)==1)) return +0.;
    /* Always +0, inpired by LIA2; We do not have cos(x+pi) == - cos(x)
       in this case */
 
@@ -798,8 +798,8 @@ void sinpiquick(double *rh, double *rm, double x, int index, int quadrant) {
      return 1;
 
    cospi_accurate(&rh, &rm, &rl, y, index, quadrant);
-   ReturnRoundUpwards3(rh,rm,rl);  
-}; 
+   ReturnRoundUpwards3(rh,rm,rl);
+};
 
 
 
@@ -808,21 +808,21 @@ double cospi_rz(double x){
    double xs, y,u, rh, rm, rl, absx;
    db_number xdb, t;
    int32_t xih, absxih, index, quadrant;
-   
-   if (x<0) absx =-x; else absx=x; 
+
+   if (x<0) absx =-x; else absx=x;
 
    xdb.d=x;
    xs = x*128.0;
 
 
-   /* argument reduction. 
-      We do it before the special case tests for performance, 
+   /* argument reduction.
+      We do it before the special case tests for performance,
       it might compute garbage for inf, very large inputs, etc */
    if(absx>  TWOTO42 ) {  /* 2^42, x is very large, let us first subtract a large integer from it */
      t.d = xs;
-     t.i[LO] =0; /* remove the low part, in which was the coma since x > 2^42. 
+     t.i[LO] =0; /* remove the low part, in which was the coma since x > 2^42.
 		    So what remains in t is an FP integer almost as large as x */
-     xs = xs-t.d; /* we are going to throw away the int part anyway */ 
+     xs = xs-t.d; /* we are going to throw away the int part anyway */
    }
 
    t.d = TWOTO5251 + xs;
@@ -841,25 +841,25 @@ double cospi_rz(double x){
 
    if (absxih>=0x7ff00000) {
      xdb.l=0xfff8000000000000LL;
-     return xdb.d - xdb.d; 
+     return xdb.d - xdb.d;
    }
-      
+
    if(absxih>=0x43400000) /* 2^53, which entails that x is an even integer */
      return 1.0; /*signed */
 
-   if(index==0 && y==0. && ((quadrant&1)==1)) return +0.; 
+   if(index==0 && y==0. && ((quadrant&1)==1)) return +0.;
    /* Always +0, inpired by LIA2; We do not have cos(x+pi) == - cos(x)
       in this case */
 
-   if(index==0 && y==0. && quadrant==0) return 1.; 
-   if(index==0 && y==0. && quadrant==2) return -1.; 
+   if(index==0 && y==0. && quadrant==0) return 1.;
+   if(index==0 && y==0. && quadrant==2) return -1.;
 
    if (absxih<0x3E200000) /* 2^-29 */
      return 0.9999999999999998889776975374843459576368331909179687500; /* 1-2^-53 */
 
    cospi_accurate(&rh, &rm, &rl, y, index, quadrant);
    ReturnRoundTowardsZero3(rh,rm,rl);
-  }; 
+  };
 
 
 
@@ -871,8 +871,8 @@ double cospi_rz(double x){
    double xs, y,u, rh, rm, rl, ch,cm,cl, ich,icm,icl, sh,sm,sl, sign,absx;
    db_number xdb, t;
    int32_t xih, absxih, index, quadrant;
-   
-   if (x<0) absx = -x;   else absx = x; 
+
+   if (x<0) absx = -x;   else absx = x;
 
    xdb.d = x;
 
@@ -881,9 +881,9 @@ double cospi_rz(double x){
    /* argument reduction */
    if(absx>  TWOTO42 ) {  /* x is very large, let us first subtract a large integer from it */
      t.d = xs;
-     t.i[LO] =0; /* remove the low part. The point is somewhere there since x > 2^42. 
+     t.i[LO] =0; /* remove the low part. The point is somewhere there since x > 2^42.
 		    So what remains in t is an FP integer almost as large as x */
-     xs = xs-t.d; /* we are going to throw away the int part anyway */ 
+     xs = xs-t.d; /* we are going to throw away the int part anyway */
    }
 
    t.d = TWOTO5251 + xs;
@@ -905,9 +905,9 @@ double cospi_rz(double x){
    /* SPECIAL CASES: x=(Nan, Inf) sin(pi*x)=Nan */
    if (absxih>=0x7ff00000) {
      xdb.l=0xfff8000000000000LL;
-     return xdb.d - xdb.d; 
+     return xdb.d - xdb.d;
    }
-      
+
    if(absxih>=0x43300000) /* 2^52, which entails that x is an integer */
      return sign*0.0; /*signed */
 
@@ -921,13 +921,13 @@ double cospi_rz(double x){
        return rh;
      }
      /* First step for Pi*x. TODO: FMA-based optimisation */
-     const double DekkerConst  = 134217729.; /* 2^27 +1 */   
-     double tt, xh, xl;                           
+     const double DekkerConst  = 134217729.; /* 2^27 +1 */
+     double tt, xh, xl;
      /* Splitting of x. Both xh and xl have at least 26 consecutive LSB zeroes */
-     tt = x*DekkerConst;     
+     tt = x*DekkerConst;
      xh = (x-tt)+tt;
-     xl = x-xh;   
-     Add12(rh,rl, xh*PIHH, (xl*PIHH + xh*PIHM) + (xh*PIM + xl*PIHM) );               
+     xl = x-xh;
+     Add12(rh,rl, xh*PIHH, (xl*PIHH + xh*PIHM) + (xh*PIM + xl*PIHM) );
      if(rh == (rh + (rl * PIX_RNCST_TAN)))
        return rh;
    }
@@ -937,9 +937,9 @@ double cospi_rz(double x){
    Recpr33(&ich, &icm, &icl, ch, cm, cl);
    sinpi_accurate(&sh, &sm, &sl, y, index, quadrant);
    Mul33(&rh,&rm,&rl, sh,sm,sl, ich,icm,icl);
-   ReturnRoundToNearest3(rh,rm,rl);   
+   ReturnRoundToNearest3(rh,rm,rl);
 
-}; 
+};
 
 
 
@@ -948,8 +948,8 @@ double cospi_rz(double x){
    double xs, y,u, rh, rm, rl, ch,cm,cl, ich,icm,icl, sh,sm,sl, sign,absx;
    db_number xdb, t;
    int32_t xih, absxih, index, quadrant;
-   
-   if (x<0) absx = -x;   else absx = x; 
+
+   if (x<0) absx = -x;   else absx = x;
 
    xdb.d = x;
 
@@ -958,9 +958,9 @@ double cospi_rz(double x){
    /* argument reduction */
    if(absx>  TWOTO42 ) {  /* x is very large, let us first subtract a large integer from it */
      t.d = xs;
-     t.i[LO] =0; /* remove the low part. The point is somewhere there since x > 2^42. 
+     t.i[LO] =0; /* remove the low part. The point is somewhere there since x > 2^42.
 		    So what remains in t is an FP integer almost as large as x */
-     xs = xs-t.d; /* we are going to throw away the int part anyway */ 
+     xs = xs-t.d; /* we are going to throw away the int part anyway */
    }
 
    t.d = TWOTO5251 + xs;
@@ -981,9 +981,9 @@ double cospi_rz(double x){
    /* SPECIAL CASES: x=(Nan, Inf) sin(pi*x)=Nan */
    if (absxih>=0x7ff00000) {
      xdb.l=0xfff8000000000000LL;
-     return xdb.d - xdb.d; 
+     return xdb.d - xdb.d;
    }
-      
+
    if(absxih>=0x43300000) /* 2^52, which entails that x is an integer */
      return sign*0.0; /*signed */
 
@@ -997,13 +997,13 @@ double cospi_rz(double x){
        return rh;
      }
      /* First step for Pi*x. TODO: FMA-based optimisation */
-     const double DekkerConst  = 134217729.; /* 2^27 +1 */   
-     double tt, xh, xl;                           
+     const double DekkerConst  = 134217729.; /* 2^27 +1 */
+     double tt, xh, xl;
      /* Splitting of x. Both xh and xl have at least 26 consecutive LSB zeroes */
-     tt = x*DekkerConst;     
+     tt = x*DekkerConst;
      xh = (x-tt)+tt;
-     xl = x-xh;   
-     Add12(rh,rl, xh*PIHH, (xl*PIHH + xh*PIHM) + (xh*PIM + xl*PIHM) );               
+     xl = x-xh;
+     Add12(rh,rl, xh*PIHH, (xl*PIHH + xh*PIHM) + (xh*PIM + xl*PIHM) );
      TEST_AND_RETURN_RD(rh,rl,PIX_EPS_SIN);
    }
    /* Fall here either if we have a large input, or if we have a small
@@ -1012,11 +1012,11 @@ double cospi_rz(double x){
    Recpr33(&ich, &icm, &icl, ch, cm, cl);
    sinpi_accurate(&sh, &sm, &sl, y, index, quadrant);
    Mul33(&rh,&rm,&rl, sh,sm,sl, ich,icm,icl);
-   ReturnRoundDownwards3(rh,rm,rl);   
+   ReturnRoundDownwards3(rh,rm,rl);
 };
 
 
- 
+
 
 
 
@@ -1028,8 +1028,8 @@ double cospi_rz(double x){
    double xs, y,u, rh, rm, rl, ch,cm,cl, ich,icm,icl, sh,sm,sl, sign,absx;
    db_number xdb, t;
    int32_t xih, absxih, index, quadrant;
-   
-   if (x<0) absx = -x;   else absx = x; 
+
+   if (x<0) absx = -x;   else absx = x;
 
    xdb.d = x;
 
@@ -1038,9 +1038,9 @@ double cospi_rz(double x){
    /* argument reduction */
    if(absx>  TWOTO42 ) {  /* x is very large, let us first subtract a large integer from it */
      t.d = xs;
-     t.i[LO] =0; /* remove the low part. The point is somewhere there since x > 2^42. 
+     t.i[LO] =0; /* remove the low part. The point is somewhere there since x > 2^42.
 		    So what remains in t is an FP integer almost as large as x */
-     xs = xs-t.d; /* we are going to throw away the int part anyway */ 
+     xs = xs-t.d; /* we are going to throw away the int part anyway */
    }
 
    t.d = TWOTO5251 + xs;
@@ -1061,9 +1061,9 @@ double cospi_rz(double x){
    /* SPECIAL CASES: x=(Nan, Inf) sin(pi*x)=Nan */
    if (absxih>=0x7ff00000) {
      xdb.l=0xfff8000000000000LL;
-     return xdb.d - xdb.d; 
+     return xdb.d - xdb.d;
    }
-      
+
    if(absxih>=0x43300000) /* 2^52, which entails that x is an integer */
      return sign*0.0; /*signed */
 
@@ -1077,13 +1077,13 @@ double cospi_rz(double x){
        return rh;
      }
      /* First step for Pi*x. TODO: FMA-based optimisation */
-     const double DekkerConst  = 134217729.; /* 2^27 +1 */   
-     double tt, xh, xl;                           
+     const double DekkerConst  = 134217729.; /* 2^27 +1 */
+     double tt, xh, xl;
      /* Splitting of x. Both xh and xl have at least 26 consecutive LSB zeroes */
-     tt = x*DekkerConst;     
+     tt = x*DekkerConst;
      xh = (x-tt)+tt;
-     xl = x-xh;   
-     Add12(rh,rl, xh*PIHH, (xl*PIHH + xh*PIHM) + (xh*PIM + xl*PIHM) );               
+     xl = x-xh;
+     Add12(rh,rl, xh*PIHH, (xl*PIHH + xh*PIHM) + (xh*PIM + xl*PIHM) );
      TEST_AND_RETURN_RU(rh,rl,PIX_EPS_TAN);
    }
    /* Fall here either if we have a large input, or if we have a small
@@ -1092,7 +1092,7 @@ double cospi_rz(double x){
    Recpr33(&ich, &icm, &icl, ch, cm, cl);
    sinpi_accurate(&sh, &sm, &sl, y, index, quadrant);
    Mul33(&rh,&rm,&rl, sh,sm,sl, ich,icm,icl);
-   ReturnRoundUpwards3(rh,rm,rl);   
+   ReturnRoundUpwards3(rh,rm,rl);
 };
 
 
@@ -1101,8 +1101,8 @@ double cospi_rz(double x){
    double xs, y,u, rh, rm, rl, ch,cm,cl, ich,icm,icl, sh,sm,sl, sign,absx;
    db_number xdb, t;
    int32_t xih, absxih, index, quadrant;
-   
-   if (x<0) absx = -x;   else absx = x; 
+
+   if (x<0) absx = -x;   else absx = x;
 
    xdb.d = x;
 
@@ -1111,9 +1111,9 @@ double cospi_rz(double x){
    /* argument reduction */
    if(absx>  TWOTO42 ) {  /* x is very large, let us first subtract a large integer from it */
      t.d = xs;
-     t.i[LO] =0; /* remove the low part. The point is somewhere there since x > 2^42. 
+     t.i[LO] =0; /* remove the low part. The point is somewhere there since x > 2^42.
 		    So what remains in t is an FP integer almost as large as x */
-     xs = xs-t.d; /* we are going to throw away the int part anyway */ 
+     xs = xs-t.d; /* we are going to throw away the int part anyway */
    }
 
    t.d = TWOTO5251 + xs;
@@ -1134,9 +1134,9 @@ double cospi_rz(double x){
    /* SPECIAL CASES: x=(Nan, Inf) sin(pi*x)=Nan */
    if (absxih>=0x7ff00000) {
      xdb.l=0xfff8000000000000LL;
-     return xdb.d - xdb.d; 
+     return xdb.d - xdb.d;
    }
-      
+
    if(absxih>=0x43300000) /* 2^52, which entails that x is an integer */
      return sign*0.0; /*signed */
 
@@ -1150,13 +1150,13 @@ double cospi_rz(double x){
        return rh;
      }
      /* First step for Pi*x. TODO: FMA-based optimisation */
-     const double DekkerConst  = 134217729.; /* 2^27 +1 */   
-     double tt, xh, xl;                           
+     const double DekkerConst  = 134217729.; /* 2^27 +1 */
+     double tt, xh, xl;
      /* Splitting of x. Both xh and xl have at least 26 consecutive LSB zeroes */
-     tt = x*DekkerConst;     
+     tt = x*DekkerConst;
      xh = (x-tt)+tt;
-     xl = x-xh;   
-     Add12(rh,rl, xh*PIHH, (xl*PIHH + xh*PIHM) + (xh*PIM + xl*PIHM) );               
+     xl = x-xh;
+     Add12(rh,rl, xh*PIHH, (xl*PIHH + xh*PIHM) + (xh*PIM + xl*PIHM) );
      TEST_AND_RETURN_RZ(rh,rl,PIX_EPS_SIN);
    }
    /* Fall here either if we have a large input, or if we have a small
@@ -1165,7 +1165,7 @@ double cospi_rz(double x){
    Recpr33(&ich, &icm, &icl, ch, cm, cl);
    sinpi_accurate(&sh, &sm, &sl, y, index, quadrant);
    Mul33(&rh,&rm,&rl, sh,sm,sl, ich,icm,icl);
-   ReturnRoundTowardsZero3(rh,rm,rl);   
-}; 
+   ReturnRoundTowardsZero3(rh,rm,rl);
+};
 
 

@@ -8,9 +8,9 @@
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or 
+ * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -18,7 +18,7 @@
  *
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 */
 
 #include <stdio.h>
@@ -55,15 +55,15 @@ void asin_accurate_lower(double *asinh, double *asinm, double *asinl, double x, 
 
      Compute monomials 27 to 37 in double precision
      monomials 13 to 25 in double-double and
-     1 to 11 in triple-double precision in a 
+     1 to 11 in triple-double precision in a
      modified Horner form
 
   */
 
   /* Double computations */
-  
+
 #if defined(PROCESSOR_HAS_FMA) && !defined(AVOID_FMA)
-  highPoly = FMA(FMA(FMA(FMA(FMA(tbl[33],xSqh,tbl[32]),xSqh,tbl[31]),xSqh,tbl[30]),xSqh,tbl[29]),xSqh,tbl[28]);		 
+  highPoly = FMA(FMA(FMA(FMA(FMA(tbl[33],xSqh,tbl[32]),xSqh,tbl[31]),xSqh,tbl[30]),xSqh,tbl[29]),xSqh,tbl[28]);		
 #else
   highPoly = tbl[28] + xSqh * (tbl[29] + xSqh * (tbl[30] + xSqh * (tbl[31] + xSqh * (tbl[32] + xSqh * tbl[33]))));
 #endif
@@ -97,7 +97,7 @@ void asin_accurate_lower(double *asinh, double *asinm, double *asinl, double x, 
   Add33(&t12h,&t12m,&t12l,tbl[0],tbl[1],tbl[2],tt12h,tt12m,tt12l);        /* 140 - 38/53 */
 
   Mul123(&xCubeh,&xCubem,&xCubel,x,xSqh,xSql);                            /* 154 - 47/53 */
- 
+
   Mul33(&tt13h,&tt13m,&tt13l,xCubeh,xCubem,xCubel,t12h,t12m,t12l);        /* 136 - 34/53 */
   Add133(&t13h,&t13m,&t13l,x,tt13h,tt13m,tt13l);                          /* 138 - 32/53 */
 
@@ -123,23 +123,23 @@ void  asin_accurate_middle(double *asinh, double *asinm, double *asinl, double z
 #endif
 
   /* Evaluate the polynomial of degree 35
-     Its coefficients start at tbl[i+1] 
+     Its coefficients start at tbl[i+1]
      Evaluate degrees 35 to 20 in double precision,
      degrees 20 to 7 in double-double precision and
-     finally degrees 6 to 1 in triple-double. 
-     The constant coefficient is a double-double, the 
-     computations are nevertheless in triple-double 
+     finally degrees 6 to 1 in triple-double.
+     The constant coefficient is a double-double, the
+     computations are nevertheless in triple-double
   */
 
   /* Double computations */
-  
+
 #if defined(PROCESSOR_HAS_FMA) && !defined(AVOID_FMA)
   highPoly = FMA(FMA(FMA(FMA(FMA(FMA(FMA(FMA(FMA(FMA(FMA(FMA(FMA(FMA(FMA(FMA(FMA(FMA(FMA(
              tbl[i+58] ,z,tbl[i+57]),z,tbl[i+56]),z,tbl[i+55]),z,tbl[i+54]),z,
              tbl[i+53]),z,tbl[i+52]),z,tbl[i+51]),z,tbl[i+50]),z,tbl[i+49]),z,
              tbl[i+48]),z,tbl[i+47]),z,tbl[i+46]),z,tbl[i+45]),z,tbl[i+44]),z,
 	     tbl[i+43]),z,tbl[i+42]),z,tbl[i+41]),z,tbl[i+40]),z,tbl[i+39]);
-								 
+								
 #else
   highPoly = tbl[i+39] + z * (tbl[i+40] + z * (tbl[i+41] + z * (tbl[i+42] + z * (
              tbl[i+43] + z * (tbl[i+44] + z * (tbl[i+45] + z * (tbl[i+46] + z * (
@@ -148,9 +148,9 @@ void  asin_accurate_middle(double *asinh, double *asinm, double *asinl, double z
              tbl[i+55] + z * (tbl[i+56] + z * (tbl[i+57] + z * tbl[i+58]))))))))))))))))));
 #endif
 
-  
+
   /* Double-double computations */
-  
+
   Mul12(&tt1h,&tt1l,z,highPoly);
   Add22(&t1h,&t1l,tbl[i+37],tbl[i+38],tt1h,tt1l);
 
@@ -207,7 +207,7 @@ void asin_accurate_higher(double *asinh, double *asinm, double *asinl, double z,
   crlibm_second_step_taken++;
 #endif
 
-  /* We evaluate asin(x) as 
+  /* We evaluate asin(x) as
 
      asin(x) = f(z) * sqrt(2*z) + Pi/2
 
@@ -218,16 +218,16 @@ void asin_accurate_higher(double *asinh, double *asinm, double *asinl, double z,
      f(z) is approximated by p(z)
 
      The polynomial p(z) is of degree 29
-     Its coefficients start at tbl[TBLIDX10] 
+     Its coefficients start at tbl[TBLIDX10]
      Coefficients for degrees 29 to 18 are in double precision,
      for degrees 17 to 9 in double-double precision and
-     finally for degrees 8 to 1 in triple-double. 
-     The constant coefficient (-1) is not stored in the table, 
-     the computations are nevertheless in triple-double 
+     finally for degrees 8 to 1 in triple-double.
+     The constant coefficient (-1) is not stored in the table,
+     the computations are nevertheless in triple-double
      We evaluate the monomials in the precision in which
      the correspondant coefficients are stored
-     The coefficients' values decrease very quickly 
-     so even with |z| < 2^-2.18 we can compute degree 18 
+     The coefficients' values decrease very quickly
+     so even with |z| < 2^-2.18 we can compute degree 18
      already in double precision
 
      Compute than sqrt(2*z) as a triple-double
@@ -244,14 +244,14 @@ void asin_accurate_higher(double *asinh, double *asinm, double *asinl, double z,
              tbl[TBLIDX10+53] ,z,tbl[TBLIDX10+52]),z,tbl[TBLIDX10+51]),z,
              tbl[TBLIDX10+50]),z,tbl[TBLIDX10+49]),z,tbl[TBLIDX10+48]),z,
              tbl[TBLIDX10+47]),z,tbl[TBLIDX10+46]),z,tbl[TBLIDX10+45]),z,
-             tbl[TBLIDX10+44]),z,tbl[TBLIDX10+43]),z,tbl[TBLIDX10+42]);						 
+             tbl[TBLIDX10+44]),z,tbl[TBLIDX10+43]),z,tbl[TBLIDX10+42]);						
 #else
   highPoly = tbl[TBLIDX10+42] + z * (tbl[TBLIDX10+43] + z * (tbl[TBLIDX10+44] + z * (
              tbl[TBLIDX10+45] + z * (tbl[TBLIDX10+46] + z * (tbl[TBLIDX10+47] + z * (
              tbl[TBLIDX10+48] + z * (tbl[TBLIDX10+49] + z * (tbl[TBLIDX10+50] + z * (
              tbl[TBLIDX10+51] + z * (tbl[TBLIDX10+52] + z *  tbl[TBLIDX10+53]))))))))));
 #endif
-  
+
   /* Double-double computations */
 
   Mul12(&tt1h,&tt1l,z,highPoly);
@@ -333,7 +333,7 @@ double asin_rn(double x) {
   xdb.d = x;
 
   /* Special case handling */
-  
+
   /* Strip off the sign of argument x */
   if (xdb.i[HI] & 0x80000000) sign = -1; else sign = 1;
   xdb.i[HI] &= 0x7fffffff;
@@ -344,12 +344,12 @@ double asin_rn(double x) {
   }
 
   /* If |x| < 2^(-28) we have
-     
-     arcsin(x) = x * ( 1 + xi ) 
 
-     with 0 <= xi < 2^(-55) 
-          
-     So we can decide the rounding without any computation 
+     arcsin(x) = x * ( 1 + xi )
+
+     with 0 <= xi < 2^(-55)
+
+     So we can decide the rounding without any computation
   */
   if (xdb.i[HI] < 0x3e300000) {
     return x;
@@ -363,7 +363,7 @@ double asin_rn(double x) {
   */
 
   if (xdb.i[HI] < BOUND1) {
-    /* Special interval 0..BOUND1 
+    /* Special interval 0..BOUND1
        The polynomial has no even monomials
        We must prove extra accuracy in the interval 0..sin(2^(-18))
     */
@@ -388,7 +388,7 @@ double asin_rn(double x) {
       /* Double-double precision evaluation */
       Mul12(&tt1h,&tt1l,xSqh,highPoly);
       Add22(&t1h,&t1l,tbl[12],tbl[13],tt1h,tt1l);
-      
+
       MulAdd212(&t2h,&t2l,tbl[9],tbl[10],xSqh,t1h,t1l);
       MulAdd212(&t3h,&t3l,tbl[6],tbl[7],xSqh,t2h,t2l);
       MulAdd22(&t4h,&t4l,tmp4,tmp5,xSqh,xSql,t3h,t3l);
@@ -398,7 +398,7 @@ double asin_rn(double x) {
 
     Mul122(&xCubeh,&xCubel,x,xSqh,xSql);
     Mul22(&tt6h,&tt6l,xCubeh,xCubel,t5h,t5l);
-    
+
     Add12(tmp1,tmp2,x,tt6h);
     tmp3 = tmp2 + tt6l;
     Add12(polyh,polyl,tmp1,tmp3);
@@ -410,14 +410,14 @@ double asin_rn(double x) {
     /* Rounding test (on polyh+polyl, equivalently to asinh+asinm)
        The RN rounding constant is at tbl[34]
     */
-    if(polyh == (polyh + (polyl * tbl[34]))) 
+    if(polyh == (polyh + (polyl * tbl[34])))
       return asinh;
 
     /* Launch accurate phase */
 
     asin_accurate_lower(&asinh,&asinm,&asinl,x,xSqh,xSql,sign);
 
-    ReturnRoundToNearest3(asinh,asinm,asinl); 
+    ReturnRoundToNearest3(asinh,asinm,asinl);
   }
 
   if (xdb.i[HI] >= BOUND9) {
@@ -444,10 +444,10 @@ double asin_rn(double x) {
 #else
     highPoly = tbl[TBLIDX10+24] + z * (tbl[TBLIDX10+26] + z * (tbl[TBLIDX10+28] + z * (
 	       tbl[TBLIDX10+30] + z * (tbl[TBLIDX10+32] + z * (tbl[TBLIDX10+34] + z * (
-	       tbl[TBLIDX10+36] + z * (tbl[TBLIDX10+38] + z * (tbl[TBLIDX10+40] + z * 
+	       tbl[TBLIDX10+36] + z * (tbl[TBLIDX10+38] + z * (tbl[TBLIDX10+40] + z *
                tbl[TBLIDX10+42]))))))));
 #endif
-    
+
     /* Double-double precision evaluation */
     Mul12(&tt1h,&tt1l,z,highPoly);
     Add22(&t1h,&t1l,tbl[TBLIDX10+21],tbl[TBLIDX10+22],tt1h,tt1l);
@@ -464,35 +464,35 @@ double asin_rn(double x) {
     /* Compute sqrt(2*z) as a double-double */
 
     twoZ = 2 * z;
-    sqrt12(&sqrtzh,&sqrtzl,twoZ);                                                         
+    sqrt12(&sqrtzh,&sqrtzl,twoZ);
 
     /* Multiply p(z) by sqrt(2*z) and add Pi/2 */
 
-    Mul22(&pTimesSh,&pTimesSl,polyh,polyl,sqrtzh,sqrtzl);                    
-    Add22(&allh,&alll,PIHALFH,PIHALFM,pTimesSh,pTimesSl);       
+    Mul22(&pTimesSh,&pTimesSl,polyh,polyl,sqrtzh,sqrtzl);
+    Add22(&allh,&alll,PIHALFH,PIHALFM,pTimesSh,pTimesSl);
 
     /* Multiply by sign */
     asinh = sign * allh;
     asinm = sign * alll;
 
-    /* Rounding test 
+    /* Rounding test
        The RN rounding constant is at tbl[TBLIDX10+54]
     */
 
-    if(allh == (allh + (alll * tbl[TBLIDX10+54]))) 
+    if(allh == (allh + (alll * tbl[TBLIDX10+54])))
       return asinh;
 
     /* Launch accurate phase */
 
     asin_accurate_higher(&asinh,&asinm,&asinl,z,sign);
 
-    ReturnRoundToNearest3(asinh,asinm,asinl); 
+    ReturnRoundToNearest3(asinh,asinm,asinl);
   }
-  
-  /* General 8 main intervals 
+
+  /* General 8 main intervals
      We can already suppose that BOUND1 <= x <= BOUND9
   */
-  
+
   if (xdb.i[HI] < BOUND5) {
     if (xdb.i[HI] < BOUND3) {
       if (xdb.i[HI] < BOUND2) i = TBLIDX2; else i = TBLIDX3;
@@ -507,7 +507,7 @@ double asin_rn(double x) {
     }
   }
 
-  /* Argument reduction 
+  /* Argument reduction
      i points to the interval midpoint value in the table
   */
   z = x - tbl[i];
@@ -522,12 +522,12 @@ double asin_rn(double x) {
              tbl[i+27]),z,tbl[i+25]),z,tbl[i+23]),z,tbl[i+21]);
 #else
   highPoly = tbl[i+21] + z * (tbl[i+23] + z * (tbl[i+25] + z * (
-             tbl[i+27] + z * (tbl[i+29] + z * (tbl[i+31] + z * ( 
+             tbl[i+27] + z * (tbl[i+29] + z * (tbl[i+31] + z * (
              tbl[i+33] + z *  tbl[i+35]))))));
 #endif
 
   /* Double-double precision evaluation */
-    
+
   Mul12(&tt1h,&tt1l,z,highPoly);
   Add22(&t1h,&t1l,tbl[i+18],tbl[i+19],tt1h,tt1l);
 
@@ -542,17 +542,17 @@ double asin_rn(double x) {
   asinh = sign * polyh;
   asinm = sign * polyl;
 
-  /* Rounding test 
+  /* Rounding test
      The RN rounding constant is at tbl[i+59]
   */
-    if(polyh == (polyh + (polyl * tbl[i+59]))) 
+    if(polyh == (polyh + (polyl * tbl[i+59])))
       return asinh;
 
   /* Launch accurate phase */
 
   asin_accurate_middle(&asinh,&asinm,&asinl,z,i,sign);
 
-  ReturnRoundToNearest3(asinh,asinm,asinl); 
+  ReturnRoundToNearest3(asinh,asinm,asinl);
 }
 
 
@@ -576,7 +576,7 @@ double asin_ru(double x) {
   xdb.d = x;
 
   /* Special case handling */
-  
+
   /* Strip off the sign of argument x */
   if (xdb.i[HI] & 0x80000000) sign = -1; else sign = 1;
   xdb.i[HI] &= 0x7fffffff;
@@ -587,21 +587,21 @@ double asin_ru(double x) {
   }
 
   /* If |x| < 2^(-28) we have
-     
-     arcsin(x) = x * ( 1 + xi ) 
 
-     with 0 <= xi < 2^(-55) 
-          
-     So we can decide the rounding without any computation 
+     arcsin(x) = x * ( 1 + xi )
+
+     with 0 <= xi < 2^(-55)
+
+     So we can decide the rounding without any computation
   */
   if (xdb.i[HI] < 0x3e300000) {
     /* If x == 0 then we got the algebraic result arcsin(0) = 0
-       If x < 0 then the truncation rest is negative but less than 
+       If x < 0 then the truncation rest is negative but less than
        1 ulp; we round upwards by returning x
     */
     if (x <= 0) return x;
     /* Otherwise the rest is positive, less than 1 ulp and the
-       image is not algebraic 
+       image is not algebraic
        We return x + 1ulp
     */
     xdb.l++;
@@ -616,7 +616,7 @@ double asin_ru(double x) {
   */
 
   if (xdb.i[HI] < BOUND1) {
-    /* Special interval 0..BOUND1 
+    /* Special interval 0..BOUND1
        The polynomial has no even monomials
        We must prove extra accuracy in the interval 0..sin(2^(-18))
     */
@@ -641,7 +641,7 @@ double asin_ru(double x) {
       /* Double-double precision evaluation */
       Mul12(&tt1h,&tt1l,xSqh,highPoly);
       Add22(&t1h,&t1l,tbl[12],tbl[13],tt1h,tt1l);
-      
+
       MulAdd212(&t2h,&t2l,tbl[9],tbl[10],xSqh,t1h,t1l);
       MulAdd212(&t3h,&t3l,tbl[6],tbl[7],xSqh,t2h,t2l);
       MulAdd22(&t4h,&t4l,tmp4,tmp5,xSqh,xSql,t3h,t3l);
@@ -651,7 +651,7 @@ double asin_ru(double x) {
 
     Mul122(&xCubeh,&xCubel,x,xSqh,xSql);
     Mul22(&tt6h,&tt6l,xCubeh,xCubel,t5h,t5l);
-    
+
     Add12(tmp1,tmp2,x,tt6h);
     tmp3 = tmp2 + tt6l;
     Add12(polyh,polyl,tmp1,tmp3);
@@ -660,7 +660,7 @@ double asin_ru(double x) {
     asinh = sign * polyh;
     asinm = sign * polyl;
 
-    /* Rounding test 
+    /* Rounding test
        The RU rounding constant is at tbl[35]
     */
     TEST_AND_RETURN_RU(asinh, asinm, tbl[35]);
@@ -669,7 +669,7 @@ double asin_ru(double x) {
 
     asin_accurate_lower(&asinh,&asinm,&asinl,x,xSqh,xSql,sign);
 
-    ReturnRoundUpwards3(asinh,asinm,asinl); 
+    ReturnRoundUpwards3(asinh,asinm,asinl);
   }
 
   if (xdb.i[HI] > BOUND9) {
@@ -696,10 +696,10 @@ double asin_ru(double x) {
 #else
     highPoly = tbl[TBLIDX10+24] + z * (tbl[TBLIDX10+26] + z * (tbl[TBLIDX10+28] + z * (
 	       tbl[TBLIDX10+30] + z * (tbl[TBLIDX10+32] + z * (tbl[TBLIDX10+34] + z * (
-	       tbl[TBLIDX10+36] + z * (tbl[TBLIDX10+38] + z * (tbl[TBLIDX10+40] + z * 
+	       tbl[TBLIDX10+36] + z * (tbl[TBLIDX10+38] + z * (tbl[TBLIDX10+40] + z *
                tbl[TBLIDX10+42]))))))));
 #endif
-    
+
     /* Double-double precision evaluation */
     Mul12(&tt1h,&tt1l,z,highPoly);
     Add22(&t1h,&t1l,tbl[TBLIDX10+21],tbl[TBLIDX10+22],tt1h,tt1l);
@@ -716,18 +716,18 @@ double asin_ru(double x) {
     /* Compute sqrt(2*z) as a double-double */
 
     twoZ = 2 * z;
-    sqrt12(&sqrtzh,&sqrtzl,twoZ);                                                         
+    sqrt12(&sqrtzh,&sqrtzl,twoZ);
 
     /* Multiply p(z) by sqrt(2*z) and add Pi/2 */
 
-    Mul22(&pTimesSh,&pTimesSl,polyh,polyl,sqrtzh,sqrtzl);                    
-    Add22(&allh,&alll,PIHALFH,PIHALFM,pTimesSh,pTimesSl);       
+    Mul22(&pTimesSh,&pTimesSl,polyh,polyl,sqrtzh,sqrtzl);
+    Add22(&allh,&alll,PIHALFH,PIHALFM,pTimesSh,pTimesSl);
 
     /* Multiply by sign */
     asinh = sign * allh;
     asinm = sign * alll;
 
-    /* Rounding test 
+    /* Rounding test
        The RU rounding constant is at tbl[TBLIDX10+55]
     */
     TEST_AND_RETURN_RU(asinh, asinm, tbl[TBLIDX10+55]);
@@ -736,13 +736,13 @@ double asin_ru(double x) {
 
     asin_accurate_higher(&asinh,&asinm,&asinl,z,sign);
 
-    ReturnRoundUpwards3(asinh,asinm,asinl); 
+    ReturnRoundUpwards3(asinh,asinm,asinl);
   }
-  
-  /* General 8 main intervals 
+
+  /* General 8 main intervals
      We can already suppose that BOUND1 <= x <= BOUND9
   */
-  
+
   if (xdb.i[HI] < BOUND5) {
     if (xdb.i[HI] < BOUND3) {
       if (xdb.i[HI] < BOUND2) i = TBLIDX2; else i = TBLIDX3;
@@ -757,7 +757,7 @@ double asin_ru(double x) {
     }
   }
 
-  /* Argument reduction 
+  /* Argument reduction
      i points to the interval midpoint value in the table
   */
   z = x - tbl[i];
@@ -772,12 +772,12 @@ double asin_ru(double x) {
              tbl[i+27]),z,tbl[i+25]),z,tbl[i+23]),z,tbl[i+21]);
 #else
   highPoly = tbl[i+21] + z * (tbl[i+23] + z * (tbl[i+25] + z * (
-             tbl[i+27] + z * (tbl[i+29] + z * (tbl[i+31] + z * ( 
+             tbl[i+27] + z * (tbl[i+29] + z * (tbl[i+31] + z * (
              tbl[i+33] + z *  tbl[i+35]))))));
 #endif
 
   /* Double-double precision evaluation */
-    
+
   Mul12(&tt1h,&tt1l,z,highPoly);
   Add22(&t1h,&t1l,tbl[i+18],tbl[i+19],tt1h,tt1l);
 
@@ -792,7 +792,7 @@ double asin_ru(double x) {
   asinh = sign * polyh;
   asinm = sign * polyl;
 
-  /* Rounding test 
+  /* Rounding test
      The RU rounding constant is at tbl[i+60]
   */
   TEST_AND_RETURN_RU(asinh, asinm, tbl[i+60]);
@@ -801,7 +801,7 @@ double asin_ru(double x) {
 
   asin_accurate_middle(&asinh,&asinm,&asinl,z,i,sign);
 
-  ReturnRoundUpwards3(asinh,asinm,asinl); 
+  ReturnRoundUpwards3(asinh,asinm,asinl);
 }
 
 double asin_rd(double x) {
@@ -820,7 +820,7 @@ double asin_rd(double x) {
   xdb.d = x;
 
   /* Special case handling */
-  
+
   /* Strip off the sign of argument x */
   if (xdb.i[HI] & 0x80000000) sign = -1; else sign = 1;
   xdb.i[HI] &= 0x7fffffff;
@@ -831,21 +831,21 @@ double asin_rd(double x) {
   }
 
   /* If |x| < 2^(-28) we have
-     
-     arcsin(x) = x * ( 1 + xi ) 
 
-     with 0 <= xi < 2^(-55) 
-          
-     So we can decide the rounding without any computation 
+     arcsin(x) = x * ( 1 + xi )
+
+     with 0 <= xi < 2^(-55)
+
+     So we can decide the rounding without any computation
   */
   if (xdb.i[HI] < 0x3e300000) {
     /* If x == 0 then we got the algebraic result arcsin(0) = 0
-       If x > 0 then the truncation rest is positive but less than 
+       If x > 0 then the truncation rest is positive but less than
        1 ulp; we round downwards by returning x
     */
     if (x >= 0) return x;
     /* Otherwise the rest is negative, less than 1 ulp and the
-       image is not algebraic 
+       image is not algebraic
        We return x - 1ulp
        We stripped off the sign, so we add 1 ulp to -x (in xdb.d) and multiply by -1
     */
@@ -861,7 +861,7 @@ double asin_rd(double x) {
   */
 
   if (xdb.i[HI] < BOUND1) {
-    /* Special interval 0..BOUND1 
+    /* Special interval 0..BOUND1
        The polynomial has no even monomials
        We must prove extra accuracy in the interval 0..sin(2^(-18))
     */
@@ -886,7 +886,7 @@ double asin_rd(double x) {
       /* Double-double precision evaluation */
       Mul12(&tt1h,&tt1l,xSqh,highPoly);
       Add22(&t1h,&t1l,tbl[12],tbl[13],tt1h,tt1l);
-      
+
       MulAdd212(&t2h,&t2l,tbl[9],tbl[10],xSqh,t1h,t1l);
       MulAdd212(&t3h,&t3l,tbl[6],tbl[7],xSqh,t2h,t2l);
       MulAdd22(&t4h,&t4l,tmp4,tmp5,xSqh,xSql,t3h,t3l);
@@ -896,7 +896,7 @@ double asin_rd(double x) {
 
     Mul122(&xCubeh,&xCubel,x,xSqh,xSql);
     Mul22(&tt6h,&tt6l,xCubeh,xCubel,t5h,t5l);
-    
+
     Add12(tmp1,tmp2,x,tt6h);
     tmp3 = tmp2 + tt6l;
     Add12(polyh,polyl,tmp1,tmp3);
@@ -905,7 +905,7 @@ double asin_rd(double x) {
     asinh = sign * polyh;
     asinm = sign * polyl;
 
-    /* Rounding test 
+    /* Rounding test
        The RD rounding constant is at tbl[35]
     */
     TEST_AND_RETURN_RD(asinh, asinm, tbl[35]);
@@ -914,7 +914,7 @@ double asin_rd(double x) {
 
     asin_accurate_lower(&asinh,&asinm,&asinl,x,xSqh,xSql,sign);
 
-    ReturnRoundDownwards3(asinh,asinm,asinl); 
+    ReturnRoundDownwards3(asinh,asinm,asinl);
   }
 
   if (xdb.i[HI] > BOUND9) {
@@ -941,10 +941,10 @@ double asin_rd(double x) {
 #else
     highPoly = tbl[TBLIDX10+24] + z * (tbl[TBLIDX10+26] + z * (tbl[TBLIDX10+28] + z * (
 	       tbl[TBLIDX10+30] + z * (tbl[TBLIDX10+32] + z * (tbl[TBLIDX10+34] + z * (
-	       tbl[TBLIDX10+36] + z * (tbl[TBLIDX10+38] + z * (tbl[TBLIDX10+40] + z * 
+	       tbl[TBLIDX10+36] + z * (tbl[TBLIDX10+38] + z * (tbl[TBLIDX10+40] + z *
                tbl[TBLIDX10+42]))))))));
 #endif
-    
+
     /* Double-double precision evaluation */
     Mul12(&tt1h,&tt1l,z,highPoly);
     Add22(&t1h,&t1l,tbl[TBLIDX10+21],tbl[TBLIDX10+22],tt1h,tt1l);
@@ -961,18 +961,18 @@ double asin_rd(double x) {
     /* Compute sqrt(2*z) as a double-double */
 
     twoZ = 2 * z;
-    sqrt12(&sqrtzh,&sqrtzl,twoZ);                                                         
+    sqrt12(&sqrtzh,&sqrtzl,twoZ);
 
     /* Multiply p(z) by sqrt(2*z) and add Pi/2 */
 
-    Mul22(&pTimesSh,&pTimesSl,polyh,polyl,sqrtzh,sqrtzl);                    
-    Add22(&allh,&alll,PIHALFH,PIHALFM,pTimesSh,pTimesSl);       
+    Mul22(&pTimesSh,&pTimesSl,polyh,polyl,sqrtzh,sqrtzl);
+    Add22(&allh,&alll,PIHALFH,PIHALFM,pTimesSh,pTimesSl);
 
     /* Multiply by sign */
     asinh = sign * allh;
     asinm = sign * alll;
 
-    /* Rounding test 
+    /* Rounding test
        The RD rounding constant is at tbl[TBLIDX10+55]
     */
     TEST_AND_RETURN_RD(asinh, asinm, tbl[TBLIDX10+55]);
@@ -981,13 +981,13 @@ double asin_rd(double x) {
 
     asin_accurate_higher(&asinh,&asinm,&asinl,z,sign);
 
-    ReturnRoundDownwards3(asinh,asinm,asinl); 
+    ReturnRoundDownwards3(asinh,asinm,asinl);
   }
-  
-  /* General 8 main intervals 
+
+  /* General 8 main intervals
      We can already suppose that BOUND1 <= x <= BOUND9
   */
-  
+
   if (xdb.i[HI] < BOUND5) {
     if (xdb.i[HI] < BOUND3) {
       if (xdb.i[HI] < BOUND2) i = TBLIDX2; else i = TBLIDX3;
@@ -1002,7 +1002,7 @@ double asin_rd(double x) {
     }
   }
 
-  /* Argument reduction 
+  /* Argument reduction
      i points to the interval midpoint value in the table
   */
   z = x - tbl[i];
@@ -1017,12 +1017,12 @@ double asin_rd(double x) {
              tbl[i+27]),z,tbl[i+25]),z,tbl[i+23]),z,tbl[i+21]);
 #else
   highPoly = tbl[i+21] + z * (tbl[i+23] + z * (tbl[i+25] + z * (
-             tbl[i+27] + z * (tbl[i+29] + z * (tbl[i+31] + z * ( 
+             tbl[i+27] + z * (tbl[i+29] + z * (tbl[i+31] + z * (
              tbl[i+33] + z *  tbl[i+35]))))));
 #endif
 
   /* Double-double precision evaluation */
-    
+
   Mul12(&tt1h,&tt1l,z,highPoly);
   Add22(&t1h,&t1l,tbl[i+18],tbl[i+19],tt1h,tt1l);
 
@@ -1037,7 +1037,7 @@ double asin_rd(double x) {
   asinh = sign * polyh;
   asinm = sign * polyl;
 
-  /* Rounding test 
+  /* Rounding test
      The RD rounding constant is at tbl[i+60]
   */
   TEST_AND_RETURN_RD(asinh, asinm, tbl[i+60]);
@@ -1046,7 +1046,7 @@ double asin_rd(double x) {
 
   asin_accurate_middle(&asinh,&asinm,&asinl,z,i,sign);
 
-  ReturnRoundDownwards3(asinh,asinm,asinl); 
+  ReturnRoundDownwards3(asinh,asinm,asinl);
 }
 
 double asin_rz(double x) {
@@ -1065,7 +1065,7 @@ double asin_rz(double x) {
   xdb.d = x;
 
   /* Special case handling */
-  
+
   /* Strip off the sign of argument x */
   if (xdb.i[HI] & 0x80000000) sign = -1; else sign = 1;
   xdb.i[HI] &= 0x7fffffff;
@@ -1076,12 +1076,12 @@ double asin_rz(double x) {
   }
 
   /* If |x| < 2^(-28) we have
-     
-     arcsin(x) = x * ( 1 + xi ) 
 
-     with 0 <= xi < 2^(-55) 
-          
-     So we can decide the rounding without any computation 
+     arcsin(x) = x * ( 1 + xi )
+
+     with 0 <= xi < 2^(-55)
+
+     So we can decide the rounding without any computation
   */
   if (xdb.i[HI] < 0x3e300000) {
     /* If x == 0 the result is algebraic and equal to 0
@@ -1089,7 +1089,7 @@ double asin_rz(double x) {
        If x > 0 the truncation rest is positive and less than 1 ulp, we return x
     */
     return x;
-  }  
+  }
 
   /* Recast x */
   x = xdb.d;
@@ -1099,7 +1099,7 @@ double asin_rz(double x) {
   */
 
   if (xdb.i[HI] < BOUND1) {
-    /* Special interval 0..BOUND1 
+    /* Special interval 0..BOUND1
        The polynomial has no even monomials
        We must prove extra accuracy in the interval 0..sin(2^(-18))
     */
@@ -1124,7 +1124,7 @@ double asin_rz(double x) {
       /* Double-double precision evaluation */
       Mul12(&tt1h,&tt1l,xSqh,highPoly);
       Add22(&t1h,&t1l,tbl[12],tbl[13],tt1h,tt1l);
-      
+
       MulAdd212(&t2h,&t2l,tbl[9],tbl[10],xSqh,t1h,t1l);
       MulAdd212(&t3h,&t3l,tbl[6],tbl[7],xSqh,t2h,t2l);
       MulAdd22(&t4h,&t4l,tmp4,tmp5,xSqh,xSql,t3h,t3l);
@@ -1134,7 +1134,7 @@ double asin_rz(double x) {
 
     Mul122(&xCubeh,&xCubel,x,xSqh,xSql);
     Mul22(&tt6h,&tt6l,xCubeh,xCubel,t5h,t5l);
-    
+
     Add12(tmp1,tmp2,x,tt6h);
     tmp3 = tmp2 + tt6l;
     Add12(polyh,polyl,tmp1,tmp3);
@@ -1143,7 +1143,7 @@ double asin_rz(double x) {
     asinh = sign * polyh;
     asinm = sign * polyl;
 
-    /* Rounding test 
+    /* Rounding test
        The RZ rounding constant is at tbl[35]
     */
     TEST_AND_RETURN_RZ(asinh, asinm, tbl[35]);
@@ -1152,7 +1152,7 @@ double asin_rz(double x) {
 
     asin_accurate_lower(&asinh,&asinm,&asinl,x,xSqh,xSql,sign);
 
-    ReturnRoundTowardsZero3(asinh,asinm,asinl); 
+    ReturnRoundTowardsZero3(asinh,asinm,asinl);
   }
 
   if (xdb.i[HI] > BOUND9) {
@@ -1179,10 +1179,10 @@ double asin_rz(double x) {
 #else
     highPoly = tbl[TBLIDX10+24] + z * (tbl[TBLIDX10+26] + z * (tbl[TBLIDX10+28] + z * (
 	       tbl[TBLIDX10+30] + z * (tbl[TBLIDX10+32] + z * (tbl[TBLIDX10+34] + z * (
-	       tbl[TBLIDX10+36] + z * (tbl[TBLIDX10+38] + z * (tbl[TBLIDX10+40] + z * 
+	       tbl[TBLIDX10+36] + z * (tbl[TBLIDX10+38] + z * (tbl[TBLIDX10+40] + z *
                tbl[TBLIDX10+42]))))))));
 #endif
-    
+
     /* Double-double precision evaluation */
     Mul12(&tt1h,&tt1l,z,highPoly);
     Add22(&t1h,&t1l,tbl[TBLIDX10+21],tbl[TBLIDX10+22],tt1h,tt1l);
@@ -1199,18 +1199,18 @@ double asin_rz(double x) {
     /* Compute sqrt(2*z) as a double-double */
 
     twoZ = 2 * z;
-    sqrt12(&sqrtzh,&sqrtzl,twoZ);                                                         
+    sqrt12(&sqrtzh,&sqrtzl,twoZ);
 
     /* Multiply p(z) by sqrt(2*z) and add Pi/2 */
 
-    Mul22(&pTimesSh,&pTimesSl,polyh,polyl,sqrtzh,sqrtzl);                    
-    Add22(&allh,&alll,PIHALFH,PIHALFM,pTimesSh,pTimesSl);       
+    Mul22(&pTimesSh,&pTimesSl,polyh,polyl,sqrtzh,sqrtzl);
+    Add22(&allh,&alll,PIHALFH,PIHALFM,pTimesSh,pTimesSl);
 
     /* Multiply by sign */
     asinh = sign * allh;
     asinm = sign * alll;
 
-    /* Rounding test 
+    /* Rounding test
        The RZ rounding constant is at tbl[TBLIDX10+55]
     */
     TEST_AND_RETURN_RZ(asinh, asinm, tbl[TBLIDX10+55]);
@@ -1219,13 +1219,13 @@ double asin_rz(double x) {
 
     asin_accurate_higher(&asinh,&asinm,&asinl,z,sign);
 
-    ReturnRoundTowardsZero3(asinh,asinm,asinl); 
+    ReturnRoundTowardsZero3(asinh,asinm,asinl);
   }
-  
-  /* General 8 main intervals 
+
+  /* General 8 main intervals
      We can already suppose that BOUND1 <= x <= BOUND9
   */
-  
+
   if (xdb.i[HI] < BOUND5) {
     if (xdb.i[HI] < BOUND3) {
       if (xdb.i[HI] < BOUND2) i = TBLIDX2; else i = TBLIDX3;
@@ -1240,7 +1240,7 @@ double asin_rz(double x) {
     }
   }
 
-  /* Argument reduction 
+  /* Argument reduction
      i points to the interval midpoint value in the table
   */
   z = x - tbl[i];
@@ -1255,12 +1255,12 @@ double asin_rz(double x) {
              tbl[i+27]),z,tbl[i+25]),z,tbl[i+23]),z,tbl[i+21]);
 #else
   highPoly = tbl[i+21] + z * (tbl[i+23] + z * (tbl[i+25] + z * (
-             tbl[i+27] + z * (tbl[i+29] + z * (tbl[i+31] + z * ( 
+             tbl[i+27] + z * (tbl[i+29] + z * (tbl[i+31] + z * (
              tbl[i+33] + z *  tbl[i+35]))))));
 #endif
 
   /* Double-double precision evaluation */
-    
+
   Mul12(&tt1h,&tt1l,z,highPoly);
   Add22(&t1h,&t1l,tbl[i+18],tbl[i+19],tt1h,tt1l);
 
@@ -1275,7 +1275,7 @@ double asin_rz(double x) {
   asinh = sign * polyh;
   asinm = sign * polyl;
 
-  /* Rounding test 
+  /* Rounding test
      The RZ rounding constant is at tbl[i+60]
   */
   TEST_AND_RETURN_RZ(asinh, asinm, tbl[i+60]);
@@ -1284,7 +1284,7 @@ double asin_rz(double x) {
 
   asin_accurate_middle(&asinh,&asinm,&asinl,z,i,sign);
 
-  ReturnRoundTowardsZero3(asinh,asinm,asinl); 
+  ReturnRoundTowardsZero3(asinh,asinm,asinl);
 }
 
 

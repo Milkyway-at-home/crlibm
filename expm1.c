@@ -9,9 +9,9 @@
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or 
+ * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -19,7 +19,7 @@
  *
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 */
 
 #include <stdio.h>
@@ -37,7 +37,7 @@
 #define DEBUG 0
 
 
-void expm1_direct_td(double *expm1h, double *expm1m, double *expm1l, 
+void expm1_direct_td(double *expm1h, double *expm1m, double *expm1l,
 		     double x, double xSqHalfh, double xSqHalfl, double xSqh, double xSql, int expoX) {
   double highPoly, tt1h, t1h, t1l, t2h, t2l, t3h, t3l, t4h, t4l, t5h, t5l, t6h, t6l;
   double tt6h, tt6m, tt6l, t7h, t7m, t7l, lowPolyh, lowPolym, lowPolyl;
@@ -68,7 +68,7 @@ void expm1_direct_td(double *expm1h, double *expm1m, double *expm1l,
     /* Double-double evaluation steps */
 
     Add12(t1h,t1l,accuDirectpolyC10h,tt1h);
-    
+
     MulAdd212(&t2h,&t2l,accuDirectpolyC9h,accuDirectpolyC9m,x,t1h,t1l);
     MulAdd212(&t3h,&t3l,accuDirectpolyC8h,accuDirectpolyC8m,x,t2h,t2l);
     MulAdd212(&t4h,&t4l,accuDirectpolyC7h,accuDirectpolyC7m,x,t3h,t3l);
@@ -79,7 +79,7 @@ void expm1_direct_td(double *expm1h, double *expm1m, double *expm1l,
 
     Mul123(&tt6h,&tt6m,&tt6l,x,t6h,t6l);                                          /* 154 - 47/53 */
     Add233(&t7h,&t7m,&t7l,accuDirectpolyC4h,accuDirectpolyC4m,tt6h,tt6m,tt6l);    /* 150 - 43/53 */
-   
+
     Mul133(&tt7h,&tt7m,&tt7l,x,t7h,t7m,t7l);                                      /* 143 - 38/53 */
     Add33(&t8h,&t8m,&t8l,accuDirectpolyC3h,accuDirectpolyC3m,accuDirectpolyC3l,tt7h,tt7m,tt7l); /* 135 - 33/53 */
 
@@ -98,8 +98,8 @@ void expm1_direct_td(double *expm1h, double *expm1m, double *expm1l,
       /* If we are here, we must perform reconstruction */
 
       /* First reconstruction step */
-                                                                             
-      Add133(&r1h,&r1m,&r1l,2,polyh,polym,polyl);                             
+
+      Add133(&r1h,&r1m,&r1l,2,polyh,polym,polyl);
       Mul33(&rr1h,&rr1m,&rr1l,r1h,r1m,r1l,polyh,polym,polyl);
       if (expoX >= 1) {
 
@@ -142,10 +142,10 @@ void expm1_direct_td(double *expm1h, double *expm1m, double *expm1l,
     Renormalize3(expm1h,expm1m,expm1l,expm1hover,expm1mover,expm1lover);
 }
 
-void expm1_common_td(double *expm1h, double *expm1m, double *expm1l, 
-		     double rh, double rm, double rl, 
-		     double tbl1h, double tbl1m, double tbl1l, 
-		     double tbl2h, double tbl2m, double tbl2l, 
+void expm1_common_td(double *expm1h, double *expm1m, double *expm1l,
+		     double rh, double rm, double rl,
+		     double tbl1h, double tbl1m, double tbl1l,
+		     double tbl2h, double tbl2m, double tbl2l,
 		     int M) {
   double highPoly, highPolyMulth, highPolyMultm, highPolyMultl;
   double rhSquareh, rhSquarel, rhSquareHalfh, rhSquareHalfl;
@@ -179,7 +179,7 @@ void expm1_common_td(double *expm1h, double *expm1m, double *expm1l,
   Mul123(&rhCubeh,&rhCubem,&rhCubel,rh,rhSquareh,rhSquarel);
 
   rhSquareHalfh = 0.5 * rhSquareh;
-  rhSquareHalfl = 0.5 * rhSquarel;  
+  rhSquareHalfl = 0.5 * rhSquarel;
 
   /* Polynomial approximation - triple-double precision steps */
 
@@ -204,9 +204,9 @@ void expm1_common_td(double *expm1h, double *expm1m, double *expm1l,
 	tbl2h,tbl2m,tbl2l,
 	polyWithTbl1h,polyWithTbl1m,polyWithTbl1l);
 
-  /* Multiplication by 2^(M) 
+  /* Multiplication by 2^(M)
 
-     We perform it in integer to overcome the non-representability of 2^(1024) 
+     We perform it in integer to overcome the non-representability of 2^(1024)
      This case is possible for M = 1024 and polyWithTablesh < 1
 
      The overlap in the triple-double polyWithTables[hml] stays unchanged.
@@ -231,14 +231,14 @@ void expm1_common_td(double *expm1h, double *expm1m, double *expm1l,
   expm = polyWithTablesmdb.d;
   expl = polyWithTablesldb.d;
 
-  /* Subtraction of -1 
-     
-     We use a conditional Add133 
+  /* Subtraction of -1
+
+     We use a conditional Add133
   */
 
   Add133Cond(&expm1hover,&expm1mover,&expm1lover,-1,exph,expm,expl);
 
-  /* Renormalization */    
+  /* Renormalization */
 
   Renormalize3(expm1h,expm1m,expm1l,expm1hover,expm1mover,expm1lover);
 
@@ -262,7 +262,7 @@ double expm1_rn(double x) {
   double middlePoly, doublePoly;
 
 
-  xdb.d = x; 
+  xdb.d = x;
 
   /* Strip off the sign of x for the following tests */
 
@@ -274,7 +274,7 @@ double expm1_rn(double x) {
   }
 
 
-  /* Filter out special cases like overflow, -1 in result, infinities and NaNs 
+  /* Filter out special cases like overflow, -1 in result, infinities and NaNs
      The filters are not sharp, we have positive arguments that flow through
   */
   if (xIntHi >= SIMPLEOVERFLOWBOUND) {
@@ -290,7 +290,7 @@ double expm1_rn(double x) {
 	/* +inf */
 	return x+x;  /* return +inf */
       }
-      
+
       /* If we are here, we are -inf */
       return -1.0;
     }
@@ -302,7 +302,7 @@ double expm1_rn(double x) {
       return LARGEST * LARGEST;  /* return +inf and set flag */
     }
   }
-  
+
   /* Test if we know already that we are -1.0 (+ correction depending on rounding mode) in result */
   if (x < MINUSONEBOUND) {
     return -1.0;
@@ -315,18 +315,18 @@ double expm1_rn(double x) {
 
        expm1(x) = (expm1(x/2) + 2) * expm1(x/2)
 
-       We perform the range reduction in such a way that finally |x| < 1/32 
+       We perform the range reduction in such a way that finally |x| < 1/32
     */
 
     /* Extract the exponent of |x| and add 5 (2^5 = 32) */
     expoX = ((xIntHi & 0x7ff00000) >> 20) - (1023 - 5);
-    
+
     /* If this particularily biased exponent expoX is negative, we are already less than 1/32 */
     if (expoX >= 0) {
       /* If we are here, we must perform range reduction */
 
 
-      /* We multiply x by 2^(-expoX-1) by bit manipulation 
+      /* We multiply x by 2^(-expoX-1) by bit manipulation
 	 x cannot be denormalized so there is no danger
       */
       xdb.i[HI] += (-expoX-1) << 20;
@@ -336,7 +336,7 @@ double expm1_rn(double x) {
       xIntHi = xdb.i[HI] & 0x7fffffff;
       x = xdb.d;
     }
-    
+
     /* Here, we have always |x| < 1/32 */
 
 
@@ -369,7 +369,7 @@ double expm1_rn(double x) {
       doublePoly = middlePoly + highPolyWithSquare;
 
     }
-    
+
     /* Double-double evaluation steps */
     tt1h = x * doublePoly;
 
@@ -377,7 +377,7 @@ double expm1_rn(double x) {
     xSqHalfl = 0.5 * xSql;
     Add12(t2h,templ,x,xSqHalfh);
     t2l = templ + xSqHalfl;
-    
+
     Add12(t1h,t1l,quickDirectpolyC3h,tt1h);
     Mul122(&xCubeh,&xCubel,x,xSqh,xSql);
     Mul22(&tt3h,&tt3l,xCubeh,xCubel,t1h,t1l);
@@ -408,7 +408,7 @@ double expm1_rn(double x) {
 	  Add12(r3h,r3t,2,rr2h);
 	  r3l = r3t + rr2l;
 	  Mul22(&rr3h,&rr3l,r3h,r3l,rr2h,rr2l);
-	  
+	
 	  /* expoX may be maximally 2 */
 
 	  expm1h = rr3h;
@@ -432,15 +432,15 @@ double expm1_rn(double x) {
     /* Rounding test */
     if(expm1h == (expm1h + (expm1m * ROUNDCSTDIRECTRN)))
      return expm1h;
-   else 
+   else
      {
 
-#if DEBUG 
+#if DEBUG
        printf("Launch accurate phase (direct interval)\n");
 #endif
 
        expm1_direct_td(&expm1h, &expm1m, &expm1l, x, xSqHalfh, xSqHalfl, xSqh, xSql, expoX);
-      
+
        ReturnRoundToNearest3(expm1h, expm1m, expm1l);
 
      } /* Accurate phase launched */
@@ -464,7 +464,7 @@ double expm1_rn(double x) {
   /* Range reduction - part affected by error - must be redone in accurate phase */
   Mul12(&s1,&s2,msLog2Div2Lh,kd);
   s3 = kd * msLog2Div2Lm;
-  s4 = s2 + s3; 
+  s4 = s2 + s3;
   s5 = x + s1;
   Add12Cond(rh,rm,s5,s4);
 
@@ -484,31 +484,31 @@ double expm1_rn(double x) {
   rhFour = rhSquare * rhSquare;
 
   monomialFour = quickCommonpolyC4h * rhFour;
-  
+
   highPoly = monomialCube + monomialFour;
 
   highPolyWithSquare = rhSquareHalf + highPoly;
-  
+
   /* Reconstruction: integration of table values */
-  
+
   Mul22(&tablesh,&tablesl,tbl1h,tbl1m,tbl2h,tbl2m);
 
   t8 = rm + highPolyWithSquare;
   t9 = rh + t8;
 
   t10 = tablesh * t9;
-  
+
   Add12(t11,t12,tablesh,t10);
   t13 = t12 + tablesl;
   Add12(polyTblhdb.d,polyTblmdb.d,t11,t13);
-  
+
   /* Reconstruction: multiplication by 2^M */
 
   /* Implement the multiplication by addition to overcome the
      problem of the non-representability of 2^1024 (M = 1024)
      This case is possible if polyTblhdb.d < 1
   */
-  
+
   polyTblhdb.i[HI] += M << 20;
   if(polyTblmdb.d!=0.0) /* predicted true, but it happens for x=-4.1588039009762204, thanks Morten */
 	  polyTblmdb.i[HI] += M << 20;
@@ -516,13 +516,13 @@ double expm1_rn(double x) {
   exph = polyTblhdb.d;
   expm = polyTblmdb.d;
 
-  /* Subtraction of 1 
+  /* Subtraction of 1
 
-     Testing if the operation is necessary is more expensive than 
+     Testing if the operation is necessary is more expensive than
      performing it in any case.
 
-     We may cancellate at most 2 bits in the subtraction for 
-     arguments 1/4 <= x <= ln(2) (0.25 <= x <= 0.69) 
+     We may cancellate at most 2 bits in the subtraction for
+     arguments 1/4 <= x <= ln(2) (0.25 <= x <= 0.69)
      We must therefore use conditional Add12s
 
      Since we perform a subtraction, we may not have addition overflow towards +inf
@@ -539,28 +539,28 @@ double expm1_rn(double x) {
     return expm1h;
   } else {
     /* Rest of argument reduction for accurate phase */
-    
+
     Mul133(&msLog2Div2LMultKh,&msLog2Div2LMultKm,&msLog2Div2LMultKl,kd,msLog2Div2Lh,msLog2Div2Lm,msLog2Div2Ll);
     t1 = x + msLog2Div2LMultKh;
     Add12Cond(rh,t2,t1,msLog2Div2LMultKm);
     Add12Cond(rm,rl,t2,msLog2Div2LMultKl);
-    
+
     /* Table reads for accurate phase */
     tbl1l = twoPowerIndex1[index1].lo;
     tbl2l = twoPowerIndex2[index2].lo;
 
-#if DEBUG 
+#if DEBUG
        printf("Launch accurate phase (common interval)\n");
 #endif
-    
+
     /* Call accurate phase */
-    expm1_common_td(&expm1h, &expm1m, &expm1l, rh, rm, rl, tbl1h, tbl1m, tbl1l, tbl2h, tbl2m, tbl2l, M); 
-    
+    expm1_common_td(&expm1h, &expm1m, &expm1l, rh, rm, rl, tbl1h, tbl1m, tbl1l, tbl2h, tbl2m, tbl2l, M);
+
     /* Final rounding */
 
     ReturnRoundToNearest3(expm1h, expm1m, expm1l);
   } /* Accurate phase launched */
-  
+
   /* We cannot be here since we return before in any case */
 }
 
@@ -580,7 +580,7 @@ double expm1_rd(double x) {
   double msLog2Div2LMultKh, msLog2Div2LMultKm, msLog2Div2LMultKl;
   double middlePoly, doublePoly;
 
-  xdb.d = x; 
+  xdb.d = x;
 
   /* Strip off the sign of x for the following tests */
 
@@ -589,14 +589,14 @@ double expm1_rd(double x) {
   /* Test if we are so small that we can return (a corrected) x as correct rounding */
   if (xIntHi < RETURNXBOUND) {
     /* The only algebraic result is 0 for x = +/- 0; in this case, we can return x = +/- 0
-       The truncation rest x^2/2 + x^3/6 + ... is always positive 
+       The truncation rest x^2/2 + x^3/6 + ... is always positive
        but less than 1 ulp in this case, so we round down by returning x
     */
     return x;
   }
 
 
-  /* Filter out special cases like overflow, -1 in result, infinities and NaNs 
+  /* Filter out special cases like overflow, -1 in result, infinities and NaNs
      The filters are not sharp, we have positive arguments that flow through
   */
   if (xIntHi >= SIMPLEOVERFLOWBOUND) {
@@ -612,7 +612,7 @@ double expm1_rd(double x) {
 	/* +inf */
 	return x+x;  /* return +inf */
       }
-      
+
       /* If we are here, we are -inf */
       return -1.0;
     }
@@ -622,13 +622,13 @@ double expm1_rd(double x) {
     /* Test if we are actually overflowed */
     if (x > OVERFLOWBOUND) {
       /* We would be overflowed but as we are rounding downwards
-	 the nearest number lesser than the exact result is the greatest 
+	 the nearest number lesser than the exact result is the greatest
 	 normal. In any case, we must raise the inexact flag.
       */
       return LARGEST * (1.0 + SMALLEST);
     }
   }
-  
+
   /* Test if we know already that we are -1.0 (+ correction depending on rounding mode) in result */
   if (x < MINUSONEBOUND) {
     /* We round down, so we are -1.0 */
@@ -642,18 +642,18 @@ double expm1_rd(double x) {
 
        expm1(x) = (expm1(x/2) + 2) * expm1(x/2)
 
-       We perform the range reduction in such a way that finally |x| < 1/32 
+       We perform the range reduction in such a way that finally |x| < 1/32
     */
 
     /* Extract the exponent of |x| and add 5 (2^5 = 32) */
     expoX = ((xIntHi & 0x7ff00000) >> 20) - (1023 - 5);
-    
+
     /* If this particularily biased exponent expoX is negative, we are already less than 1/32 */
     if (expoX >= 0) {
       /* If we are here, we must perform range reduction */
 
 
-      /* We multiply x by 2^(-expoX-1) by bit manipulation 
+      /* We multiply x by 2^(-expoX-1) by bit manipulation
 	 x cannot be denormalized so there is no danger
       */
       xdb.i[HI] += (-expoX-1) << 20;
@@ -663,7 +663,7 @@ double expm1_rd(double x) {
       xIntHi = xdb.i[HI] & 0x7fffffff;
       x = xdb.d;
     }
-    
+
     /* Here, we have always |x| < 1/32 */
 
 
@@ -696,7 +696,7 @@ double expm1_rd(double x) {
       doublePoly = middlePoly + highPolyWithSquare;
 
     }
-    
+
     /* Double-double evaluation steps */
     tt1h = x * doublePoly;
 
@@ -704,7 +704,7 @@ double expm1_rd(double x) {
     xSqHalfl = 0.5 * xSql;
     Add12(t2h,templ,x,xSqHalfh);
     t2l = templ + xSqHalfl;
-    
+
     Add12(t1h,t1l,quickDirectpolyC3h,tt1h);
     Mul122(&xCubeh,&xCubel,x,xSqh,xSql);
     Mul22(&tt3h,&tt3l,xCubeh,xCubel,t1h,t1l);
@@ -735,7 +735,7 @@ double expm1_rd(double x) {
 	  Add12(r3h,r3t,2,rr2h);
 	  r3l = r3t + rr2l;
 	  Mul22(&rr3h,&rr3l,r3h,r3l,rr2h,rr2l);
-	  
+	
 	  /* expoX may be maximally 2 */
 
 	  expm1h = rr3h;
@@ -760,9 +760,9 @@ double expm1_rd(double x) {
     TEST_AND_RETURN_RD(expm1h, expm1m, ROUNDCSTDIRECTRD);
     {
       expm1_direct_td(&expm1h, &expm1m, &expm1l, x, xSqHalfh, xSqHalfl, xSqh, xSql, expoX);
-      
+
       ReturnRoundDownwards3(expm1h, expm1m, expm1l);
-      
+
     } /* Accurate phase launched */
 
     /* We cannot be here, since we return in all cases before */
@@ -784,7 +784,7 @@ double expm1_rd(double x) {
   /* Range reduction - part affected by error - must be redone in accurate phase */
   Mul12(&s1,&s2,msLog2Div2Lh,kd);
   s3 = kd * msLog2Div2Lm;
-  s4 = s2 + s3; 
+  s4 = s2 + s3;
   s5 = x + s1;
   Add12Cond(rh,rm,s5,s4);
 
@@ -804,31 +804,31 @@ double expm1_rd(double x) {
   rhFour = rhSquare * rhSquare;
 
   monomialFour = quickCommonpolyC4h * rhFour;
-  
+
   highPoly = monomialCube + monomialFour;
 
   highPolyWithSquare = rhSquareHalf + highPoly;
-  
+
   /* Reconstruction: integration of table values */
-  
+
   Mul22(&tablesh,&tablesl,tbl1h,tbl1m,tbl2h,tbl2m);
 
   t8 = rm + highPolyWithSquare;
   t9 = rh + t8;
 
   t10 = tablesh * t9;
-  
+
   Add12(t11,t12,tablesh,t10);
   t13 = t12 + tablesl;
   Add12(polyTblhdb.d,polyTblmdb.d,t11,t13);
-  
+
   /* Reconstruction: multiplication by 2^M */
 
   /* Implement the multiplication by addition to overcome the
      problem of the non-representability of 2^1024 (M = 1024)
      This case is possible if polyTblhdb.d < 1
   */
-  
+
   polyTblhdb.i[HI] += M << 20;
   if(polyTblmdb.d!=0.0) /* predicted true, but it happens for x=-4.1588039009762204, thanks Morten */
 	  polyTblmdb.i[HI] += M << 20;
@@ -836,13 +836,13 @@ double expm1_rd(double x) {
   exph = polyTblhdb.d;
   expm = polyTblmdb.d;
 
-  /* Subtraction of 1 
+  /* Subtraction of 1
 
-     Testing if the operation is necessary is more expensive than 
+     Testing if the operation is necessary is more expensive than
      performing it in any case.
 
-     We may cancellate at most 2 bits in the subtraction for 
-     arguments 1/4 <= x <= ln(2) (0.25 <= x <= 0.69) 
+     We may cancellate at most 2 bits in the subtraction for
+     arguments 1/4 <= x <= ln(2) (0.25 <= x <= 0.69)
      We must therefore use conditional Add12s
 
      Since we perform a subtraction, we may not have addition overflow towards +inf
@@ -858,24 +858,24 @@ double expm1_rd(double x) {
   TEST_AND_RETURN_RD(expm1h, expm1m, ROUNDCSTCOMMONRD);
   {
     /* Rest of argument reduction for accurate phase */
-    
+
     Mul133(&msLog2Div2LMultKh,&msLog2Div2LMultKm,&msLog2Div2LMultKl,kd,msLog2Div2Lh,msLog2Div2Lm,msLog2Div2Ll);
     t1 = x + msLog2Div2LMultKh;
     Add12Cond(rh,t2,t1,msLog2Div2LMultKm);
     Add12Cond(rm,rl,t2,msLog2Div2LMultKl);
-    
+
     /* Table reads for accurate phase */
     tbl1l = twoPowerIndex1[index1].lo;
     tbl2l = twoPowerIndex2[index2].lo;
-    
+
     /* Call accurate phase */
-    expm1_common_td(&expm1h, &expm1m, &expm1l, rh, rm, rl, tbl1h, tbl1m, tbl1l, tbl2h, tbl2m, tbl2l, M); 
-    
+    expm1_common_td(&expm1h, &expm1m, &expm1l, rh, rm, rl, tbl1h, tbl1m, tbl1l, tbl2h, tbl2m, tbl2l, M);
+
     /* Final rounding */
 
     ReturnRoundDownwards3(expm1h, expm1m, expm1l);
   } /* Accurate phase launched */
-  
+
   /* We cannot be here since we return before in any case */
 }
 
@@ -895,7 +895,7 @@ double expm1_ru(double x) {
   double msLog2Div2LMultKh, msLog2Div2LMultKm, msLog2Div2LMultKl;
   double middlePoly, doublePoly;
 
-  xdb.d = x; 
+  xdb.d = x;
 
   /* Strip off the sign of x for the following tests */
 
@@ -904,19 +904,19 @@ double expm1_ru(double x) {
   /* Test if we are so small that we can return (a corrected) x as correct rounding */
   if (xIntHi < RETURNXBOUND) {
     /* The only algebraic result is 0 for x = +/-0; in this case, we return x = +/-0
-       The truncation rest x^2/2 + x^3/6 + ... is always positive 
-       but less than 1 ulp in this case, so we round by adding 1 ulp 
+       The truncation rest x^2/2 + x^3/6 + ... is always positive
+       but less than 1 ulp in this case, so we round by adding 1 ulp
     */
-    
+
     if (x == 0.0) return x;
 
     if (xdb.i[HI] & 0x80000000) {
-      /* x is negative 
+      /* x is negative
 	 We add 1 ulp by subtracting 1 in long
       */
       xdb.l--;
     } else {
-      /* x is positive 
+      /* x is positive
 	 We add 1 ulp by adding 1 in long
       */
       xdb.l++;
@@ -925,7 +925,7 @@ double expm1_ru(double x) {
   }
 
 
-  /* Filter out special cases like overflow, -1 in result, infinities and NaNs 
+  /* Filter out special cases like overflow, -1 in result, infinities and NaNs
      The filters are not sharp, we have positive arguments that flow through
   */
   if (xIntHi >= SIMPLEOVERFLOWBOUND) {
@@ -941,7 +941,7 @@ double expm1_ru(double x) {
 	/* +inf */
 	return x+x;  /* return +inf */
       }
-      
+
       /* If we are here, we are -inf */
       return -1.0;
     }
@@ -953,7 +953,7 @@ double expm1_ru(double x) {
       return LARGEST * LARGEST;  /* return +inf and set flag */
     }
   }
-  
+
   /* Test if we know already that we are -1.0 (+ correction depending on rounding mode) in result */
   if (x < MINUSONEBOUND) {
     /* Round up so we are -1.0 + 1ulp */
@@ -967,18 +967,18 @@ double expm1_ru(double x) {
 
        expm1(x) = (expm1(x/2) + 2) * expm1(x/2)
 
-       We perform the range reduction in such a way that finally |x| < 1/32 
+       We perform the range reduction in such a way that finally |x| < 1/32
     */
 
     /* Extract the exponent of |x| and add 5 (2^5 = 32) */
     expoX = ((xIntHi & 0x7ff00000) >> 20) - (1023 - 5);
-    
+
     /* If this particularily biased exponent expoX is negative, we are already less than 1/32 */
     if (expoX >= 0) {
       /* If we are here, we must perform range reduction */
 
 
-      /* We multiply x by 2^(-expoX-1) by bit manipulation 
+      /* We multiply x by 2^(-expoX-1) by bit manipulation
 	 x cannot be denormalized so there is no danger
       */
       xdb.i[HI] += (-expoX-1) << 20;
@@ -988,7 +988,7 @@ double expm1_ru(double x) {
       xIntHi = xdb.i[HI] & 0x7fffffff;
       x = xdb.d;
     }
-    
+
     /* Here, we have always |x| < 1/32 */
 
 
@@ -1021,7 +1021,7 @@ double expm1_ru(double x) {
       doublePoly = middlePoly + highPolyWithSquare;
 
     }
-    
+
     /* Double-double evaluation steps */
     tt1h = x * doublePoly;
 
@@ -1029,7 +1029,7 @@ double expm1_ru(double x) {
     xSqHalfl = 0.5 * xSql;
     Add12(t2h,templ,x,xSqHalfh);
     t2l = templ + xSqHalfl;
-    
+
     Add12(t1h,t1l,quickDirectpolyC3h,tt1h);
     Mul122(&xCubeh,&xCubel,x,xSqh,xSql);
     Mul22(&tt3h,&tt3l,xCubeh,xCubel,t1h,t1l);
@@ -1060,7 +1060,7 @@ double expm1_ru(double x) {
 	  Add12(r3h,r3t,2,rr2h);
 	  r3l = r3t + rr2l;
 	  Mul22(&rr3h,&rr3l,r3h,r3l,rr2h,rr2l);
-	  
+	
 	  /* expoX may be maximally 2 */
 
 	  expm1h = rr3h;
@@ -1085,7 +1085,7 @@ double expm1_ru(double x) {
     TEST_AND_RETURN_RU(expm1h, expm1m, ROUNDCSTDIRECTRD);
     {
       expm1_direct_td(&expm1h, &expm1m, &expm1l, x, xSqHalfh, xSqHalfl, xSqh, xSql, expoX);
-      
+
       ReturnRoundUpwards3(expm1h, expm1m, expm1l);
 
     } /* Accurate phase launched */
@@ -1109,7 +1109,7 @@ double expm1_ru(double x) {
   /* Range reduction - part affected by error - must be redone in accurate phase */
   Mul12(&s1,&s2,msLog2Div2Lh,kd);
   s3 = kd * msLog2Div2Lm;
-  s4 = s2 + s3; 
+  s4 = s2 + s3;
   s5 = x + s1;
   Add12Cond(rh,rm,s5,s4);
 
@@ -1129,31 +1129,31 @@ double expm1_ru(double x) {
   rhFour = rhSquare * rhSquare;
 
   monomialFour = quickCommonpolyC4h * rhFour;
-  
+
   highPoly = monomialCube + monomialFour;
 
   highPolyWithSquare = rhSquareHalf + highPoly;
-  
+
   /* Reconstruction: integration of table values */
-  
+
   Mul22(&tablesh,&tablesl,tbl1h,tbl1m,tbl2h,tbl2m);
 
   t8 = rm + highPolyWithSquare;
   t9 = rh + t8;
 
   t10 = tablesh * t9;
-  
+
   Add12(t11,t12,tablesh,t10);
   t13 = t12 + tablesl;
   Add12(polyTblhdb.d,polyTblmdb.d,t11,t13);
-  
+
   /* Reconstruction: multiplication by 2^M */
 
   /* Implement the multiplication by addition to overcome the
      problem of the non-representability of 2^1024 (M = 1024)
      This case is possible if polyTblhdb.d < 1
   */
-  
+
   polyTblhdb.i[HI] += M << 20;
   if(polyTblmdb.d!=0.0) /* predicted true, but it happens for x=-4.1588039009762204, thanks Morten */
 	  polyTblmdb.i[HI] += M << 20;
@@ -1161,13 +1161,13 @@ double expm1_ru(double x) {
   exph = polyTblhdb.d;
   expm = polyTblmdb.d;
 
-  /* Subtraction of 1 
+  /* Subtraction of 1
 
-     Testing if the operation is necessary is more expensive than 
+     Testing if the operation is necessary is more expensive than
      performing it in any case.
 
-     We may cancellate at most 2 bits in the subtraction for 
-     arguments 1/4 <= x <= ln(2) (0.25 <= x <= 0.69) 
+     We may cancellate at most 2 bits in the subtraction for
+     arguments 1/4 <= x <= ln(2) (0.25 <= x <= 0.69)
      We must therefore use conditional Add12s
 
      Since we perform a subtraction, we may not have addition overflow towards +inf
@@ -1183,27 +1183,27 @@ double expm1_ru(double x) {
   TEST_AND_RETURN_RU(expm1h, expm1m, ROUNDCSTCOMMONRD);
   {
     /* Rest of argument reduction for accurate phase */
-    
+
     Mul133(&msLog2Div2LMultKh,&msLog2Div2LMultKm,&msLog2Div2LMultKl,kd,msLog2Div2Lh,msLog2Div2Lm,msLog2Div2Ll);
     t1 = x + msLog2Div2LMultKh;
     Add12Cond(rh,t2,t1,msLog2Div2LMultKm);
     Add12Cond(rm,rl,t2,msLog2Div2LMultKl);
-    
+
     /* Table reads for accurate phase */
     tbl1l = twoPowerIndex1[index1].lo;
     tbl2l = twoPowerIndex2[index2].lo;
-    
+
     /* Call accurate phase */
-    expm1_common_td(&expm1h, &expm1m, &expm1l, rh, rm, rl, tbl1h, tbl1m, tbl1l, tbl2h, tbl2m, tbl2l, M); 
-    
+    expm1_common_td(&expm1h, &expm1m, &expm1l, rh, rm, rl, tbl1h, tbl1m, tbl1l, tbl2h, tbl2m, tbl2l, M);
+
     /* Final rounding */
 
     ReturnRoundUpwards3(expm1h, expm1m, expm1l);
   } /* Accurate phase launched */
-  
+
   /* We cannot be here since we return before in any case */
 }
- 
+
 double expm1_rz(double x) {
   db_number xdb, shiftedXMultdb, polyTblhdb, polyTblmdb;
   int xIntHi, expoX, k, M, index1, index2;
@@ -1220,7 +1220,7 @@ double expm1_rz(double x) {
   double msLog2Div2LMultKh, msLog2Div2LMultKm, msLog2Div2LMultKl;
   double middlePoly, doublePoly;
 
-  xdb.d = x; 
+  xdb.d = x;
 
   /* Strip off the sign of x for the following tests */
 
@@ -1230,9 +1230,9 @@ double expm1_rz(double x) {
   if (xIntHi < RETURNXBOUND) {
     /* The only algebraic result is 0 for x = +/- 0; in this case, we can return x = +/- 0
        expm1 is positive for positive x, negative for negative x
-       The truncation rest x^2/2 + x^3/6 + ... is always positive 
+       The truncation rest x^2/2 + x^3/6 + ... is always positive
        but less than 1 ulp in this case, so we round as follows:
-       
+
        - x is positive => expm1 is positive => round downwards => truncate by returning x
        - x is negative => expm1 is negative => round upwards => add 1 ulp
     */
@@ -1240,13 +1240,13 @@ double expm1_rz(double x) {
     if (x == 0.0) return x;
 
     if (xdb.i[HI] & 0x80000000) {
-      /* x is negative 
+      /* x is negative
 	 We add 1 ulp by subtracting 1 in long
       */
       xdb.l--;
       return xdb.d;
     } else {
-      /* x is positive 
+      /* x is positive
 	 We do nothing (see above)
       */
       return x;
@@ -1254,7 +1254,7 @@ double expm1_rz(double x) {
   }
 
 
-  /* Filter out special cases like overflow, -1 in result, infinities and NaNs 
+  /* Filter out special cases like overflow, -1 in result, infinities and NaNs
      The filters are not sharp, we have positive arguments that flow through
   */
   if (xIntHi >= SIMPLEOVERFLOWBOUND) {
@@ -1270,7 +1270,7 @@ double expm1_rz(double x) {
 	/* +inf */
 	return x+x;  /* return +inf */
       }
-      
+
       /* If we are here, we are -inf */
       return -1.0;
     }
@@ -1280,13 +1280,13 @@ double expm1_rz(double x) {
     /* Test if we are actually overflowed */
     if (x > OVERFLOWBOUND) {
       /* We would be overflowed but as we are rounding towards zero, i.e. downwards,
-	 the nearest number lesser than the exact result is the greatest 
+	 the nearest number lesser than the exact result is the greatest
 	 normal. In any case, we must raise the inexact flag.
       */
       return LARGEST * (1.0 + SMALLEST);
     }
   }
-  
+
   /* Test if we know already that we are -1.0 (+ correction depending on rounding mode) in result */
   if (x < MINUSONEBOUND) {
     /* We round towards zero, i.e. upwards, so we return -1.0+1ulp */
@@ -1301,18 +1301,18 @@ double expm1_rz(double x) {
 
        expm1(x) = (expm1(x/2) + 2) * expm1(x/2)
 
-       We perform the range reduction in such a way that finally |x| < 1/32 
+       We perform the range reduction in such a way that finally |x| < 1/32
     */
 
     /* Extract the exponent of |x| and add 5 (2^5 = 32) */
     expoX = ((xIntHi & 0x7ff00000) >> 20) - (1023 - 5);
-    
+
     /* If this particularily biased exponent expoX is negative, we are already less than 1/32 */
     if (expoX >= 0) {
       /* If we are here, we must perform range reduction */
 
 
-      /* We multiply x by 2^(-expoX-1) by bit manipulation 
+      /* We multiply x by 2^(-expoX-1) by bit manipulation
 	 x cannot be denormalized so there is no danger
       */
       xdb.i[HI] += (-expoX-1) << 20;
@@ -1354,7 +1354,7 @@ double expm1_rz(double x) {
       doublePoly = middlePoly + highPolyWithSquare;
 
     }
-    
+
     /* Double-double evaluation steps */
     tt1h = x * doublePoly;
 
@@ -1362,7 +1362,7 @@ double expm1_rz(double x) {
     xSqHalfl = 0.5 * xSql;
     Add12(t2h,templ,x,xSqHalfh);
     t2l = templ + xSqHalfl;
-    
+
     Add12(t1h,t1l,quickDirectpolyC3h,tt1h);
     Mul122(&xCubeh,&xCubel,x,xSqh,xSql);
     Mul22(&tt3h,&tt3l,xCubeh,xCubel,t1h,t1l);
@@ -1393,7 +1393,7 @@ double expm1_rz(double x) {
 	  Add12(r3h,r3t,2,rr2h);
 	  r3l = r3t + rr2l;
 	  Mul22(&rr3h,&rr3l,r3h,r3l,rr2h,rr2l);
-	  
+	
 	  /* expoX may be maximally 2 */
 
 	  expm1h = rr3h;
@@ -1418,7 +1418,7 @@ double expm1_rz(double x) {
     TEST_AND_RETURN_RZ(expm1h, expm1m, ROUNDCSTDIRECTRD);
     {
       expm1_direct_td(&expm1h, &expm1m, &expm1l, x, xSqHalfh, xSqHalfl, xSqh, xSql, expoX);
-      
+
       ReturnRoundTowardsZero3(expm1h, expm1m, expm1l);
 
     } /* Accurate phase launched */
@@ -1442,7 +1442,7 @@ double expm1_rz(double x) {
   /* Range reduction - part affected by error - must be redone in accurate phase */
   Mul12(&s1,&s2,msLog2Div2Lh,kd);
   s3 = kd * msLog2Div2Lm;
-  s4 = s2 + s3; 
+  s4 = s2 + s3;
   s5 = x + s1;
   Add12Cond(rh,rm,s5,s4);
 
@@ -1462,45 +1462,45 @@ double expm1_rz(double x) {
   rhFour = rhSquare * rhSquare;
 
   monomialFour = quickCommonpolyC4h * rhFour;
-  
+
   highPoly = monomialCube + monomialFour;
 
   highPolyWithSquare = rhSquareHalf + highPoly;
-  
+
   /* Reconstruction: integration of table values */
-  
+
   Mul22(&tablesh,&tablesl,tbl1h,tbl1m,tbl2h,tbl2m);
 
   t8 = rm + highPolyWithSquare;
   t9 = rh + t8;
 
   t10 = tablesh * t9;
-  
+
   Add12(t11,t12,tablesh,t10);
   t13 = t12 + tablesl;
   Add12(polyTblhdb.d,polyTblmdb.d,t11,t13);
-  
+
   /* Reconstruction: multiplication by 2^M */
 
   /* Implement the multiplication by addition to overcome the
      problem of the non-representability of 2^1024 (M = 1024)
      This case is possible if polyTblhdb.d < 1
   */
-  
-  polyTblhdb.i[HI] += M << 20; 
+
+  polyTblhdb.i[HI] += M << 20;
   if(polyTblmdb.d!=0.0) /* predicted true, but it happens for x=-4.1588039009762204, thanks Morten */
 	  polyTblmdb.i[HI] += M << 20;
 
   exph = polyTblhdb.d;
   expm = polyTblmdb.d;
 
-  /* Subtraction of 1 
+  /* Subtraction of 1
 
-     Testing if the operation is necessary is more expensive than 
+     Testing if the operation is necessary is more expensive than
      performing it in any case.
 
-     We may cancellate at most 2 bits in the subtraction for 
-     arguments 1/4 <= x <= ln(2) (0.25 <= x <= 0.69) 
+     We may cancellate at most 2 bits in the subtraction for
+     arguments 1/4 <= x <= ln(2) (0.25 <= x <= 0.69)
      We must therefore use conditional Add12s
 
      Since we perform a subtraction, we may not have addition overflow towards +inf
@@ -1517,24 +1517,24 @@ double expm1_rz(double x) {
   {
 
     /* Rest of argument reduction for accurate phase */
-    
+
     Mul133(&msLog2Div2LMultKh,&msLog2Div2LMultKm,&msLog2Div2LMultKl,kd,msLog2Div2Lh,msLog2Div2Lm,msLog2Div2Ll);
     t1 = x + msLog2Div2LMultKh;
     Add12Cond(rh,t2,t1,msLog2Div2LMultKm);
     Add12Cond(rm,rl,t2,msLog2Div2LMultKl);
-    
+
     /* Table reads for accurate phase */
     tbl1l = twoPowerIndex1[index1].lo;
     tbl2l = twoPowerIndex2[index2].lo;
-    
+
     /* Call accurate phase */
-    expm1_common_td(&expm1h, &expm1m, &expm1l, rh, rm, rl, tbl1h, tbl1m, tbl1l, tbl2h, tbl2m, tbl2l, M); 
-    
+    expm1_common_td(&expm1h, &expm1m, &expm1l, rh, rm, rl, tbl1h, tbl1m, tbl1l, tbl2h, tbl2m, tbl2l, M);
+
     /* Final rounding */
 
     ReturnRoundTowardsZero3(expm1h, expm1m, expm1l);
   } /* Accurate phase launched */
-  
+
   /* We cannot be here since we return before in any case */
 }
 
@@ -1581,8 +1581,8 @@ interval j_expm1(interval x)
   x_inf=LOW(x);
   x_sup=UP(x);
 
-  xdb_inf.d = x_inf; 
-  xdb_sup.d = x_sup; 
+  xdb_inf.d = x_inf;
+  xdb_sup.d = x_sup;
 
 
   /* Strip off the sign of x for the following tests */
@@ -1618,19 +1618,19 @@ interval j_expm1(interval x)
 
        expm1(x) = (expm1(x/2) + 2) * expm1(x/2)
 
-       We perform the range reduction in such a way that finally |x| < 1/32 
+       We perform the range reduction in such a way that finally |x| < 1/32
     */
 
     /* Extract the exponent of |x| and add 5 (2^5 = 32) */
     expoX_inf = ((xIntHi_inf & 0x7ff00000) >> 20) - (1023 - 5);
     expoX_sup = ((xIntHi_sup & 0x7ff00000) >> 20) - (1023 - 5);
-    
+
     /* If this particularily biased exponent expoX is negative, we are already less than 1/32 */
     if (expoX_inf >= 0) {
       /* If we are here, we must perform range reduction */
 
 
-      /* We multiply x by 2^(-expoX-1) by bit manipulation 
+      /* We multiply x by 2^(-expoX-1) by bit manipulation
 	 x cannot be denormalized so there is no danger
       */
       xdb_inf.i[HI] += (-expoX_inf-1) << 20;
@@ -1645,7 +1645,7 @@ interval j_expm1(interval x)
       /* If we are here, we must perform range reduction */
 
 
-      /* We multiply x by 2^(-expoX-1) by bit manipulation 
+      /* We multiply x by 2^(-expoX-1) by bit manipulation
 	 x cannot be denormalized so there is no danger
       */
       xdb_sup.i[HI] += (-expoX_sup-1) << 20;
@@ -1707,7 +1707,7 @@ interval j_expm1(interval x)
       doublePoly_sup = middlePoly_sup + highPolyWithSquare_sup;
 
     }
-    
+
     /* Double-double evaluation steps */
     tt1h_inf = x_inf * doublePoly_inf;
     tt1h_sup = x_sup * doublePoly_sup;
@@ -1720,7 +1720,7 @@ interval j_expm1(interval x)
     Add12(t2h_sup,templ_sup,x_sup,xSqHalfh_sup);
     t2l_inf = templ_inf + xSqHalfl_inf;
     t2l_sup = templ_sup + xSqHalfl_sup;
-    
+
     Add12(t1h_inf,t1l_inf,quickDirectpolyC3h,tt1h_inf);
     Add12(t1h_sup,t1l_sup,quickDirectpolyC3h,tt1h_sup);
     Mul122(&xCubeh_inf,&xCubel_inf,x_inf,xSqh_inf,xSql_inf);
@@ -1755,7 +1755,7 @@ interval j_expm1(interval x)
 	  Add12(r3h_inf,r3t_inf,2,rr2h_inf);
 	  r3l_inf = r3t_inf + rr2l_inf;
 	  Mul22(&rr3h_inf,&rr3l_inf,r3h_inf,r3l_inf,rr2h_inf,rr2l_inf);
-	  
+	
 	  /* expoX may be maximally 2 */
 
 	  expm1h_inf = rr3h_inf;
@@ -1796,7 +1796,7 @@ interval j_expm1(interval x)
 	  Add12(r3h_sup,r3t_sup,2,rr2h_sup);
 	  r3l_sup = r3t_sup + rr2l_sup;
 	  Mul22(&rr3h_sup,&rr3l_sup,r3h_sup,r3l_sup,rr2h_sup,rr2l_sup);
-	  
+	
 	  /* expoX may be maximally 2 */
 
 	  expm1h_sup = rr3h_sup;
@@ -1823,14 +1823,14 @@ interval j_expm1(interval x)
     if((roundable==2) || (roundable==0))
     {
       expm1_direct_td(&expm1h_inf, &expm1m_inf, &expm1l_inf, x_inf, xSqHalfh_inf, xSqHalfl_inf, xSqh_inf, xSql_inf, expoX_inf);
-      
+
       RoundDownwards3(&restemp_inf,expm1h_inf, expm1m_inf, expm1l_inf);
-      
+
     } /* Accurate phase launched */
     if((roundable==1) || (roundable==0))
     {
       expm1_direct_td(&expm1h_sup, &expm1m_sup, &expm1l_sup, x_sup, xSqHalfh_sup, xSqHalfl_sup, xSqh_sup, xSql_sup, expoX_sup);
-      
+
       RoundUpwards3(&restemp_sup,expm1h_sup, expm1m_sup, expm1l_sup);
 
     } /* Accurate phase launched */
@@ -1847,18 +1847,18 @@ interval j_expm1(interval x)
 
        expm1(x) = (expm1(x/2) + 2) * expm1(x/2)
 
-       We perform the range reduction in such a way that finally |x| < 1/32 
+       We perform the range reduction in such a way that finally |x| < 1/32
     */
 
     /* Extract the exponent of |x| and add 5 (2^5 = 32) */
     expoX_inf = ((xIntHi_inf & 0x7ff00000) >> 20) - (1023 - 5);
-    
+
     /* If this particularily biased exponent expoX is negative, we are already less than 1/32 */
     if (expoX_inf >= 0) {
       /* If we are here, we must perform range reduction */
 
 
-      /* We multiply x by 2^(-expoX-1) by bit manipulation 
+      /* We multiply x by 2^(-expoX-1) by bit manipulation
 	 x cannot be denormalized so there is no danger
       */
       xdb_inf.i[HI] += (-expoX_inf-1) << 20;
@@ -1868,7 +1868,7 @@ interval j_expm1(interval x)
       xIntHi_inf = xdb_inf.i[HI] & 0x7fffffff;
       x_inf = xdb_inf.d;
     }
-    
+
     /* Here, we have always |x| < 1/32 */
 
 
@@ -1901,7 +1901,7 @@ interval j_expm1(interval x)
       doublePoly_inf = middlePoly_inf + highPolyWithSquare_inf;
 
     }
-    
+
     /* Double-double evaluation steps */
     tt1h_inf = x_inf * doublePoly_inf;
 
@@ -1909,7 +1909,7 @@ interval j_expm1(interval x)
     xSqHalfl_inf = 0.5 * xSql_inf;
     Add12(t2h_inf,templ_inf,x_inf,xSqHalfh_inf);
     t2l_inf = templ_inf + xSqHalfl_inf;
-    
+
     Add12(t1h_inf,t1l_inf,quickDirectpolyC3h,tt1h_inf);
     Mul122(&xCubeh_inf,&xCubel_inf,x_inf,xSqh_inf,xSql_inf);
     Mul22(&tt3h_inf,&tt3l_inf,xCubeh_inf,xCubel_inf,t1h_inf,t1l_inf);
@@ -1940,7 +1940,7 @@ interval j_expm1(interval x)
 	  Add12(r3h_inf,r3t_inf,2,rr2h_inf);
 	  r3l_inf = r3t_inf + rr2l_inf;
 	  Mul22(&rr3h_inf,&rr3l_inf,r3h_inf,r3l_inf,rr2h_inf,rr2l_inf);
-	  
+	
 	  /* expoX may be maximally 2 */
 
 	  expm1h_inf = rr3h_inf;
@@ -1967,9 +1967,9 @@ interval j_expm1(interval x)
     if(roundable==0)
     {
       expm1_direct_td(&expm1h_inf, &expm1m_inf, &expm1l_inf, x_inf, xSqHalfh_inf, xSqHalfl_inf, xSqh_inf, xSql_inf, expoX_inf);
-      
+
       RoundDownwards3(&restemp_inf,expm1h_inf, expm1m_inf, expm1l_inf);
-      
+
     } /* Accurate phase launched */
 
   }
@@ -1981,18 +1981,18 @@ interval j_expm1(interval x)
 
        expm1(x) = (expm1(x/2) + 2) * expm1(x/2)
 
-       We perform the range reduction in such a way that finally |x| < 1/32 
+       We perform the range reduction in such a way that finally |x| < 1/32
     */
 
     /* Extract the exponent of |x| and add 5 (2^5 = 32) */
     expoX_sup = ((xIntHi_sup & 0x7ff00000) >> 20) - (1023 - 5);
-    
+
     /* If this particularily biased exponent expoX is negative, we are already less than 1/32 */
     if (expoX_sup >= 0) {
       /* If we are here, we must perform range reduction */
 
 
-      /* We multiply x by 2^(-expoX-1) by bit manipulation 
+      /* We multiply x by 2^(-expoX-1) by bit manipulation
 	 x cannot be denormalized so there is no danger
       */
       xdb_sup.i[HI] += (-expoX_sup-1) << 20;
@@ -2002,7 +2002,7 @@ interval j_expm1(interval x)
       xIntHi_sup = xdb_sup.i[HI] & 0x7fffffff;
       x_sup = xdb_sup.d;
     }
-    
+
     /* Here, we have always |x| < 1/32 */
 
 
@@ -2035,7 +2035,7 @@ interval j_expm1(interval x)
       doublePoly_sup = middlePoly_sup + highPolyWithSquare_sup;
 
     }
-    
+
     /* Double-double evaluation steps */
     tt1h_sup = x_sup * doublePoly_sup;
 
@@ -2043,7 +2043,7 @@ interval j_expm1(interval x)
     xSqHalfl_sup = 0.5 * xSql_sup;
     Add12(t2h_sup,templ_sup,x_sup,xSqHalfh_sup);
     t2l_sup = templ_sup + xSqHalfl_sup;
-    
+
     Add12(t1h_sup,t1l_sup,quickDirectpolyC3h,tt1h_sup);
     Mul122(&xCubeh_sup,&xCubel_sup,x_sup,xSqh_sup,xSql_sup);
     Mul22(&tt3h_sup,&tt3l_sup,xCubeh_sup,xCubel_sup,t1h_sup,t1l_sup);
@@ -2074,7 +2074,7 @@ interval j_expm1(interval x)
 	  Add12(r3h_sup,r3t_sup,2,rr2h_sup);
 	  r3l_sup = r3t_sup + rr2l_sup;
 	  Mul22(&rr3h_sup,&rr3l_sup,r3h_sup,r3l_sup,rr2h_sup,rr2l_sup);
-	  
+	
 	  /* expoX may be maximally 2 */
 
 	  expm1h_sup = rr3h_sup;
@@ -2101,7 +2101,7 @@ interval j_expm1(interval x)
     if(roundable==0)
     {
       expm1_direct_td(&expm1h_sup, &expm1m_sup, &expm1l_sup, x_sup, xSqHalfh_sup, xSqHalfl_sup, xSqh_sup, xSql_sup, expoX_sup);
-      
+
       RoundUpwards3(&restemp_sup,expm1h_sup, expm1m_sup, expm1l_sup);
 
     } /* Accurate phase launched */
@@ -2136,8 +2136,8 @@ interval j_expm1(interval x)
     Mul12(&s1_sup,&s2_sup,msLog2Div2Lh,kd_sup);
     s3_inf = kd_inf * msLog2Div2Lm;
     s3_sup = kd_sup * msLog2Div2Lm;
-    s4_inf = s2_inf + s3_inf; 
-    s4_sup = s2_sup + s3_sup; 
+    s4_inf = s2_inf + s3_inf;
+    s4_sup = s2_sup + s3_sup;
     s5_inf = x_inf + s1_inf;
     s5_sup = x_sup + s1_sup;
     Add12Cond(rh_inf,rm_inf,s5_inf,s4_inf);
@@ -2177,7 +2177,7 @@ interval j_expm1(interval x)
     highPolyWithSquare_sup = rhSquareHalf_sup + highPoly_sup;
 
     /* Reconstruction: integration of table values */
-  
+
     Mul22(&tablesh_inf,&tablesl_inf,tbl1h_inf,tbl1m_inf,tbl2h_inf,tbl2m_inf);
     Mul22(&tablesh_sup,&tablesl_sup,tbl1h_sup,tbl1m_sup,tbl2h_sup,tbl2m_sup);
 
@@ -2202,7 +2202,7 @@ interval j_expm1(interval x)
        problem of the non-representability of 2^1024 (M = 1024)
        This case is possible if polyTblhdb.d < 1
     */
-  
+
     polyTblhdb_inf.i[HI] += M_inf << 20;
     polyTblhdb_sup.i[HI] += M_sup << 20;
 	 if(polyTblmdb_inf.d!=0.0) /* predicted true, but it happens for x=-4.1588039009762204, thanks Morten */
@@ -2215,13 +2215,13 @@ interval j_expm1(interval x)
     expm_inf = polyTblmdb_inf.d;
     expm_sup = polyTblmdb_sup.d;
 
-    /* Subtraction of 1 
+    /* Subtraction of 1
 
-       Testing if the operation is necessary is more expensive than 
+       Testing if the operation is necessary is more expensive than
        performing it in any case.
 
-       We may cancellate at most 2 bits in the subtraction for 
-       arguments 1/4 <= x <= ln(2) (0.25 <= x <= 0.69) 
+       We may cancellate at most 2 bits in the subtraction for
+       arguments 1/4 <= x <= ln(2) (0.25 <= x <= 0.69)
        We must therefore use conditional Add12s
 
        Since we perform a subtraction, we may not have addition overflow towards +inf
@@ -2241,19 +2241,19 @@ interval j_expm1(interval x)
     if((roundable==2) || (roundable==0))
     {
       /* Rest of argument reduction for accurate phase */
-    
+
       Mul133(&msLog2Div2LMultKh_inf,&msLog2Div2LMultKm_inf,&msLog2Div2LMultKl_inf,kd_inf,msLog2Div2Lh,msLog2Div2Lm,msLog2Div2Ll);
       t1_inf = x_inf + msLog2Div2LMultKh_inf;
       Add12Cond(rh_inf,t2_inf,t1_inf,msLog2Div2LMultKm_inf);
       Add12Cond(rm_inf,rl_inf,t2_inf,msLog2Div2LMultKl_inf);
-    
+
       /* Table reads for accurate phase */
       tbl1l_inf = twoPowerIndex1[index1_inf].lo;
       tbl2l_inf = twoPowerIndex2[index2_inf].lo;
-    
+
       /* Call accurate phase */
-      expm1_common_td(&expm1h_inf, &expm1m_inf, &expm1l_inf, rh_inf, rm_inf, rl_inf, tbl1h_inf, tbl1m_inf, tbl1l_inf, tbl2h_inf, tbl2m_inf, tbl2l_inf, M_inf); 
-    
+      expm1_common_td(&expm1h_inf, &expm1m_inf, &expm1l_inf, rh_inf, rm_inf, rl_inf, tbl1h_inf, tbl1m_inf, tbl1l_inf, tbl2h_inf, tbl2m_inf, tbl2l_inf, M_inf);
+
       /* Final rounding */
 
       RoundDownwards3(&res_inf,expm1h_inf, expm1m_inf, expm1l_inf);
@@ -2265,14 +2265,14 @@ interval j_expm1(interval x)
       t1_sup = x_sup + msLog2Div2LMultKh_sup;
       Add12Cond(rh_sup,t2_sup,t1_sup,msLog2Div2LMultKm_sup);
       Add12Cond(rm_sup,rl_sup,t2_sup,msLog2Div2LMultKl_sup);
-    
+
       /* Table reads for accurate phase */
       tbl1l_sup = twoPowerIndex1[index1_sup].lo;
       tbl2l_sup = twoPowerIndex2[index2_sup].lo;
-    
+
       /* Call accurate phase */
-      expm1_common_td(&expm1h_sup, &expm1m_sup, &expm1l_sup, rh_sup, rm_sup, rl_sup, tbl1h_sup, tbl1m_sup, tbl1l_sup, tbl2h_sup, tbl2m_sup, tbl2l_sup, M_sup); 
-    
+      expm1_common_td(&expm1h_sup, &expm1m_sup, &expm1l_sup, rh_sup, rm_sup, rl_sup, tbl1h_sup, tbl1m_sup, tbl1l_sup, tbl2h_sup, tbl2m_sup, tbl2l_sup, M_sup);
+
       /* Final rounding */
 
       RoundUpwards3(&res_sup,expm1h_sup, expm1m_sup, expm1l_sup);
@@ -2301,7 +2301,7 @@ interval j_expm1(interval x)
     /* Range reduction - part affected by error - must be redone in accurate phase */
     Mul12(&s1_inf,&s2_inf,msLog2Div2Lh,kd_inf);
     s3_inf = kd_inf * msLog2Div2Lm;
-    s4_inf = s2_inf + s3_inf; 
+    s4_inf = s2_inf + s3_inf;
     s5_inf = x_inf + s1_inf;
     Add12Cond(rh_inf,rm_inf,s5_inf,s4_inf);
 
@@ -2327,7 +2327,7 @@ interval j_expm1(interval x)
     highPolyWithSquare_inf = rhSquareHalf_inf + highPoly_inf;
 
     /* Reconstruction: integration of table values */
-  
+
     Mul22(&tablesh_inf,&tablesl_inf,tbl1h_inf,tbl1m_inf,tbl2h_inf,tbl2m_inf);
 
     t8_inf = rm_inf + highPolyWithSquare_inf;
@@ -2345,7 +2345,7 @@ interval j_expm1(interval x)
        problem of the non-representability of 2^1024 (M = 1024)
        This case is possible if polyTblhdb.d < 1
     */
-  
+
     polyTblhdb_inf.i[HI] += M_inf << 20;
 	 if(polyTblmdb_inf.d!=0.0) /* predicted true, but it happens for x=-4.1588039009762204, thanks Morten */
 		 polyTblmdb_inf.i[HI] += M_inf << 20;
@@ -2353,13 +2353,13 @@ interval j_expm1(interval x)
     exph_inf = polyTblhdb_inf.d;
     expm_inf = polyTblmdb_inf.d;
 
-    /* Subtraction of 1 
+    /* Subtraction of 1
 
-       Testing if the operation is necessary is more expensive than 
+       Testing if the operation is necessary is more expensive than
        performing it in any case.
 
-       We may cancellate at most 2 bits in the subtraction for 
-       arguments 1/4 <= x <= ln(2) (0.25 <= x <= 0.69) 
+       We may cancellate at most 2 bits in the subtraction for
+       arguments 1/4 <= x <= ln(2) (0.25 <= x <= 0.69)
        We must therefore use conditional Add12s
 
        Since we perform a subtraction, we may not have addition overflow towards +inf
@@ -2376,19 +2376,19 @@ interval j_expm1(interval x)
     if(roundable==0)
     {
       /* Rest of argument reduction for accurate phase */
-    
+
       Mul133(&msLog2Div2LMultKh_inf,&msLog2Div2LMultKm_inf,&msLog2Div2LMultKl_inf,kd_inf,msLog2Div2Lh,msLog2Div2Lm,msLog2Div2Ll);
       t1_inf = x_inf + msLog2Div2LMultKh_inf;
       Add12Cond(rh_inf,t2_inf,t1_inf,msLog2Div2LMultKm_inf);
       Add12Cond(rm_inf,rl_inf,t2_inf,msLog2Div2LMultKl_inf);
-    
+
       /* Table reads for accurate phase */
       tbl1l_inf = twoPowerIndex1[index1_inf].lo;
       tbl2l_inf = twoPowerIndex2[index2_inf].lo;
-    
+
       /* Call accurate phase */
-      expm1_common_td(&expm1h_inf, &expm1m_inf, &expm1l_inf, rh_inf, rm_inf, rl_inf, tbl1h_inf, tbl1m_inf, tbl1l_inf, tbl2h_inf, tbl2m_inf, tbl2l_inf, M_inf); 
-    
+      expm1_common_td(&expm1h_inf, &expm1m_inf, &expm1l_inf, rh_inf, rm_inf, rl_inf, tbl1h_inf, tbl1m_inf, tbl1l_inf, tbl2h_inf, tbl2m_inf, tbl2l_inf, M_inf);
+
       /* Final rounding */
 
       RoundDownwards3(&res_inf,expm1h_inf, expm1m_inf, expm1l_inf);
@@ -2414,7 +2414,7 @@ interval j_expm1(interval x)
     /* Range reduction - part affected by error - must be redone in accurate phase */
     Mul12(&s1_sup,&s2_sup,msLog2Div2Lh,kd_sup);
     s3_sup = kd_sup * msLog2Div2Lm;
-    s4_sup = s2_sup + s3_sup; 
+    s4_sup = s2_sup + s3_sup;
     s5_sup = x_sup + s1_sup;
     Add12Cond(rh_sup,rm_sup,s5_sup,s4_sup);
 
@@ -2440,7 +2440,7 @@ interval j_expm1(interval x)
     highPolyWithSquare_sup = rhSquareHalf_sup + highPoly_sup;
 
     /* Reconstruction: integration of table values */
-  
+
     Mul22(&tablesh_sup,&tablesl_sup,tbl1h_sup,tbl1m_sup,tbl2h_sup,tbl2m_sup);
 
     t8_sup = rm_sup + highPolyWithSquare_sup;
@@ -2458,7 +2458,7 @@ interval j_expm1(interval x)
        problem of the non-representability of 2^1024 (M = 1024)
        This case is possible if polyTblhdb.d < 1
     */
-  
+
     polyTblhdb_sup.i[HI] += M_sup << 20;
 	 if(polyTblmdb_sup.d!=0.0) /* predicted true, but it happens for x=-4.1588039009762204, thanks Morten */
 		 polyTblmdb_sup.i[HI] += M_sup << 20;
@@ -2466,13 +2466,13 @@ interval j_expm1(interval x)
     exph_sup = polyTblhdb_sup.d;
     expm_sup = polyTblmdb_sup.d;
 
-    /* Subtraction of 1 
+    /* Subtraction of 1
 
-       Testing if the operation is necessary is more expensive than 
+       Testing if the operation is necessary is more expensive than
        performing it in any case.
 
-       We may cancellate at most 2 bits in the subtraction for 
-       arguments 1/4 <= x <= ln(2) (0.25 <= x <= 0.69) 
+       We may cancellate at most 2 bits in the subtraction for
+       arguments 1/4 <= x <= ln(2) (0.25 <= x <= 0.69)
        We must therefore use conditional Add12s
 
        Since we perform a subtraction, we may not have addition overflow towards +inf
@@ -2492,14 +2492,14 @@ interval j_expm1(interval x)
       t1_sup = x_sup + msLog2Div2LMultKh_sup;
       Add12Cond(rh_sup,t2_sup,t1_sup,msLog2Div2LMultKm_sup);
       Add12Cond(rm_sup,rl_sup,t2_sup,msLog2Div2LMultKl_sup);
-    
+
       /* Table reads for accurate phase */
       tbl1l_sup = twoPowerIndex1[index1_sup].lo;
       tbl2l_sup = twoPowerIndex2[index2_sup].lo;
-    
+
       /* Call accurate phase */
-      expm1_common_td(&expm1h_sup, &expm1m_sup, &expm1l_sup, rh_sup, rm_sup, rl_sup, tbl1h_sup, tbl1m_sup, tbl1l_sup, tbl2h_sup, tbl2m_sup, tbl2l_sup, M_sup); 
-    
+      expm1_common_td(&expm1h_sup, &expm1m_sup, &expm1l_sup, rh_sup, rm_sup, rl_sup, tbl1h_sup, tbl1m_sup, tbl1l_sup, tbl2h_sup, tbl2m_sup, tbl2l_sup, M_sup);
+
       /* Final rounding */
 
       RoundUpwards3(&res_sup,expm1h_sup, expm1m_sup, expm1l_sup);

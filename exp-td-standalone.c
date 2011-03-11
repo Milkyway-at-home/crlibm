@@ -6,8 +6,8 @@
 #define AVOID_FMA 0
 
 
-extern void exp_td_accurate(double *polyTblh, double *polyTblm, double *polyTbll, 
-			    double rh, double rm, double rl, 
+extern void exp_td_accurate(double *polyTblh, double *polyTblm, double *polyTbll,
+			    double rh, double rm, double rl,
 			    double tbl1h, double tbl1m, double tbl1l,
 			    double tbl2h, double tbl2m, double tbl2l);
 
@@ -18,19 +18,19 @@ extern void exp_td_accurate(double *polyTblh, double *polyTblm, double *polyTbll
 
    2^exponent * (exph + expm + expl) \approx exp(x)
 
-   Unless the subnormal case for x, no special cases are 
+   Unless the subnormal case for x, no special cases are
    handled.
 
    The triple-double exph + expm + expl is non-overlapping.
    The domain for exph + expm + expl is 1/2..2
-   The integer exponent is in the range -1024..1024. The 
+   The integer exponent is in the range -1024..1024. The
    value 2^(exponent) may therefore be non-representable
    whereas 2^exponent * (exph + expm + expl) is.
 
 */
 
 
-void exp13(int *exponent, double *exph, double *expm, double *expl, double x) { 
+void exp13(int *exponent, double *exph, double *expm, double *expl, double x) {
   double rh, rm, rl, tbl1h, tbl1m, tbl1l;
   double tbl2h, tbl2m, tbl2l;
   double xMultLog2InvMult2L, shiftedXMult, kd;
@@ -38,7 +38,7 @@ void exp13(int *exponent, double *exph, double *expm, double *expl, double x) {
   double t1, t2;
   db_number shiftedXMultdb, xdb;
   int k, M, index1, index2, xIntHi;
-   
+
   /* Argument reduction and filtering for special cases */
 
   /* Compute k as a double and as an int */
@@ -47,7 +47,7 @@ void exp13(int *exponent, double *exph, double *expm, double *expl, double x) {
   shiftedXMult = xMultLog2InvMult2L + shiftConst;
   kd = shiftedXMult - shiftConst;
   shiftedXMultdb.d = shiftedXMult;
-  
+
   /* Special cases tests */
   xIntHi = xdb.i[HI];
   /* Test if argument is a denormal or zero */
@@ -58,7 +58,7 @@ void exp13(int *exponent, double *exph, double *expm, double *expl, double x) {
     *expl = 0.0;
     return;
   }
- 
+
   k = shiftedXMultdb.i[LO];
   M = k >> L;
   index1 = k & INDEXMASK1;
@@ -80,7 +80,7 @@ void exp13(int *exponent, double *exph, double *expm, double *expl, double x) {
   Add12Cond(rm,rl,t2,msLog2Div2LMultKl);
 
   /* Polynomial approximation and reconstruction: factorized code */
-  
+
   exp_td_accurate(exph, expm, expl, rh, rm, rl, tbl1h, tbl1m, tbl1l, tbl2h, tbl2m, tbl2l);
 
   *exponent = M;

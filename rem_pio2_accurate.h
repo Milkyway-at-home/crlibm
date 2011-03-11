@@ -1,9 +1,9 @@
 /*
  * 2oPi[] store in hexadecimal 48 digits, each keeping 30 bits of
- * 2/pi. 
+ * 2/pi.
  * We then store 1440 bits of 2/pi. which is for sure a bit too much ...
  */
- 
+
 #include "crlibm.h"
 #include "crlibm_private.h"
 
@@ -26,7 +26,7 @@ static const int two_over_pi[]=
 
 
 /*
- * This scs number store 211 bits of pi/2 
+ * This scs number store 211 bits of pi/2
  */
 static const scs Pio2=
   {{0x00000001, 0x2487ed51, 0x042d1846, 0x26263314,
@@ -40,11 +40,11 @@ static const scs Pio2=
 #if 0
 
 /*
- * This scs number store 211 bits of pi/4 
+ * This scs number store 211 bits of pi/4
  */
 static const scs Pio4=
-/* ~7.853982e-01 */ 
-{{0x3243f6a8, 0x22168c23, 0x1313198a, 0x0b80dc1c, 
+/* ~7.853982e-01 */
+{{0x3243f6a8, 0x22168c23, 0x1313198a, 0x0b80dc1c,
 0x344a4093, 0x2088a67c, 0x31d0082e, 0x3ea63b13},
 DB_ONE,  -1,   1 };
 

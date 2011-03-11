@@ -1,6 +1,6 @@
 /*
  *  triple_double.h
- *  
+ *
  * This file contains useful tools and data for triple double data representation.
  *
  */
@@ -13,8 +13,8 @@
 
  /* undef all the variables that might have been defined in
     scs_lib/scs_private.h */
-#undef VERSION 
-#undef PACKAGE 
+#undef VERSION
+#undef PACKAGE
 #undef HAVE_GMP_H
 #undef HAVE_MPFR_H
 #undef HAVE_MATHLIB_H
@@ -30,7 +30,7 @@
 #define TRIPLEDOUBLE_AS_FUNCTIONS 0
 
 
-#define  Renormalize3(resh, resm, resl, ah, am, al)     DoRenormalize3(resh, resm, resl, ah, am, al)  
+#define  Renormalize3(resh, resm, resl, ah, am, al)     DoRenormalize3(resh, resm, resl, ah, am, al)
 /*extern void Renormalize3(double* resh, double* resm, double* resl, double ah, double am, double al) ;*/
 
 #if TRIPLEDOUBLE_AS_FUNCTIONS
@@ -46,7 +46,7 @@ extern void Recpr33(double* resh, double* resm, double* resl, double dh, double 
 #define  Mul233(resh, resm, resl, ah, al, bh, bm, bl)      DoMul233(resh, resm, resl, ah, al, bh, bm, bl)
 #define  Mul33(resh, resm, resl, ah, am, al, bh, bm, bl)   DoMul33(resh, resm, resl, ah, am, al, bh, bm, bl)
 #define  Mul133(resh, resm, resl, a, bh, bm, bl)           DoMul133(resh, resm, resl, a, bh, bm, bl)
-#define  Mul123(resh, resm, resl, a, bh, bl)               DoMul123(resh, resm, resl, a, bh, bl)    
+#define  Mul123(resh, resm, resl, a, bh, bl)               DoMul123(resh, resm, resl, a, bh, bl)
 #define  Sqrt13(resh, resm, resl , x)                      DoSqrt13(resh, resm, resl , x)
 #define  Recpr33(resh, resm, resl, dh, dm, dl)             DoRecpr33(resh, resm, resl, dh, dm, dl)
 #endif
@@ -61,7 +61,7 @@ extern void Recpr33(double* resh, double* resm, double* resl, double dh, double 
 
 
    Arguments:       a triple double number ah, am, al
-   
+
    Results:         a triple double number resh, resm, resl
 
    Preconditions:   abs(ah) > abs(am) > abs(al)
@@ -95,16 +95,16 @@ extern void Recpr33(double* resh, double* resm, double* resl, double dh, double 
    Arguments:       two double double numbers:
                     ah, al and
 		    bh, bl
-   
+
    Results:         a triple double number resh, resm, resl
 
-   Preconditions:   abs(ah) > abs(al) 
+   Preconditions:   abs(ah) > abs(al)
                     ah and al do not overlap
 		    ah = round-to-nearest(ah + al)
-		    abs(bh) > abs(bl) 
+		    abs(bh) > abs(bl)
                     bh and bl do not overlap
 		    bh = round-to-nearest(bh + bl)
-		    
+
    Guarantees:      resm and resl are non-overlapping
                     resm = round-to-nearest(resm + resl)
 		    abs(resm) <= 2^(-49) * abs(resh)
@@ -131,13 +131,13 @@ extern void Recpr33(double* resh, double* resm, double* resl, double dh, double 
 
 /* Mul233
 
-   Procedure for multiplying a double double number by 
+   Procedure for multiplying a double double number by
    a triple double number resulting in a triple double number
 
 
    Arguments:       a double double number ah, al
                     a triple double number bh, bm, bl
-   
+
    Results:         a triple double number resh, resm, resl
 
    Preconditions:   abs(ah) > abs(al)
@@ -148,7 +148,7 @@ extern void Recpr33(double* resh, double* resm, double* resl, double dh, double 
 		    where
 		    b_o >= 2
 		    b_u >= 1
-		    
+
    Guarantees:      resm and resl are non-overlapping
                     resm = round-to-nearest(resm + resl)
 		    abs(resm) <= 2^(\gamma) * abs(resh)
@@ -156,8 +156,8 @@ extern void Recpr33(double* resh, double* resm, double* resl, double dh, double 
 		    \gamma >= min(48,b_o-4,b_o+b_u-4)
 		    resh+resm+resl=(ah+al) * (bh+bm+bl) * (1+eps)
 		    where
-		    abs(eps) <= 
-                       (2^(-99-b_o) + 2^(-99-b_o-b_u) + 2^(-152)) / 
+		    abs(eps) <=
+                       (2^(-99-b_o) + 2^(-99-b_o-b_u) + 2^(-152)) /
 		         (1 - 2^(-53) - 2^(-b_o+1) - 2^(-b_o-b_u+1))
 
    Details:         resh, resm and resl are considered to be pointers
@@ -192,7 +192,7 @@ extern void Recpr33(double* resh, double* resm, double* resl, double dh, double 
    Arguments:       two triple double numbers:
                     ah, am, al and
 		    bh, bm, bl
-   
+
    Results:         a triple double number resh, resm, resl
 
    Preconditions:   abs(bh) <= 0.75 * abs(ah)  OR  ( sign(bh) = sign(ah) AND abs(bh) <= abs(ah))  (i)
@@ -204,14 +204,14 @@ extern void Recpr33(double* resh, double* resm, double* resl, double dh, double 
 		    b_o >= a_o >= 4
 		    b_u >= a_u >= 4
 
-		    Condition (i) may not be respected if 
+		    Condition (i) may not be respected if
 		    one can assume in this case that ah=am=al=0
-		    
+
    Guarantees:      resm and resl are non-overlapping
                     resm = round-to-nearest(resm + resl)
 		    abs(resm) <= 2^(-min(a_o,b_o) + 5) * abs(resh)
 		    resh+resm+resl = (ah+am+al + bh+bm+bl) * (1+eps)
-                    where 
+                    where
 		    abs(eps) <= 2^(-min(a_o+a_u,b_o+b_u)-47) + 2^(-min(a_o,a_u)-98)
 
    Details:         resh, resm and resl are considered to be pointers
@@ -239,7 +239,7 @@ extern void Recpr33(double* resh, double* resm, double* resl, double dh, double 
    Arguments:       two triple double numbers:
                     ah, am, al and
 		    bh, bm, bl
-   
+
    Results:         a triple double number resh, resm, resl
 
    Preconditions:   abs(am) <= 2^(-a_o) * abs(ah)
@@ -250,9 +250,9 @@ extern void Recpr33(double* resh, double* resm, double* resl, double dh, double 
 		    b_o >= a_o >= 4
 		    b_u >= a_u >= 4
 
-		    Condition (i) may not be respected if 
+		    Condition (i) may not be respected if
 		    one can assume in this case that ah=am=al=0
-		    
+
    Guarantees:      TODO
    Details:         resh, resm and resl are considered to be pointers
 */
@@ -274,13 +274,13 @@ extern void Recpr33(double* resh, double* resm, double* resl, double dh, double 
 
 /* Add233
 
-   Procedure for adding a double double number to a triple 
+   Procedure for adding a double double number to a triple
    double number resulting in a triple double number
 
 
    Arguments:       a double double number ah, al
                     a triple double number bh, bm, bl
-   
+
    Results:         a triple double number resh, resm, resl
 
    Preconditions:   abs(ah) > abs(al)
@@ -292,7 +292,7 @@ extern void Recpr33(double* resh, double* resm, double* resl, double dh, double 
 		    where
 		    b_o >= 2
 		    b_u >= 1
-		    
+
    Guarantees:      resm and resl are non-overlapping
                     resm = round-to-nearest(resm + resl)
 		    abs(resm) <= 2^(\gamma) * abs(resh)
@@ -300,7 +300,7 @@ extern void Recpr33(double* resh, double* resm, double* resl, double dh, double 
 		    \gamma >= min(45,b_o-4,b_o+b_u-2)
 		    resh+resm+resl=((ah+al) + (bh+bm+bl)) * (1+eps)
 		    where
-		    abs(eps) <= 
+		    abs(eps) <=
                        <= 2^(-b_o-b_u-52) + 2^(-b_o-104) + 2^(-153)
 
    Details:         resh, resm and resl are considered to be pointers
@@ -319,27 +319,27 @@ extern void Recpr33(double* resh, double* resm, double* resl, double dh, double 
 
 /* Add123
 
-   Procedure for adding a double number to a double 
+   Procedure for adding a double number to a double
    double number resulting in a triple double number
 
 
-   Arguments:       a double number a 
+   Arguments:       a double number a
                     a double double number bh, bl
-   
+
    Results:         a triple double number resh, resm, resl
 
    Preconditions:   abs(bh) <= 2^(-2) * abs(a)
 		    abs(bl) <= 2^(-53) * abs(bh)
-		    
+
    Guarantees:      resm and resl are non-overlapping
                     resm = round-to-nearest(resm + resl)
 		    abs(resm) <= 2^(-\gamma) * abs(resh)
 		    where
-		    
+
 		    \gamma >= 52
 
 		    resh+resm+resl=(a + (bh+bm+bl)) exactly
-		    
+
 
    Details:         resh, resm and resl are considered to be pointers
 */
@@ -353,27 +353,27 @@ extern void Recpr33(double* resh, double* resm, double* resl, double dh, double 
 
 /* Add213
 
-   Procedure for adding a double double number to a double 
+   Procedure for adding a double double number to a double
    number resulting in a triple double number
 
 
-   Arguments:       a double double number ah, al 
+   Arguments:       a double double number ah, al
                     a double number b
-   
+
    Results:         a triple double number resh, resm, resl
 
    Preconditions:   abs(b) <= 2^(-2) * abs(ah)
 		    abs(al) <= 2^(-53) * abs(ah)
-		    
+
    Guarantees:      resm and resl are non-overlapping
                     resm = round-to-nearest(resm + resl)
 		    abs(resm) <= 2^(-\gamma) * abs(resh)
 		    where
-		    
+
 		    \gamma >= 52
 
 		    resh+resm+resl=(a + (bh+bm+bl)) exactly
-		    
+
 
    Details:         resh, resm and resl are considered to be pointers
 */
@@ -389,21 +389,21 @@ extern void Recpr33(double* resh, double* resm, double* resl, double dh, double 
 
 /* Add23
 
-   Procedure for adding a double-double number to a double-double 
+   Procedure for adding a double-double number to a double-double
    number resulting in a triple double number
 
 
    Arguments:       a double double number ah, al
                     a double double number bh, bl
-   
+
    Results:         a triple double number resh, resm, resl
 
    Preconditions:   abs(bh) <= 2^(-2) * abs(ah)
                     abs(al) <= 2^(-53) * abs(ah)
 		    abs(bl) <= 2^(-53) * abs(bh)
-		    
+
    Guarantees:      TO DO
-		    
+
 
    Details:         resh, resm and resl are considered to be pointers
 */
@@ -423,13 +423,13 @@ extern void Recpr33(double* resh, double* resm, double* resl, double dh, double 
 
 /* Add133
 
-   Procedure for adding a double number to a triple 
+   Procedure for adding a double number to a triple
    double number resulting in a triple double number
 
 
-   Arguments:       a double number a 
+   Arguments:       a double number a
                     a triple double number bh, bm, bl
-   
+
    Results:         a triple double number resh, resm, resl
 
    Preconditions:   abs(bh) <= 2^(-2) * abs(a)
@@ -438,7 +438,7 @@ extern void Recpr33(double* resh, double* resm, double* resl, double dh, double 
 		    where
 		    b_o >= 2
 		    b_u >= 1
-		    
+
    Guarantees:      resm and resl are non-overlapping
                     resm = round-to-nearest(resm + resl)
 		    abs(resm) <= 2^(\gamma) * abs(resh)
@@ -446,7 +446,7 @@ extern void Recpr33(double* resh, double* resm, double* resl, double dh, double 
 		    \gamma >= min(47,2-b_o,1-b_o-b_u)
 		    resh+resm+resl=(a + (bh+bm+bl)) * (1+eps)
 		    where
-		    abs(eps) <= 
+		    abs(eps) <=
                        <= 2^(-52-b_o-b_u) + 2^(-154)
 
 
@@ -464,13 +464,13 @@ extern void Recpr33(double* resh, double* resm, double* resl, double dh, double 
 
 /* Add133Cond
 
-   Procedure for adding a double number to a triple 
+   Procedure for adding a double number to a triple
    double number resulting in a triple double number
 
 
-   Arguments:       a double number a 
+   Arguments:       a double number a
                     a triple double number bh, bm, bl
-   
+
    Results:         a triple double number resh, resm, resl
 
    Preconditions:   abs(bm) <= 2^(-b_o) * abs(bh)
@@ -478,7 +478,7 @@ extern void Recpr33(double* resh, double* resm, double* resl, double dh, double 
 		    where
 		    b_o >= 2
 		    b_u >= 1
-		    
+
    Guarantees:      resm and resl are non-overlapping
                     resm = round-to-nearest(resm + resl)
 		    abs(resm) <= 2^(\gamma) * abs(resh)
@@ -488,7 +488,7 @@ extern void Recpr33(double* resh, double* resm, double* resl, double dh, double 
 
 		    resh+resm+resl=(a + (bh+bm+bl)) * (1+eps)
 		    where
-		    abs(eps) <= 
+		    abs(eps) <=
 
 		    TODO
 
@@ -509,13 +509,13 @@ extern void Recpr33(double* resh, double* resm, double* resl, double dh, double 
 
 /* Add233Cond
 
-   Procedure for adding a double double number to a triple 
+   Procedure for adding a double double number to a triple
    double number resulting in a triple double number
 
 
    Arguments:       a double double number ah, al
                     a triple double number bh, bm, bl
-   
+
    Results:         a triple double number resh, resm, resl
 
    Preconditions:   abs(ah) > abs(al)
@@ -526,7 +526,7 @@ extern void Recpr33(double* resh, double* resm, double* resl, double dh, double 
 		    where
 		    b_o >= 2
 		    b_u >= 1
-		    
+
    Guarantees:      resm and resl are non-overlapping
                     resm = round-to-nearest(resm + resl)
 		    abs(resm) <= 2^(\gamma) * abs(resh)
@@ -534,7 +534,7 @@ extern void Recpr33(double* resh, double* resm, double* resl, double dh, double 
 		    \gamma >= ????
 		    resh+resm+resl=((ah+al) + (bh+bm+bl)) * (1+eps)
 		    where
-		    abs(eps) <= 
+		    abs(eps) <=
                        <= ????
 
    Details:         resh, resm and resl are considered to be pointers
@@ -563,7 +563,7 @@ extern void Recpr33(double* resh, double* resm, double* resl, double dh, double 
    Arguments:       two triple double numbers:
                     ah, am, al and
 		    bh, bm, bl
-   
+
    Results:         a triple double number resh, resm, resl
 
    Preconditions:   abs(am) <= 2^(-a_o) * abs(ah)
@@ -574,16 +574,16 @@ extern void Recpr33(double* resh, double* resm, double* resl, double dh, double 
 		    b_o, a_o >= 5
 		    b_u, a_u >= 5
 
-		    
+
    Guarantees:      resm and resl are non-overlapping
                     resm = round-to-nearest(resm + resl)
 		    abs(resm) <= 2^(-g_o) * abs(resh)
 		    with
 		    g_o > min(48,-4+a_o,-4+b_o,-4+a_o-b_o)
 		    resh+resm+resl = (ah+am+al) * (bh+bm+bl) * (1+eps)
-                    where 
+                    where
 		    abs(eps) <= 2^-151 + 2^-99-a_o + 2^-99-b_o +
-		    + 2^-49-a_o-a_u + 2^-49-b_o-b_u + 2^50-a_o-b_o-b_u + 
+		    + 2^-49-a_o-a_u + 2^-49-b_o-b_u + 2^50-a_o-b_o-b_u +
 		    + 2^50-a_o-b_o-b_u + 2^-101-a_o-b_o + 2^-52-a_o-a_u-b_o-b_u
 
    Details:         resh, resm and resl are considered to be pointers
@@ -623,7 +623,7 @@ extern void Recpr33(double* resh, double* resm, double* resl, double dh, double 
 
    Arguments:       a double a
 		    a triple double bh, bm, bl
-   
+
    Results:         a triple double number resh, resm, resl
 
    Preconditions:   abs(bm) <= 2^(-b_o) * abs(bh)
@@ -632,14 +632,14 @@ extern void Recpr33(double* resh, double* resm, double* resl, double dh, double 
 		    b_o >= 2
 		    b_u >= 2
 
-		    
+
    Guarantees:      resm and resl are non-overlapping
                     resm = round-to-nearest(resm + resl)
 		    abs(resm) <= 2^(-g_o) * abs(resh)
 		    with
-		    g_o > min(47,-5-b_o,-5+b_o+b_u) 
+		    g_o > min(47,-5-b_o,-5+b_o+b_u)
 		    resh+resm+resl = a * (bh+bm+bl) * (1+eps)
-                    where 
+                    where
 		    abs(eps) <= 2^-49-b_o-b_u + 2^-101-b_o + 2^-156
 
    Details:         resh, resm and resl are considered to be pointers
@@ -665,16 +665,16 @@ extern void Recpr33(double* resh, double* resm, double* resl, double dh, double 
 
    Arguments:       a double a
 		    a double double bh, bl
-   
+
    Results:         a triple double number resh, resm, resl
-		    
+
    Guarantees:      resm and resl are non-overlapping
                     resm = round-to-nearest(resm + resl)
 		    abs(resm) <= 2^(-g_o) * abs(resh)
 		    with
-		    g_o > 47 
+		    g_o > 47
 		    resh+resm+resl = a * (bh+bm) * (1+eps)
-                    where 
+                    where
 		    abs(eps) <= 2^-154
 
    Details:         resh, resm and resl are considered to be pointers
@@ -699,15 +699,15 @@ extern void Recpr33(double* resh, double* resm, double* resl, double dh, double 
 
 
    Arguments:       a triple double number xh, xm, xl
-   
-   Results:         a double number xprime 
+
+   Results:         a double number xprime
                     returned by a return-statement
 
    Preconditions:   xh, xm and xl are non-overlapping
                     xm = RN(xm +math xl)
 		    xh != 0, xm != 0
 		    xl = 0 iff xm != +/- 0.5 * ulp(xh) (0.25 if xh = 2^e)
-		    		    
+
    Guarantees:      xprime = RN(xh + xm + xl)
 
    Sideeffects:     returns, i.e. leaves the function
@@ -747,12 +747,12 @@ extern void Recpr33(double* resh, double* resm, double* resl, double dh, double 
 
 
    Arguments:       a triple double number xh, xm, xl
-   
-   Results:         a double number xprime 
+
+   Results:         a double number xprime
                     returned by a return-statement
 
    Preconditions:   |xm + xl| <= 2^(-5) * |xh|
-		    		    
+
    Guarantees:      xprime = RN(xh + xm + xl)
 
    Sideeffects:     returns, i.e. leaves the function
@@ -786,8 +786,8 @@ extern void Recpr33(double* resh, double* resm, double* resl, double dh, double 
 
 
    Arguments:       a triple double number xh, xm, xl
-   
-   Results:         a double number xprime 
+
+   Results:         a double number xprime
                     returned by a return-statement
 
    Preconditions:   xh, xm and xl are non-overlapping
@@ -796,7 +796,7 @@ extern void Recpr33(double* resh, double* resm, double* resl, double dh, double 
 
 		    Exact algebraic images have already
 		    been filtered out.
-		    		    
+
    Guarantees:      xprime = RU(xh + xm + xl)
 
    Sideeffects:     returns, i.e. leaves the function
@@ -830,8 +830,8 @@ extern void Recpr33(double* resh, double* resm, double* resl, double dh, double 
 
 
    Arguments:       a triple double number xh, xm, xl
-   
-   Results:         a double number xprime 
+
+   Results:         a double number xprime
                     returned by a return-statement
 
    Preconditions:   xh, xm and xl are non-overlapping
@@ -840,7 +840,7 @@ extern void Recpr33(double* resh, double* resm, double* resl, double dh, double 
 
 		    Exact algebraic images have already
 		    been filtered out.
-		    		    
+
    Guarantees:      xprime = RD(xh + xm + xl)
 
    Sideeffects:     returns, i.e. leaves the function
@@ -874,8 +874,8 @@ extern void Recpr33(double* resh, double* resm, double* resl, double dh, double 
 
 
    Arguments:       a triple double number xh, xm, xl
-   
-   Results:         a double number xprime 
+
+   Results:         a double number xprime
                     returned by a return-statement
 
    Preconditions:   xh, xm and xl are non-overlapping
@@ -884,7 +884,7 @@ extern void Recpr33(double* resh, double* resm, double* resl, double dh, double 
 
 		    Exact algebraic images have already
 		    been filtered out.
-		    		    
+
    Guarantees:      xprime = RZ(xh + xm + xl)
 
    Sideeffects:     returns, i.e. leaves the function
@@ -922,14 +922,14 @@ extern void Recpr33(double* resh, double* resm, double* resl, double dh, double 
    Arguments:       a triple double number xh, xm, xl
                     a double constant wca representing 2^k
 		    where 2^-k is Lefevre's worst case accuracy
-   
-   Results:         a double number xprime 
+
+   Results:         a double number xprime
                     returned by a return-statement
 
    Preconditions:   xh, xm and xl are non-overlapping
                     xm = RN(xm +math xl)
 		    xh != 0, xm != 0
-		    		    
+
    Guarantees:      xprime = RU(xh + xm + xl)
 
    Sideeffects:     returns, i.e. leaves the function
@@ -968,14 +968,14 @@ extern void Recpr33(double* resh, double* resm, double* resl, double dh, double 
    Arguments:       a triple double number xh, xm, xl
                     a double constant wca representing 2^k
 		    where 2^-k is Lefevre's worst case accuracy
-   
-   Results:         a double number xprime 
+
+   Results:         a double number xprime
                     returned by a return-statement
 
    Preconditions:   xh, xm and xl are non-overlapping
                     xm = RN(xm +math xl)
 		    xh != 0, xm != 0
-		    		    
+
    Guarantees:      xprime = RD(xh + xm + xl)
 
    Sideeffects:     returns, i.e. leaves the function
@@ -1012,14 +1012,14 @@ extern void Recpr33(double* resh, double* resm, double* resl, double dh, double 
    Arguments:       a triple double number xh, xm, xl
                     a double constant wca representing 2^k
 		    where 2^-k is Lefevre's worst case accuracy
-   
-   Results:         a double number xprime 
+
+   Results:         a double number xprime
                     returned by a return-statement
 
    Preconditions:   xh, xm and xl are non-overlapping
                     xm = RN(xm +math xl)
 		    xh != 0, xm != 0
-		    		    
+
    Guarantees:      xprime = RZ(xh + xm + xl)
 
    Sideeffects:     returns, i.e. leaves the function
@@ -1040,15 +1040,15 @@ extern void Recpr33(double* resh, double* resm, double* resl, double dh, double 
 
 
    Arguments:       a triple double number xh, xm, xl
-   
-   Results:         a double number xprime 
+
+   Results:         a double number xprime
                     returned by a return-statement
 
    Preconditions:   xh, xm and xl are non-overlapping
                     xm = RN(xm +math xl)
 		    xh != 0, xm != 0
 		    xl = 0 iff xm != +/- 0.5 * ulp(xh) (0.25 if xh = 2^e)
-		    		    
+
    Guarantees:      xprime = RN(xh + xm + xl)
 
    Details:         res is considered to be a pointer
@@ -1089,8 +1089,8 @@ extern void Recpr33(double* resh, double* resm, double* resl, double dh, double 
 
 
    Arguments:       a triple double number xh, xm, xl
-   
-   Results:         a double number xprime 
+
+   Results:         a double number xprime
                     returned by a return-statement
 
    Preconditions:   xh, xm and xl are non-overlapping
@@ -1099,7 +1099,7 @@ extern void Recpr33(double* resh, double* resm, double* resl, double dh, double 
 
 		    Exact algebraic images have already
 		    been filtered out.
-		    		    
+
    Guarantees:      xprime = RU(xh + xm + xl)
 
    Details:         res is considered to be a pointer
@@ -1133,8 +1133,8 @@ extern void Recpr33(double* resh, double* resm, double* resl, double dh, double 
 
 
    Arguments:       a triple double number xh, xm, xl
-   
-   Results:         a double number xprime 
+
+   Results:         a double number xprime
                     returned by a return-statement
 
    Preconditions:   xh, xm and xl are non-overlapping
@@ -1143,7 +1143,7 @@ extern void Recpr33(double* resh, double* resm, double* resl, double dh, double 
 
 		    Exact algebraic images have already
 		    been filtered out.
-		    		    
+
    Guarantees:      xprime = RD(xh + xm + xl)
 
    Details:         res is considered to be a pointer
@@ -1177,8 +1177,8 @@ extern void Recpr33(double* resh, double* resm, double* resl, double dh, double 
 
 
    Arguments:       a triple double number xh, xm, xl
-   
-   Results:         a double number xprime 
+
+   Results:         a double number xprime
                     returned by a return-statement
 
    Preconditions:   xh, xm and xl are non-overlapping
@@ -1187,7 +1187,7 @@ extern void Recpr33(double* resh, double* resm, double* resl, double dh, double 
 
 		    Exact algebraic images have already
 		    been filtered out.
-		    		    
+
    Guarantees:      xprime = RZ(xh + xm + xl)
 
    Details:         res is considered to be a pointer
@@ -1218,12 +1218,12 @@ extern void Recpr33(double* resh, double* resm, double* resl, double dh, double 
 /* sqrt13
 
    Computes a triple-double approximation of sqrt(x)
-   
+
    Should be provable to be exact to at least 140 bits.
 
    Only handles the following special cases:
    - x == 0
-   - subnormal x 
+   - subnormal x
    The following cases are not handled:
    - x < 0
    - x = +/-Infty, NaN
@@ -1339,7 +1339,7 @@ extern void Recpr33(double* resh, double* resm, double* resl, double dh, double 
 /* recpr33()
 
    Computes a triple-double reciprocal of a triple-double
-   
+
    Should be provable to be exact to at least 140 bits
 
    No special case handling is done
