@@ -187,10 +187,11 @@ add_definitions(-DSCS_NB_WORDS=8 -DSCS_NB_BITS=30)
 
 include_directories(${PROJECT_SOURCE_DIR})
 
+enable_testing()
 add_subdirectory(tests)
 
 
-enable_testing()
+
 
 set(TEST_DIR ${PROJECT_SOURCE_DIR}/tests)
 

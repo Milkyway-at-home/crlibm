@@ -19,6 +19,11 @@
 #include <libmcr.h>
 #endif
 
+#if defined(_MSC_VER) || defined(__MINGW32__)
+  #define random rand
+#endif
+
+
 
 #define RN 1
 #define RU 2
