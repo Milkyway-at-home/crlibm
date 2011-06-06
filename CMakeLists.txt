@@ -1,10 +1,14 @@
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 2.6)
+project(crlibm C)
 
 include(CheckIncludeFile)
 include(CheckFunctionExists)
 
-project(crlibm C)
-message("Trying to build crlibm on an ${CMAKE_SYSTEM_PROCESSOR} under ${CMAKE_SYSTEM_NAME}, compiler is ${CMAKE_C_COMPILER}")
+option(CRLIBM_QUIET_BUILD "Quietly build" OFF)
+
+if(NOT CRLIBM_QUIET_BUILD)
+  message("Trying to build crlibm on an ${CMAKE_SYSTEM_PROCESSOR} under ${CMAKE_SYSTEM_NAME}, compiler is ${CMAKE_C_COMPILER}")
+endif()
 
 set(CMAKE_MODULE_PATH "${crlibm_SOURCE_DIR}/cmake_modules")
 
@@ -188,7 +192,7 @@ add_definitions(-DSCS_NB_WORDS=8 -DSCS_NB_BITS=30)
 include_directories(${PROJECT_SOURCE_DIR})
 
 enable_testing()
-add_subdirectory(tests)
+add_subdirectory(tests EXCLUDE_FROM_ALL)
 
 
 
@@ -258,6 +262,10 @@ endif()
 add_library(crlibm STATIC ${crlibm_src} ${crlibm_headers})
 
 set_target_properties(crlibm PROPERTIES PUBLIC_HEADER crlibm.h)
+
+if(CRLIBM_QUIET_BUILD)
+  set_target_properties(crlibm PROPERTIES COMPILE_FLAGS "-w")
+endif()
 
 install(TARGETS crlibm
         ARCHIVE       DESTINATION lib
