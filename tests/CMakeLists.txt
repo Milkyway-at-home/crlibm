@@ -30,3 +30,30 @@ include_directories(${PROJECT_SOURCE_DIR})
 link_directories(${PROJECT_SOURCE_DIR})
 target_link_libraries(blind_test crlibm m)
 
+set(test_data acos
+              acospi
+              asin
+              asinpi
+              atan
+              atanpi
+              cos
+              cosh
+              cospi
+              exp
+              expm1
+              log
+              log10
+              log1p
+              log2
+              pow
+              sin
+              sinh
+              sinpi
+              tan
+              tanpi)
+
+foreach(test ${test_data})
+  add_test(NAME ${test} COMMAND blind_test tests/${test_data}.testdata)
+endforeach()
+
+
